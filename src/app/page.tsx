@@ -1,8 +1,7 @@
-import React from 'react'
+import React from "react";
+import HomeView from "@/home/ui/views/home-view";
 
 const HomePage = () => {
-    return (
-        <div>HomePage</div>
-    )
-}
-export default HomePage
+  return <HomeView />;
+};
+export default HomePage;

@@ -7,6 +7,7 @@ export const users = defineTable({
   email: v.string(),
   phone: v.string(),
   externalId: v.optional(v.string()),
+  githubLink: v.optional(v.string()),
 })
   .index("by_externalId", ["externalId"])
   .index("by_email", ["email"])

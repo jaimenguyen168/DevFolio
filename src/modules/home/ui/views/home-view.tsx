@@ -2,9 +2,9 @@
 
 import React from "react";
 import { useQuery } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
-import { Id } from "../../../../convex/_generated/dataModel";
-import GameSection from "@/home/ui/components/GameSection";
+import { api } from "../../../../../convex/_generated/api";
+import { Id } from "../../../../../convex/_generated/dataModel";
+import GameSection from "@/modules/home/ui/components/GameSection";
 
 const HomeView = () => {
   const user = useQuery(api.functions.users.getUser, {
@@ -12,7 +12,7 @@ const HomeView = () => {
   });
 
   return (
-    <div className="flex-1 md:px-12 pb-16 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 lg:gap-8">
+    <div className="flex-1 px-12 pb-16 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 lg:gap-8">
       {/* Left Side - Intro */}
       <div className="col-span-1 flex flex-col justify-center items-start">
         <div className="mb-2 md:text-lg text-gray-400">Hi all. I am</div>

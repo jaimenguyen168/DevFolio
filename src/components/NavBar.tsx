@@ -40,15 +40,19 @@ const NavBar = () => {
     <nav className="flex items-center w-full border-b border-gray-700">
       {/* Desktop Navigation */}
       <div className="hidden lg:contents">
-        <div className="w-[300px] px-8 py-5 border-r border-gray-700 text-gray-400">
-          <Link href="/home">{user?.name}</Link>
-        </div>
+        <Link
+          href="/home"
+          className="w-[300px] px-8 py-5 border-r border-gray-700 text-gray-400 block"
+        >
+          {user?.name}
+        </Link>
 
-        {/* Main Navigation Links - Center */}
+        {/* Main Navigation Links */}
         <div className="flex flex-1">
           {mainNavLinks.map((link, index) => (
-            <button
+            <Link
               key={index}
+              href={link.href}
               onClick={() => setSelected(link.label)}
               className={`relative px-8 py-5 border-r border-gray-700 transition-colors ${
                 selected === link.label
@@ -56,18 +60,19 @@ const NavBar = () => {
                   : "text-gray-400 hover:text-white"
               }`}
             >
-              <Link href={link.href}>{link.label}</Link>
+              {link.label}
               {/* Orange bottom border for selected item */}
               {selected === link.label && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-400"></div>
               )}
-            </button>
+            </Link>
           ))}
         </div>
 
-        {/* Contact Link - Far Right */}
+        {/* Contact Link */}
         {contactLink && (
-          <button
+          <Link
+            href={contactLink.href}
             onClick={() => setSelected(contactLink.label)}
             className={`relative px-8 py-5 border-l border-gray-700 transition-colors ${
               selected === contactLink.label
@@ -75,12 +80,12 @@ const NavBar = () => {
                 : "text-gray-400 hover:text-white"
             }`}
           >
-            <Link href={contactLink.href}>{contactLink.label}</Link>
+            {contactLink.label}
             {/* Orange bottom border for selected contact */}
             {selected === contactLink.label && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-400"></div>
             )}
-          </button>
+          </Link>
         )}
       </div>
 

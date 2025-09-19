@@ -1,6 +1,7 @@
 import React from "react";
+import AboutMeView from "@/modules/about/ui/views/about-me-view";
 
 const AboutPage = () => {
-  return <div>AboutPage</div>;
+  return <AboutMeView />;
 };
 export default AboutPage;

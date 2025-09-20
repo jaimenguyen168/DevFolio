@@ -84,9 +84,12 @@ const CodeSnippets = () => {
                   searchKeymap: false,
                 }}
                 style={{
-                  fontSize: "12px",
+                  fontSize: "14px",
                   fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
+                  height: "100%",
+                  backgroundColor: "transparent",
                 }}
+                className="[&_.cm-editor]:!bg-transparent [&_.cm-focused]:!bg-transparent [&_.cm-gutters]:w-8 [&_.cm-gutters]:min-w-8 [&_.cm-gutters]:!bg-transparent [&_.cm-gutter]:!bg-transparent [&_.cm-lineNumbers]:!bg-transparent h-full"
               />
             </div>
           </div>

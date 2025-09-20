@@ -95,7 +95,7 @@ const AboutMeView = () => {
                 >
                   <span className="flex items-center">
                     <Folder size={16} className="mr-2" />
-                    <span className="text-md">education</span>
+                    <span className="text-md">_education</span>
                   </span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-1">
@@ -110,7 +110,7 @@ const AboutMeView = () => {
                       }`}
                     >
                       <File size={12} />
-                      <span className="text-sm">high-school.md</span>
+                      <span className="text-sm">_high-school.md</span>
                     </Button>
                     <Button
                       variant="ghost"
@@ -122,7 +122,7 @@ const AboutMeView = () => {
                       }`}
                     >
                       <File size={12} />
-                      <span className="text-sm">university.md</span>
+                      <span className="text-sm">_university.md</span>
                     </Button>
                   </div>
                 </AccordionContent>
@@ -136,7 +136,7 @@ const AboutMeView = () => {
       <AccordionItem value="contacts" className="border-gray-700">
         <AccordionTrigger className="flex items-center space-x-2 text-white hover:text-orange-400 transition-colors hover:no-underline py-3.5 border-b border-gray-700 rounded-none px-4">
           <span className="flex items-center">
-            <User size={16} className="mr-2" /> contact
+            <User size={16} className="mr-2" /> _contact
           </span>
         </AccordionTrigger>
         <AccordionContent className="pb-2">

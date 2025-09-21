@@ -293,9 +293,9 @@ const SnakeGame = ({ onWin, onPlayAgain }: SnakeGameProps) => {
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                 <div className="text-center">
                   <div className="text-teal-400 text-lg font-bold mb-2">
-                    Snake Game
+                    Let&apos;s play Snake!
                   </div>
-                  <div className="text-gray-300 text-xs mb-2">
+                  <div className="text-gray-300 text-sm mb-2">
                     Press start to begin
                   </div>
                 </div>
@@ -380,8 +380,8 @@ const SnakeGame = ({ onWin, onPlayAgain }: SnakeGameProps) => {
             </div>
 
             {!gameStarted && (
-              <h3 className="text-teal-300 font-semibold text-lg mb-3 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                Let&apos;s Play!
+              <h3 className="text-teal-300 rotate-24 font-black text-3xl mb-3 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center animate-pulse">
+                ?!
               </h3>
             )}
           </div>
@@ -390,7 +390,7 @@ const SnakeGame = ({ onWin, onPlayAgain }: SnakeGameProps) => {
         {/* Score Section */}
         <div>
           <h3 className="text-teal-300 font-semibold text-lg mb-3">
-            Score: <span className="font-black">{score}</span>
+            Score: <span className="font-black text-orange-400">{score}</span>
           </h3>
         </div>
 

@@ -12,7 +12,7 @@ const HomeView = () => {
   });
 
   return (
-    <div className="flex-1 px-12 pb-16 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 lg:gap-8">
+    <div className="flex-1 px-12 pb-16 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 lg:gap-8">
       {/* Left Side - Intro */}
       <div className="col-span-1 flex flex-col justify-center items-start">
         <div className="mb-2 md:text-lg text-gray-400">Hi all. I am</div>
@@ -25,21 +25,26 @@ const HomeView = () => {
 
         {/* Code Comment Style Info */}
         <div className="space-y-2 text-gray-500 text-sm md:text-base">
-          <div className="hidden lg:block">
-            // complete the game to continue
-          </div>
+          <div className="hidden lg:block">// win the game for a surprise</div>
           <div>// find my profile on Github:</div>
           <div className="flex flex-wrap items-center space-x-2 space-y-2 break-all">
             <span className="text-indigo-500">const</span>
             <span className="text-orange-300">githubLink</span>
             <span className="text-white">=</span>
-            <span className="text-green-400 break-all">{user?.githubLink}</span>
+            <a
+              href={user?.githubLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-400 break-all mb-1.5 hover:text-green-300 hover:underline cursor-pointer transition-colors"
+            >
+              {user?.githubLink}
+            </a>
           </div>
         </div>
       </div>
 
       {/* Right Side - Game Section */}
-      <div className="hidden lg:block max-w-lg">
+      <div className="hidden lg:block max-w-2xl">
         <GameSection />
       </div>
     </div>

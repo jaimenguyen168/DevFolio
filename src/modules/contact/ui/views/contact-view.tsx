@@ -289,7 +289,7 @@ button.addEventListener('click', () => {
         <div className="flex flex-col lg:flex-row flex-1 w-full min-h-0">
           {/* Middle Section - Contact Form */}
           <div className="w-full lg:w-1/2 border-b lg:border-b-0 lg:border-r border-gray-700 flex flex-col p-8 xl:p-16 2xl:p-28 flex-shrink-0">
-            <div className="lg:w-[500px] w-full" />
+            <div className="lg:w-[500px] 2xl:w-[1600px] w-full" />
             {submitStatus === "success" ? (
               <EmailSuccessView onPress={handleSendNewMessage} />
             ) : (

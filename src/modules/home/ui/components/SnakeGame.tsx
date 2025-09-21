@@ -326,7 +326,7 @@ const SnakeGame = ({ onWin, onPlayAgain }: SnakeGameProps) => {
           </div>
 
           {/* Game Controls */}
-          <div className="flex justify-between">
+          <div className="flex justify-between pt-3">
             <Button
               onClick={startGame}
               className="bg-orange-400 hover:bg-orange-300 text-white px-3 py-2 rounded transition-colors text-sm"
@@ -385,13 +385,13 @@ const SnakeGame = ({ onWin, onPlayAgain }: SnakeGameProps) => {
               </h3>
             )}
           </div>
-        </div>
 
-        {/* Score Section */}
-        <div>
-          <h3 className="text-teal-300 font-semibold text-lg mb-3">
-            Score: <span className="font-black text-orange-400">{score}</span>
-          </h3>
+          {/* Score Section */}
+          <div className="bg-slate-800/50 rounded-lg p-4 border border-teal-500/30 mt-6">
+            <h3 className="text-teal-300 font-semibold text-lg ">
+              Score: <span className="font-black text-orange-400">{score}</span>
+            </h3>
+          </div>
         </div>
 
         {/* Controls */}

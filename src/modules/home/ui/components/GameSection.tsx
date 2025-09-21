@@ -5,6 +5,7 @@ import SnakeGame from "./SnakeGame";
 import { FORTUNE_QUOTES } from "@/modules/home/constants";
 import WordSearch from "@/modules/home/ui/components/WordSearch";
 import { Button } from "@/components/ui/button";
+import BreakoutGame from "@/modules/home/ui/components/BreakoutGame";
 
 const GAMES = [
   {
@@ -22,11 +23,11 @@ const GAMES = [
   //   name: "Tetris",
   //   component: TetrisGame,
   // },
-  // {
-  //   id: "puzzle",
-  //   name: "Puzzle Game",
-  //   component: PuzzleGame,
-  // },
+  {
+    id: "breakout",
+    name: "Breakout Game",
+    component: BreakoutGame,
+  },
 ];
 
 const GameSection = () => {
@@ -65,7 +66,7 @@ const GameSection = () => {
 
   return (
     <div className="flex-1 w-full">
-      <div className="bg-gradient-to-br from-teal-500/20 to-blue-600/20 backdrop-blur-sm border border-teal-500/30 rounded-lg p-6 relative">
+      <div className="bg-gradient-to-br from-teal-500/20 to-blue-600/20 backdrop-blur-sm border border-teal-500/30 rounded-lg p-6 relative h-[570px] ">
         <Nail location="top-left" />
         <Nail location="top-right" />
         <Nail location="bottom-left" />

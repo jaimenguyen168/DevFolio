@@ -405,15 +405,19 @@ const WordSearch = ({ onWin, onPlayAgain }: WordSearchProps) => {
         </div>
 
         {/* Score Section */}
-        <div className="bg-slate-800/50 rounded-lg p-4 border border-teal-500/30">
-          <h3 className="text-teal-300 font-semibold text-lg mb-3">
-            Score: <span className="font-black text-orange-400">{score}</span>
-          </h3>
-          <div className="space-y-1 text-sm text-gray-400">
-            <div>
-              Found: {foundWords.size}/{gameData.selectedWords.length}
+        <div className="flex flex-col space-y-2">
+          <div className="bg-slate-800/50 rounded-lg p-4 border border-teal-500/30">
+            <h3 className="text-teal-300 font-semibold text-lg mb-3">
+              Score: <span className="font-black text-orange-400">{score}</span>
+            </h3>
+            <div className="space-y-1 text-sm text-gray-400">
+              <div>
+                Found: {foundWords.size}/{gameData.selectedWords.length}
+              </div>
             </div>
           </div>
+
+          <DiagonalFinger />
         </div>
       </div>
     </div>
@@ -421,3 +425,32 @@ const WordSearch = ({ onWin, onPlayAgain }: WordSearchProps) => {
 };
 
 export default WordSearch;
+
+const DiagonalFinger = () => {
+  return (
+    <div className="text-xs text-white/60 mt-2 flex items-center gap-3">
+      <span
+        className="text-2xl animate-bounce inline-block pt-1"
+        style={{
+          animation: "moveDiagonal 2s ease-in-out infinite",
+          transformOrigin: "center",
+        }}
+      >
+        👆
+      </span>
+      <span>Drag and drop to find words</span>
+
+      <style jsx>{`
+        @keyframes moveDiagonal {
+          0%,
+          100% {
+            transform: translate(0, 0) rotate(-30deg);
+          }
+          50% {
+            transform: translate(8px, -4px) rotate(15deg);
+          }
+        }
+      `}</style>
+    </div>
+  );
+};

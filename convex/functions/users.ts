@@ -1,4 +1,4 @@
-import { query } from "../_generated/server";
+import { mutation, query } from "../_generated/server";
 import { ConvexError, v } from "convex/values";
 
 export const getUser = query({
@@ -86,5 +86,43 @@ export const searchUsers = query({
         q.gte("username", searchTerm).lt("username", searchTerm + "\uFFFF"),
       )
       .take(10);
+  },
+});
+
+export const updateUser = mutation({
+  args: {
+    updates: v.object({
+      name: v.optional(v.string()),
+      email: v.optional(v.string()),
+      title: v.optional(v.string()),
+      username: v.optional(v.string()),
+      phone: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "Must be logged in to update user",
+      });
+    }
+
+    const currentUser = await ctx.db
+      .query("users")
+      .withIndex("by_external_id", (q) => q.eq("externalId", identity.subject))
+      .unique();
+
+    if (!currentUser) {
+      throw new ConvexError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      });
+    }
+
+    await ctx.db.patch(currentUser._id, args.updates);
+
+    return await ctx.db.get(currentUser._id);
   },
 });

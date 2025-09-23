@@ -9,6 +9,7 @@ import { useQuery } from "convex/react";
 import { useUsername } from "@/components/UsernameProvider";
 import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import Terminal from "@/components/Terminal";
 
 const Footer = () => {
   const { username } = useUsername();
@@ -55,9 +56,7 @@ const Footer = () => {
         <div className="flex items-center justify-end text-gray-400 space-x-4 p-4 flex-none md:flex-1">
           {isCurrentUser && (
             <>
-              <button className="hover:bg-gray-700 p-1 rounded">
-                <TerminalSquare size={24} />
-              </button>
+              <Terminal />
               <UserButton />
             </>
           )}

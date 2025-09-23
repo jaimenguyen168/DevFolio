@@ -38,10 +38,7 @@ export const isCurrentUser = query({
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "You are not authenticated",
-      });
+      return null;
     }
 
     const currentUser = await ctx.db

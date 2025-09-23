@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { FaGithub } from "react-icons/fa";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { linkConfigs } from "@/constants/linkConfigs";
-import { Code, Coffee, ExternalLink, Terminal } from "lucide-react";
+import { ExternalLink, TerminalSquare } from "lucide-react";
 import { useQuery } from "convex/react";
 import { useUsername } from "@/components/UsernameProvider";
 import { UserButton } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
 
 const Footer = () => {
   const { username } = useUsername();
@@ -53,9 +53,16 @@ const Footer = () => {
         </div>
 
         <div className="flex items-center justify-end text-gray-400 space-x-4 p-4 flex-none md:flex-1">
-          {isCurrentUser && <UserButton />}
+          {isCurrentUser && (
+            <>
+              <button className="hover:bg-gray-700 p-1 rounded">
+                <TerminalSquare size={24} />
+              </button>
+              <UserButton />
+            </>
+          )}
 
-          <span className="self-end">© {new Date().getFullYear()}</span>
+          <span>© {new Date().getFullYear()}</span>
         </div>
       </div>
     </div>

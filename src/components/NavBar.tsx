@@ -44,6 +44,10 @@ const NavBar = () => {
     link.label.includes("_contact-me"),
   );
 
+  if (user === undefined) {
+    return null;
+  }
+
   return (
     <nav className="flex items-center w-full border-b border-gray-700">
       {/* Desktop Navigation */}

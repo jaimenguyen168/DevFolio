@@ -8,8 +8,10 @@ interface HomePageProps {
 const HomePage = async ({ params }: HomePageProps) => {
   const { username } = await params;
 
-  console.log(username);
+  if (!username) {
+    return null;
+  }
 
-  return <HomeView />;
+  return <HomeView username={username} />;
 };
 export default HomePage;

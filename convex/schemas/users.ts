@@ -5,14 +5,15 @@ export const users = defineTable({
   name: v.string(),
   email: v.string(),
   title: v.optional(v.string()),
-  username: v.optional(v.string()),
+  username: v.string(),
   imageUrl: v.optional(v.string()),
   phone: v.optional(v.string()),
   externalId: v.optional(v.string()),
 })
   .index("by_external_id", ["externalId"])
   .index("by_email", ["email"])
-  .index("by_phone", ["phone"]);
+  .index("by_phone", ["phone"])
+  .index("by_username", ["username"]);
 
 export const userLinks = defineTable({
   userId: v.id("users"),

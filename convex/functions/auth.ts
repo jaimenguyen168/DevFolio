@@ -9,7 +9,9 @@ export const upsertFromClerk = internalMutation({
     const firstName = data.first_name || "User";
     const lastName = data.last_name || "";
     const fullName = `${firstName} ${lastName}`.trim();
-    const username = `${firstName.toLowerCase()}-${lastName.toLowerCase()}`;
+
+    const randomNumber = Math.floor(Math.random() * 9000);
+    const username = `${firstName.toLowerCase()}-${lastName.toLowerCase()}-${randomNumber}`;
 
     const userAttributes = {
       username: username,

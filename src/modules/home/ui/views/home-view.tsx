@@ -8,23 +8,18 @@ import NotFoundView from "@/modules/auth/ui/views/not-found-view";
 
 interface HomeViewProps {
   username: string;
-  isProtected?: boolean;
 }
 
-const HomeView = ({ username, isProtected }: HomeViewProps) => {
+const HomeView = ({ username }: HomeViewProps) => {
   const user = useQuery(api.functions.users.getUser, {
     username: username,
   });
 
-  console.log(JSON.stringify(username, null, 2));
-
   if (user === undefined) {
-    // Still loading
     return <div>Loading...</div>;
   }
 
   if (user === null) {
-    // User not found - show 404 view
     return <NotFoundView />;
   }
 
@@ -38,7 +33,7 @@ const HomeView = ({ username, isProtected }: HomeViewProps) => {
             {user?.name}
           </h1>
           <div className="text-lg md:text-2xl text-indigo-500 mb-16">
-            &gt; {user?.title}
+            &gt; {user?.title || "No Title"}
           </div>
 
           {/* Code Comment Style Info */}

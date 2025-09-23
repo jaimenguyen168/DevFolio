@@ -71,3 +71,23 @@ export const getUserLinks = query({
       .collect();
   },
 });
+
+export const searchUsers = query({
+  args: {
+    searchTerm: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (!args.searchTerm.trim()) {
+      return [];
+    }
+
+    const searchTerm = args.searchTerm.toLowerCase();
+
+    return await ctx.db
+      .query("users")
+      .withIndex("by_username", (q) =>
+        q.gte("username", searchTerm).lt("username", searchTerm + "\uFFFF"),
+      )
+      .take(10);
+  },
+});

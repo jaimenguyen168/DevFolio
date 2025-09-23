@@ -26,6 +26,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import EmailSuccessView from "@/modules/contact/ui/components/EmailSuccessView";
+import { useQuery } from "convex/react";
+import { api } from "../../../../../convex/_generated/api";
+import NotFoundView from "@/modules/auth/ui/views/not-found-view";
 
 const contactFormSchema = z.object({
   name: z
@@ -41,7 +44,15 @@ const contactFormSchema = z.object({
 
 type ContactFormData = z.infer<typeof contactFormSchema>;
 
-const ContactView = () => {
+interface ContactViewProps {
+  username: string;
+}
+
+const ContactView = ({ username }: ContactViewProps) => {
+  const user = useQuery(api.functions.users.getUser, {
+    username: username,
+  });
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "success" | "error"
@@ -119,28 +130,16 @@ const ContactView = () => {
 
     return `/**
  * Contact Form Handler
- * Please send me your message via email or phone number to connect with me
- * Email: jaimenguyen168@gmail.com | Phone: +3598246359
+ * Please send me your message to connect with me
 */
+const button = document.getElementById('submit-button');
 
-const message = {${
-      watchedValues.name
-        ? `
-  name: "${watchedValues.name}",`
-        : ""
-    }${
-      watchedValues.email
-        ? `
-  email: "${watchedValues.email}",`
-        : ""
-    }${
-      watchedValues.message
-        ? `
-  message: "${watchedValues.message}",`
-        : ""
-    }
-  date: "${date}"
-}
+const message = {${`
+  name: "${watchedValues.name}",
+  email: "${watchedValues.email}",
+  message: "${watchedValues.message}",
+  date: "${date}",
+}`}
 
 button.addEventListener('click', () => {
   form.send(message);
@@ -167,16 +166,18 @@ button.addEventListener('click', () => {
                 className="text-gray-200 justify-start p-0"
               >
                 <Mail size={14} className="mr-2" />
-                <span className="text-sm">jaimenguyen168@gmail.com</span>
+                <span className="text-sm">{user?.email}</span>
               </Button>
-              <Button
-                variant="ghost"
-                className="text-gray-200 justify-start p-0"
-                disabled
-              >
-                <Phone size={14} className="mr-2" />
-                <span className="text-sm">+3598246359</span>
-              </Button>
+              {user?.phone && (
+                <Button
+                  variant="ghost"
+                  className="text-gray-200 justify-start p-0"
+                  disabled
+                >
+                  <Phone size={14} className="mr-2" />
+                  <span className="text-sm">{user.phone}</span>
+                </Button>
+              )}
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -224,6 +225,14 @@ button.addEventListener('click', () => {
       </Accordion>
     </div>
   );
+
+  if (user === undefined) {
+    return null;
+  }
+
+  if (!user) {
+    return <NotFoundView />;
+  }
 
   return (
     <div className="flex flex-col sm:flex-row h-full relative flex-1">
@@ -309,7 +318,7 @@ button.addEventListener('click', () => {
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Jonathan Davis"
+                            placeholder="John Doe"
                             {...field}
                             className="bg-slate-800 border-gray-600 text-white placeholder-gray-400 focus-visible:ring-orange-400 focus-visible:border-orange-400 text-sm w-full"
                           />
@@ -331,7 +340,7 @@ button.addEventListener('click', () => {
                         <FormControl>
                           <Input
                             type="email"
-                            placeholder="jonathan-davis@gmail.com"
+                            placeholder="john-doe@gmail.com"
                             {...field}
                             className="bg-slate-800 border-gray-600 text-white placeholder-gray-400 focus-visible:ring-orange-400 focus-visible:border-orange-400 text-sm"
                           />
@@ -383,8 +392,8 @@ button.addEventListener('click', () => {
           </div>
 
           {/* Right Section - Code Mirror */}
-          <div className="flex-1 lg:w-1/2 w-full flex flex-col min-h-[400px] lg:min-h-0 flex-shrink-0">
-            <div className="flex-1 min-h-0 p-4 w-full">
+          <div className="flex-1 lg:w-1/2 w-full flex flex-col min-h-[400px] lg:min-h-0 flex-shrink-0 p-8 xl:p-16 2xl:p-28 ">
+            <div className="flex-1 min-h-0 w-full">
               <CodeMirror
                 value={generateCode()}
                 theme={oneDark}

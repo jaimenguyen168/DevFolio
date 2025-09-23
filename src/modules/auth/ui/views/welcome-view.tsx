@@ -1,14 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, Code, User, ArrowRight, Globe } from "lucide-react";
-import { SignIn } from "@clerk/nextjs";
 import {
   Command,
   CommandEmpty,
-  CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from "@/components/ui/command";
 import {
@@ -20,35 +17,141 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { FaGithub } from "react-icons/fa";
-
-// Mock data - replace with actual API calls
-const mockPortfolios = [
-  { id: 1, name: "john_doe", title: "Full Stack Developer", projects: 12 },
-  { id: 2, name: "jane_smith", title: "Frontend Specialist", projects: 8 },
-  { id: 3, name: "alex_chen", title: "Backend Engineer", projects: 15 },
-  { id: 4, name: "maria_garcia", title: "UI/UX Designer", projects: 10 },
-  { id: 5, name: "david_kim", title: "DevOps Engineer", projects: 6 },
-];
+import { useQuery } from "convex/react";
+import { api } from "../../../../../convex/_generated/api";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 const WelcomeView = () => {
-  const [showSignIn, setShowSignIn] = useState(false);
+  const router = useRouter();
+  const { isSignedIn } = useAuth();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [debouncedSearchValue, setDebouncedSearchValue] = useState("");
 
-  const filteredPortfolios = mockPortfolios.filter(
-    (portfolio) =>
-      portfolio.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      portfolio.title.toLowerCase().includes(searchValue.toLowerCase()),
+  const user = useQuery(api.functions.users.getCurrentUser, {});
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchValue(searchValue.trim());
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchValue]);
+
+  const searchResults = useQuery(
+    api.functions.users.searchUsers,
+    debouncedSearchValue ? { searchTerm: debouncedSearchValue } : "skip",
   );
 
+  const handleUserSelect = (username: string) => {
+    window.location.href = `/${username}`;
+    setSearchOpen(false);
+    setSearchValue("");
+  };
+
+  const handleGetStarted = () => {
+    if (isSignedIn) {
+      router.push(`/${user?.username}`);
+    } else {
+      router.push("/sign-in");
+    }
+  };
+
+  const renderSearchContent = () => {
+    if (!searchValue.trim()) {
+      return (
+        <CommandEmpty className="text-gray-400 py-8 text-center">
+          <div className="flex flex-col items-center space-y-2">
+            <Search className="text-gray-500" size={32} />
+            <p>Type a username to search for portfolios</p>
+            <p className="text-sm text-gray-500">
+              Example: johndoe, alice_dev, etc.
+            </p>
+          </div>
+        </CommandEmpty>
+      );
+    }
+
+    if (debouncedSearchValue && searchResults === undefined) {
+      return (
+        <CommandEmpty className="text-gray-400 py-8 text-center">
+          <div className="flex flex-col items-center space-y-2">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-400"></div>
+            <p>Searching for "{debouncedSearchValue}"...</p>
+          </div>
+        </CommandEmpty>
+      );
+    }
+
+    // Show no results found
+    if (debouncedSearchValue && searchResults && searchResults.length === 0) {
+      return (
+        <CommandEmpty className="text-gray-400 py-8 text-center">
+          <div className="flex flex-col items-center space-y-2">
+            <User className="text-gray-500" size={32} />
+            <p>No portfolio found for "{debouncedSearchValue}"</p>
+            <p className="text-sm text-gray-500">
+              Try a different username or check the spelling
+            </p>
+          </div>
+        </CommandEmpty>
+      );
+    }
+
+    if (searchResults && searchResults.length > 0) {
+      return (
+        <div className="space-y-2">
+          {searchResults.map((user) => (
+            <button
+              key={user._id}
+              className="text-gray-300 hover:bg-slate-700 cursor-pointer p-3 rounded-md transition-colors flex items-center justify-between flex-1 w-full "
+              onClick={() => handleUserSelect(user.username)}
+            >
+              <div className="flex items-center space-x-6">
+                <User className="text-indigo-400" size={32} />
+                <div className="flex flex-col justify-start items-start">
+                  <div className="font-semibold text-white">
+                    {user.name || user.username}
+                  </div>
+                  <div className="text-sm text-gray-400">@{user.username}</div>
+                </div>
+              </div>
+
+              <div className="font-semibold text-orange-300">View</div>
+            </button>
+          ))}
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-8">
-      <div className="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 font-mono border border-gray-700 rounded-lg overflow-hidden w-full max-w-6xl h-[90vh] flex flex-col">
+    <div className="h-screen bg-black p-8">
+      <div className="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 font-mono border border-gray-700 rounded-lg overflow-hidden h-full flex flex-col">
         {/* Header */}
-        <div className="border-b border-gray-700 p-6">
+        <div className="border-b border-gray-700 p-6 flex items-center justify-between">
           <div className="flex items-center space-x-2 text-gray-400">
             <Code size={24} />
-            <span className="text-lg">DevPortfolio</span>
+            <span className="text-lg">DevFolio</span>
+          </div>
+
+          <div className="flex items-center space-x-2 text-gray-400">
+            <span className="text-gray-400">Built with</span>
+            <span className="text-orange-400 font-bold">Next.js</span>
+            <button
+              className="p-1 cursor-pointer"
+              onClick={() =>
+                window.open(
+                  "https://github.com/jaimenguyen168/Dev-Portfolio",
+                  "_blank",
+                )
+              }
+            >
+              <FaGithub size={28} />
+            </button>
           </div>
         </div>
 
@@ -58,7 +161,7 @@ const WelcomeView = () => {
             <div className="mb-12">
               <div className="mb-4 text-gray-400 text-lg">Welcome to</div>
               <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Dev Portfolio
+                DevFolio
               </h1>
               <div className="text-xl md:text-2xl text-indigo-500 mb-8">
                 &gt; showcase your coding journey
@@ -98,98 +201,43 @@ const WelcomeView = () => {
                     />
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 border-gray-700 font-mono max-w-2xl">
+
+                <DialogContent className="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 border-gray-700 font-mono max-w-3xl">
                   <DialogHeader>
-                    <DialogTitle className="text-white font-mono text-xl">
+                    <DialogTitle className="text-white font-mono text-lg ">
                       // search portfolios
                     </DialogTitle>
                   </DialogHeader>
-                  <Command className="bg-transparent">
+                  <Command className="bg-transparent" shouldFilter={false}>
                     <CommandInput
-                      placeholder="Search by username or title..."
+                      placeholder="Enter username to search..."
                       value={searchValue}
                       onValueChange={setSearchValue}
-                      className="border-gray-600 bg-slate-800 text-white placeholder:text-gray-500"
+                      className="text-white"
                     />
                     <CommandList className="max-h-80">
-                      <CommandEmpty className="text-gray-400 py-6 text-center">
-                        No portfolios found.
-                      </CommandEmpty>
-                      <CommandGroup>
-                        {filteredPortfolios.map((portfolio) => (
-                          <CommandItem
-                            key={portfolio.id}
-                            className="text-gray-300 hover:bg-slate-700 cursor-pointer p-4"
-                            onSelect={() => {
-                              // Handle portfolio selection - navigate to portfolio
-                              console.log(
-                                `Navigate to portfolio: ${portfolio.name}`,
-                              );
-                              setSearchOpen(false);
-                            }}
-                          >
-                            <div className="flex items-center space-x-3 w-full">
-                              <User className="text-indigo-400" size={20} />
-                              <div className="flex-1">
-                                <div className="font-semibold text-white">
-                                  {portfolio.name}
-                                </div>
-                                <div className="text-sm text-gray-400">
-                                  {portfolio.title}
-                                </div>
-                              </div>
-                              <div className="text-xs text-orange-300">
-                                {portfolio.projects} projects
-                              </div>
-                            </div>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
+                      {renderSearchContent()}
                     </CommandList>
                   </Command>
                 </DialogContent>
               </Dialog>
 
               {/* Get Started */}
-              <Dialog open={showSignIn} onOpenChange={setShowSignIn}>
-                <DialogTrigger asChild>
-                  <Button
-                    size="lg"
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-6 text-lg font-mono transition-all duration-300 group"
-                  >
-                    <Code
-                      className="mr-3 group-hover:rotate-12 transition-transform"
-                      size={20}
-                    />
-                    Get Started
-                    <ArrowRight
-                      className="ml-3 group-hover:translate-x-1 transition-transform"
-                      size={20}
-                    />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 border-gray-700 font-mono max-w-md">
-                  <DialogHeader className="mb-4">
-                    <DialogTitle className="text-white font-mono text-xl text-center">
-                      // join the community
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="flex justify-center">
-                    // In your WelcomeView, replace the SignIn component with:
-                    <div className="text-center">
-                      <p className="text-gray-400 mb-4">
-                        Ready to get started?
-                      </p>
-                      <Button
-                        onClick={() => (window.location.href = "/sign-in")}
-                        className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-6 text-lg font-mono"
-                      >
-                        Sign In / Sign Up
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-6 text-lg font-mono transition-all duration-300 group"
+                onClick={handleGetStarted}
+              >
+                <Code
+                  className="mr-3 group-hover:rotate-12 transition-transform"
+                  size={20}
+                />
+                Get Started
+                <ArrowRight
+                  className="ml-3 group-hover:translate-x-1 transition-transform"
+                  size={20}
+                />
+              </Button>
             </div>
 
             {/* Features Preview */}

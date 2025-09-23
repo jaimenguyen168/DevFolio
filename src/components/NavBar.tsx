@@ -30,8 +30,19 @@ const NavBar = () => {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  const mainNavLinks = navLinks.filter((link) => link.label !== "_contact-me");
-  const contactLink = navLinks.find((link) => link.label === "_contact-me");
+  const createNavLinks = (username: string) =>
+    navLinks.map((link) => ({
+      ...link,
+      href: `/${username}${link.href}`,
+    }));
+
+  const navigationLinks = username ? createNavLinks(username) : [];
+  const mainNavLinks = navigationLinks.filter(
+    (link) => !link.label.includes("_contact-me"),
+  );
+  const contactLink = navigationLinks.find((link) =>
+    link.label.includes("_contact-me"),
+  );
 
   return (
     <nav className="flex items-center w-full border-b border-gray-700">

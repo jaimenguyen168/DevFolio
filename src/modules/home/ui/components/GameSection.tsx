@@ -66,7 +66,9 @@ const GameSection = () => {
 
   return (
     <div className="flex-1 w-full">
-      <div className="bg-gradient-to-br from-teal-500/20 to-blue-600/20 backdrop-blur-sm border border-teal-500/30 rounded-lg p-6 relative h-[570px] ">
+      <div
+        className={`bg-gradient-to-br from-teal-500/20 to-blue-600/20 backdrop-blur-sm border border-teal-500/30 rounded-lg p-6 relative ${hasWon ? "" : "h-[570px]"}`}
+      >
         <Nail location="top-left" />
         <Nail location="top-right" />
         <Nail location="bottom-left" />

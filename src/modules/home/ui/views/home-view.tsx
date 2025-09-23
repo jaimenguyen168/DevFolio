@@ -3,13 +3,25 @@
 import React from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
-import { Id } from "../../../../../convex/_generated/dataModel";
 import GameSection from "@/modules/home/ui/components/GameSection";
+import NotFoundView from "@/modules/auth/ui/views/not-found-view";
 
-const HomeView = () => {
+interface HomeViewProps {
+  username: string;
+}
+
+const HomeView = ({ username }: HomeViewProps) => {
   const user = useQuery(api.functions.users.getUser, {
-    userId: "j97dbdkdcgqh3qzspzj8ffwwgh7qr86b" as Id<"users">,
+    username: username,
   });
+
+  if (user === undefined) {
+    return <div>Loading...</div>;
+  }
+
+  if (user === null) {
+    return <NotFoundView />;
+  }
 
   return (
     <div className="flex-1 px-12 pb-16 max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 xl:gap-16">
@@ -21,7 +33,7 @@ const HomeView = () => {
             {user?.name}
           </h1>
           <div className="text-lg md:text-2xl text-indigo-500 mb-16">
-            &gt; {user?.title}
+            &gt; {user?.title || "No Title"}
           </div>
 
           {/* Code Comment Style Info */}
@@ -34,14 +46,14 @@ const HomeView = () => {
               <span className="text-indigo-500">const</span>
               <span className="text-orange-300">githubLink</span>
               <span className="text-white">=</span>
-              <a
-                href={user?.githubLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-green-400 break-all mb-1.5 hover:text-green-300 hover:underline cursor-pointer transition-colors"
-              >
-                {user?.githubLink}
-              </a>
+              {/*<a*/}
+              {/*  href={user?.githubLink}*/}
+              {/*  target="_blank"*/}
+              {/*  rel="noopener noreferrer"*/}
+              {/*  className="text-green-400 break-all mb-1.5 hover:text-green-300 hover:underline cursor-pointer transition-colors"*/}
+              {/*>*/}
+              {/*  {user?.githubLink}*/}
+              {/*</a>*/}
             </div>
           </div>
         </div>

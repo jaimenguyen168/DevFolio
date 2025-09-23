@@ -1,12 +1,62 @@
 import { query } from "../_generated/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
 export const getUser = query({
   args: {
-    userId: v.id("users"),
+    username: v.string(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.userId);
+    return await ctx.db
+      .query("users")
+      .withIndex("by_username", (q) => q.eq("username", args.username))
+      .unique();
+  },
+});
+
+export const getCurrentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      return null;
+    }
+
+    return await ctx.db
+      .query("users")
+      .withIndex("by_external_id", (q) => q.eq("externalId", identity.subject))
+      .unique();
+  },
+});
+
+export const isCurrentUser = query({
+  args: {
+    username: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Get the current user's identity from Clerk
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "You are not authenticated",
+      });
+    }
+
+    const currentUser = await ctx.db
+      .query("users")
+      .withIndex("by_external_id", (q) => q.eq("externalId", identity.subject))
+      .unique();
+
+    if (!currentUser) {
+      throw new ConvexError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      });
+    }
+
+    return currentUser.username === args.username;
   },
 });
 
@@ -19,5 +69,25 @@ export const getUserLinks = query({
       .query("userLinks")
       .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
       .collect();
+  },
+});
+
+export const searchUsers = query({
+  args: {
+    searchTerm: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (!args.searchTerm.trim()) {
+      return [];
+    }
+
+    const searchTerm = args.searchTerm.toLowerCase();
+
+    return await ctx.db
+      .query("users")
+      .withIndex("by_username", (q) =>
+        q.gte("username", searchTerm).lt("username", searchTerm + "\uFFFF"),
+      )
+      .take(10);
   },
 });

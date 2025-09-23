@@ -24,8 +24,19 @@ import {
 import ProjectCard from "@/modules/projects/ui/components/ProjectCard";
 import { Separator } from "@/components/ui/separator";
 import { AnimatePresence } from "motion/react";
+import { api } from "../../../../../convex/_generated/api";
+import { useQuery } from "convex/react";
+import NotFoundView from "@/modules/auth/ui/views/not-found-view";
 
-const ProjectsView = () => {
+interface ProjectsViewProps {
+  username: string;
+}
+
+const ProjectsView = ({ username }: ProjectsViewProps) => {
+  const user = useQuery(api.functions.users.getUser, {
+    username: username,
+  });
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
   const [availableTechs, setAvailableTechs] = useState<string[]>([]);
@@ -105,6 +116,14 @@ const ProjectsView = () => {
   const handleViewProject = (projectId: number) => {
     console.log(`Viewing project ${projectId}`);
   };
+
+  if (user === undefined) {
+    return null;
+  }
+
+  if (!user) {
+    return <NotFoundView />;
+  }
 
   const SidebarContent = () => (
     <Accordion type="multiple" defaultValue={["projects"]} className="w-full">

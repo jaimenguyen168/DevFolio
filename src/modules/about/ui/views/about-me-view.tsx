@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Folder,
-  File,
-  Mail,
-  Phone,
-  User,
-  Menu,
-  X,
-  PanelRight,
-} from "lucide-react";
+import { Folder, File, Mail, Phone, User, X, PanelRight } from "lucide-react";
 import CodeMirror, { EditorView, oneDark } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { contentMap } from "@/modules/about/constants";
@@ -22,8 +13,19 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import CodeSnippets from "@/modules/about/ui/components/CodeSnippets";
+import { api } from "../../../../../convex/_generated/api";
+import { useQuery } from "convex/react";
+import NotFoundView from "@/modules/auth/ui/views/not-found-view";
 
-const AboutMeView = () => {
+interface AboutMeViewProps {
+  username: string;
+}
+
+const AboutMeView = ({ username }: AboutMeViewProps) => {
+  const user = useQuery(api.functions.users.getUser, {
+    username: username,
+  });
+
   const [activeContent, setActiveContent] = useState("bio");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -143,17 +145,27 @@ const AboutMeView = () => {
           <div className="mt-2 space-y-2 ml-7">
             <Button disabled variant="ghost" className="text-gray-200">
               <Mail size={14} />
-              <span className="text-sm">user@gmail.com</span>
+              <span className="text-sm">{user?.email}</span>
             </Button>
-            <Button variant="ghost" className="text-gray-200" disabled>
-              <Phone size={14} />
-              <span className="text-sm">+3598246359</span>
-            </Button>
+            {user?.phone && (
+              <Button variant="ghost" className="text-gray-200" disabled>
+                <Phone size={14} />
+                <span className="text-sm">{user.phone}</span>
+              </Button>
+            )}
           </div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
   );
+
+  if (user === undefined) {
+    return null;
+  }
+
+  if (!user) {
+    return <NotFoundView />;
+  }
 
   return (
     <div className="flex flex-col sm:flex-row h-full relative">

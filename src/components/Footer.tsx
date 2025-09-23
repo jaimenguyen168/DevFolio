@@ -7,8 +7,16 @@ import { Id } from "../../convex/_generated/dataModel";
 import { linkConfigs } from "@/constants/linkConfigs";
 import { Code, Coffee, ExternalLink, Terminal } from "lucide-react";
 import { useQuery } from "convex/react";
+import { useUsername } from "@/components/UsernameProvider";
+import { UserButton } from "@clerk/nextjs";
 
 const Footer = () => {
+  const { username } = useUsername();
+
+  const isCurrentUser = useQuery(api.functions.users.isCurrentUser, {
+    username: username as string,
+  });
+
   const userLinks = useQuery(api.functions.users.getUserLinks, {
     userId: "j97dbdkdcgqh3qzspzj8ffwwgh7qr86b" as Id<"users">,
   });
@@ -44,7 +52,9 @@ const Footer = () => {
           ))}
         </div>
 
-        <div className="flex items-center justify-end text-gray-400 p-4 flex-none md:flex-1">
+        <div className="flex items-center justify-end text-gray-400 space-x-4 p-4 flex-none md:flex-1">
+          {isCurrentUser && <UserButton />}
+
           <span className="self-end">© {new Date().getFullYear()}</span>
         </div>
       </div>

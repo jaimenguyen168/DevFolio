@@ -226,7 +226,7 @@ button.addEventListener('click', () => {
   );
 
   return (
-    <div className="flex flex-col sm:flex-row h-full relative bg-slate-900">
+    <div className="flex flex-col sm:flex-row h-full relative flex-1">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
@@ -266,7 +266,7 @@ button.addEventListener('click', () => {
       {/* Right Container - Scrollable content (middle + right sections) */}
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
         {/* Tab Header */}
-        <div className="items-center border-b border-gray-700 sticky top-0 bg-slate-900 z-10 w-full">
+        <div className="items-center border-b border-gray-700 sticky top-0  z-10 w-full">
           <div className="px-4 py-3 flex items-center w-full sm:w-fit justify-between md:justify-start gap-3 sm:border-r sm:border-gray-700">
             <div className="flex items-center w-full">
               <Button
@@ -285,11 +285,11 @@ button.addEventListener('click', () => {
             </button>
           </div>
         </div>
+
         {/* Content Area */}
-        <div className="flex flex-col lg:flex-row flex-1 w-full min-h-0">
+        <div className="flex flex-col lg:flex-row flex-1 w-full min-h-0 max-w-[1600px] mx-auto">
           {/* Middle Section - Contact Form */}
           <div className="w-full lg:w-1/2 border-b lg:border-b-0 lg:border-r border-gray-700 flex flex-col p-8 xl:p-16 2xl:p-28 flex-shrink-0">
-            <div className="lg:w-[500px] 2xl:w-[1600px] w-full" />
             {submitStatus === "success" ? (
               <EmailSuccessView onPress={handleSendNewMessage} />
             ) : (

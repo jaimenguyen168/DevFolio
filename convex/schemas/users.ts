@@ -9,6 +9,7 @@ export const users = defineTable({
   imageUrl: v.optional(v.string()),
   phone: v.optional(v.string()),
   externalId: v.optional(v.string()),
+  bio: v.optional(v.string()),
 })
   .index("by_external_id", ["externalId"])
   .index("by_email", ["email"])

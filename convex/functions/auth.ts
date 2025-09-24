@@ -1,5 +1,5 @@
 import { internalMutation, QueryCtx } from "../_generated/server";
-import { v, Validator } from "convex/values";
+import { ConvexError, v, Validator } from "convex/values";
 import { UserJSON } from "@clerk/backend";
 
 export const upsertFromClerk = internalMutation({
@@ -27,6 +27,22 @@ export const upsertFromClerk = internalMutation({
     } else {
       await ctx.db.patch(user._id, userAttributes);
     }
+  },
+});
+
+export const deleteFromClerk = internalMutation({
+  args: { externalId: v.string() },
+  async handler(ctx, { externalId }) {
+    const user = await userByExternalId(ctx, externalId);
+
+    if (user === null) {
+      throw new ConvexError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      });
+    }
+
+    await ctx.db.delete(user._id);
   },
 });
 

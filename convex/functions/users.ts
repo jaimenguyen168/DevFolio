@@ -57,18 +57,6 @@ export const isCurrentUser = query({
   },
 });
 
-export const getUserLinks = query({
-  args: {
-    userId: v.id("users"),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("userLinks")
-      .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
-      .collect();
-  },
-});
-
 export const searchUsers = query({
   args: {
     searchTerm: v.string(),

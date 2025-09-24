@@ -9,41 +9,56 @@ import {
 } from "@/components/ui/drawer";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { useUsername } from "@/components/UsernameProvider";
+import { GitState } from "@/lib/git/types";
+import {
+  executeGitCommand,
+  generateHelpText,
+  showContext,
+  switchToTable,
+} from "@/lib/git/gitCommands";
+import { TABLE_CONFIGS, TABLE_OPERATIONS } from "@/lib/git/configs";
+import { useRouter } from "next/navigation";
 
 interface HistoryEntry {
   type: "input" | "output";
   content: string;
 }
 
-interface StagedChanges {
-  [key: string]: any;
-}
-
-const Terminal: React.FC = () => {
+const Terminal = () => {
+  const router = useRouter();
+  const { username } = useUsername();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [history, setHistory] = useState<HistoryEntry[]>([
-    { type: "output", content: "Welcome to Git-Style User Terminal v1.0.0" },
+    {
+      type: "output",
+      content: "Welcome to Git-Style Terminal v2.0.0",
+    },
     { type: "output", content: 'Type "help" for available commands.' },
   ]);
   const [currentInput, setCurrentInput] = useState<string>("");
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
 
-  // Get current user data from Convex
-  const currentUser = useQuery(api.functions.users.getCurrentUser);
-  const updateUser = useMutation(api.functions.users.updateUser);
+  const [gitState, setGitState] = useState<GitState>({
+    context: {},
+    stagedChanges: {},
+  });
 
-  // Staged changes that haven't been committed yet
-  const [stagedChanges, setStagedChanges] = useState<StagedChanges>({});
+  // Queries
+  const currentUser = useQuery(api.functions.users.getCurrentUser);
+  const userLinks = useQuery(api.functions.userLinks.getUserLinks, {
+    username: username as string,
+  });
+
+  // Mutations
+  const updateUser = useMutation(api.functions.users.updateUser);
+  const createUserLink = useMutation(api.functions.userLinks.createUserLink);
+  const updateUserLink = useMutation(api.functions.userLinks.updateUserLink);
+  const deleteUserLink = useMutation(api.functions.userLinks.deleteUserLink);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalContentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
 
   useEffect(() => {
     if (terminalContentRef.current) {
@@ -69,21 +84,7 @@ const Terminal: React.FC = () => {
 
     switch (mainCommand) {
       case "help":
-        output = `Available commands:
-  help              - Show this help message
-  git add users.field=value - Stage a user field change
-  git status        - Show staged changes
-  git commit        - Apply all staged changes
-  git reset         - Discard all staged changes
-  git diff          - Show differences between current and staged
-  show user         - Display current user data
-  clear             - Clear the terminal
-  exit              - Close terminal
-  
-Examples:
-  git add users.name="Jane Smith"
-  git add users.title="Senior Developer"
-  git add users.phone="+1-555-9999"`;
+        output = generateHelpText();
         break;
 
       case "clear":
@@ -98,16 +99,8 @@ Examples:
         output = await handleGitCommand(parts.slice(1));
         break;
 
-      case "show":
-        if (parts[1]?.toLowerCase() === "user") {
-          if (!currentUser) {
-            output = "Error: No user data available. Please log in.";
-          } else {
-            output = formatUserData(currentUser);
-          }
-        } else {
-          output = `Usage: show user`;
-        }
+      case "context":
+        output = showContext(gitState, TABLE_CONFIGS);
         break;
 
       default:
@@ -121,166 +114,71 @@ Examples:
 
   const handleGitCommand = async (args: string[]): Promise<string> => {
     if (args.length === 0) {
-      return "Usage: git <command>. Try 'git status', 'git add', 'git commit', etc.";
+      return "Usage: git <command>. Type 'help' for available git commands.";
     }
 
-    const gitCommand = args[0].toLowerCase();
+    const gitSubCommand = args[0].toLowerCase();
 
-    switch (gitCommand) {
-      case "add":
-        return handleGitAdd(args.slice(1));
-
-      case "status":
-        return handleGitStatus();
-
-      case "commit":
-        return await handleGitCommit(args.slice(1));
-
-      case "reset":
-        return handleGitReset();
-
-      case "diff":
-        return handleGitDiff();
-
-      default:
-        return `Unknown git command: ${gitCommand}`;
-    }
-  };
-
-  const handleGitAdd = (args: string[]): string => {
-    if (!currentUser) {
-      return "Error: No user data available. Please log in.";
+    if (TABLE_CONFIGS[gitSubCommand]) {
+      return switchToTable(
+        gitSubCommand,
+        setGitState,
+        TABLE_CONFIGS[gitSubCommand],
+      );
     }
 
-    if (args.length === 0) {
-      return "Usage: git add users.field=value";
+    if (!gitState.context.targetTable) {
+      return "No table targeted. Use 'git <table>' to target a table first (e.g., 'git users', 'git user-links').";
     }
 
-    const assignment = args.join(" ");
-
-    // Parse users.field=value
-    const match = assignment.match(/^users\.([^=]+)=(.+)$/);
-    if (!match) {
-      return "Invalid format. Use: git add users.field=value";
+    const tableOperations = TABLE_OPERATIONS[gitState.context.targetTable];
+    if (!tableOperations) {
+      return `No git operations available for table: ${gitState.context.targetTable}`;
     }
 
-    const [, field, value] = match;
+    const mutations = {
+      updateUser,
+      createUserLink,
+      updateUserLink,
+      deleteUserLink,
+    };
 
-    // Remove quotes if present
-    const cleanValue = value.replace(/^["']|["']$/g, "");
-
-    // Validate field exists - check against the mutation args
-    const validFields = ["name", "email", "title", "username", "phone"];
-    if (!validFields.includes(field)) {
-      return `Invalid field: ${field}. Valid fields: ${validFields.join(", ")}`;
-    }
-
-    // Stage the change
-    setStagedChanges((prev) => ({
-      ...prev,
-      [field]: cleanValue,
-    }));
-
-    return `Staged change: users.${field} = "${cleanValue}"`;
-  };
-
-  const handleGitStatus = (): string => {
-    if (!currentUser) {
-      return "Error: No user data available. Please log in.";
-    }
-
-    const stagedKeys = Object.keys(stagedChanges);
-
-    if (stagedKeys.length === 0) {
-      return "No changes staged for commit.";
-    }
-
-    let status = "Changes staged for commit:\n";
-    stagedKeys.forEach((key) => {
-      const currentValue = (currentUser as any)[key] || "(empty)";
-      const newValue = stagedChanges[key];
-      status += `  modified: users.${key}\n`;
-      status += `    ${currentValue} → ${newValue}\n`;
-    });
-
-    return status;
-  };
-
-  const handleGitCommit = async (args: string[]): Promise<string> => {
-    if (!currentUser) {
-      return "Error: No user data available. Please log in.";
-    }
-
-    const stagedKeys = Object.keys(stagedChanges);
-
-    if (stagedKeys.length === 0) {
-      return "No changes staged for commit.";
+    // Prepare data based on current table
+    let data: any = null;
+    if (gitState.context.targetTable === "users") {
+      data = currentUser;
+    } else if (gitState.context.targetTable === "user-links") {
+      data = { userLinks, currentUser };
     }
 
     try {
-      // Apply staged changes via Convex mutation
-      await updateUser({ updates: stagedChanges });
+      const result = await executeGitCommand(
+        args,
+        gitState,
+        setGitState,
+        tableOperations,
+        mutations,
+        data,
+      );
 
-      // Clear staged changes after successful commit
-      setStagedChanges({});
+      if (
+        gitState.context.targetTable === "users" &&
+        args[0] === "commit" &&
+        gitState.stagedChanges.username &&
+        gitState.stagedChanges.username !== username
+      ) {
+        setIsOpen(false);
+        router.push(`/${gitState.stagedChanges.username}/home`);
 
-      const message =
-        args.length > 0
-          ? args.join(" ").replace(/^["']|["']$/g, "")
-          : "Update user data";
+        return (
+          result + "\n\nUsername updated! Redirecting to new profile URL..."
+        );
+      }
 
-      return `Committed ${stagedKeys.length} change(s): "${message}"
-Updated fields: ${stagedKeys.join(", ")}`;
+      return result;
     } catch (error) {
-      return `Error committing changes: ${error instanceof Error ? error.message : "Unknown error"}`;
+      return `Error executing git command: ${error instanceof Error ? error.message : "Unknown error"}`;
     }
-  };
-
-  const handleGitReset = (): string => {
-    const stagedCount = Object.keys(stagedChanges).length;
-    setStagedChanges({});
-
-    if (stagedCount === 0) {
-      return "No staged changes to reset.";
-    }
-
-    return `Reset ${stagedCount} staged change(s).`;
-  };
-
-  const handleGitDiff = (): string => {
-    if (!currentUser) {
-      return "Error: No user data available. Please log in.";
-    }
-
-    const stagedKeys = Object.keys(stagedChanges);
-
-    if (stagedKeys.length === 0) {
-      return "No staged changes to diff.";
-    }
-
-    let diff = "Differences between current and staged:\n\n";
-    stagedKeys.forEach((key) => {
-      const currentValue = (currentUser as any)[key] || "(empty)";
-      const newValue = stagedChanges[key];
-      diff += `users.${key}:\n`;
-      diff += `- ${currentValue}\n`;
-      diff += `+ ${newValue}\n\n`;
-    });
-
-    return diff;
-  };
-
-  const formatUserData = (user: any): string => {
-    if (!user) {
-      return "Error: No user data available";
-    }
-
-    return `Current User Data:
-  name: "${user.name || "(not set)"}"
-  email: "${user.email || "(not set)"}"
-  username: "${user.username || "(not set)"}"
-  title: "${user.title || "(not set)"}"
-  phone: "${user.phone || "(not set)"}"`;
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
@@ -316,9 +214,19 @@ Updated fields: ${stagedKeys.join(", ")}`;
     setCurrentInput(e.target.value);
   };
 
-  const getStagedIndicator = (): string => {
-    const stagedCount = Object.keys(stagedChanges).length;
-    return stagedCount > 0 ? ` (${stagedCount} staged)` : "";
+  const getContextIndicator = (): string => {
+    const stagedCount = Object.keys(gitState.stagedChanges).length;
+    const stagedIndicator = stagedCount > 0 ? ` (${stagedCount} staged)` : "";
+
+    if (gitState.context.targetTable) {
+      const config = TABLE_CONFIGS[gitState.context.targetTable];
+      const modifyIndicator = gitState.context.isModifying
+        ? ` [editing ${gitState.context.targetRecord?._id}]`
+        : "";
+      return ` - ${config.displayName}${modifyIndicator}${stagedIndicator}`;
+    }
+
+    return stagedIndicator;
   };
 
   // Show loading state if user data is still loading
@@ -341,19 +249,22 @@ Updated fields: ${stagedKeys.join(", ")}`;
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
-      <DrawerTrigger asChild>
-        <button className="hover:bg-gray-700 p-1 rounded">
-          <TerminalSquare size={24} />
-        </button>
-      </DrawerTrigger>
+      <div className="flex items-center space-x-3">
+        <div className="text-gray-400 hidden md:block">Edit Terminal</div>
+        <DrawerTrigger asChild>
+          <button className="hover:bg-gray-700 p-1 rounded">
+            <TerminalSquare size={24} />
+          </button>
+        </DrawerTrigger>
+      </div>
 
-      <DrawerContent className="h-1/2 bg-gray-700 border-t border-gray-600">
+      <DrawerContent className="h-2/5 bg-gray-700 border-t border-gray-600">
         <DrawerHeader className="border-b border-gray-600 bg-black flex-shrink-0">
           <div className="flex items-center justify-between">
             <DrawerTitle className="flex items-center space-x-2 text-white">
-              <TerminalSquare size={20} className="text-green-400" />
+              <TerminalSquare size={20} className="text-orange-400" />
               <span className="font-mono text-sm">
-                Git Terminal{getStagedIndicator()}
+                Git Terminal{getContextIndicator()}
               </span>
             </DrawerTitle>
             <button
@@ -373,9 +284,11 @@ Updated fields: ${stagedKeys.join(", ")}`;
             {history.map((entry, index) => (
               <div key={index} className="mb-1">
                 {entry.type === "input" ? (
-                  <div className="text-green-400">{entry.content}</div>
+                  <div className="text-orange-400 select-text cursor-text">
+                    {entry.content}
+                  </div>
                 ) : (
-                  <div className="text-gray-300 whitespace-pre-line">
+                  <div className="text-gray-300 whitespace-pre-line select-text cursor-text">
                     {entry.content}
                   </div>
                 )}
@@ -383,8 +296,8 @@ Updated fields: ${stagedKeys.join(", ")}`;
             ))}
           </div>
 
-          <div className="flex-shrink-0 border-t border-gray-800 p-4 bg-black">
-            <div className="flex items-center text-green-400">
+          <div className="flex-shrink-0 border-t border-gray-800 p-4 py-6 bg-black">
+            <div className="flex items-center text-orange-400">
               <span className="mr-2">$</span>
               <input
                 ref={inputRef}
@@ -393,7 +306,8 @@ Updated fields: ${stagedKeys.join(", ")}`;
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 className="flex-1 bg-transparent border-none outline-none text-white caret-white"
-                placeholder="Enter git command..."
+                placeholder="Enter command..."
+                autoFocus
               />
             </div>
           </div>

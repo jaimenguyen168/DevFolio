@@ -5,6 +5,7 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import GameSection from "@/modules/home/ui/components/GameSection";
 import NotFoundView from "@/modules/auth/ui/views/not-found-view";
+import { Loader2 } from "lucide-react";
 
 interface HomeViewProps {
   username: string;
@@ -14,14 +15,23 @@ const HomeView = ({ username }: HomeViewProps) => {
   const user = useQuery(api.functions.users.getUser, {
     username: username,
   });
+  const userLinks = useQuery(api.functions.userLinks.getUserLinks, {
+    username: username,
+  });
 
-  if (user === undefined) {
-    return <div>Loading...</div>;
+  if (user === undefined || userLinks === undefined) {
+    return (
+      <div className="flex flex-1 items-center justify-center h-screen text-white">
+        <Loader2 className="animate-spin" size={36} />
+      </div>
+    );
   }
 
-  if (user === null) {
+  if (user === null || userLinks === null) {
     return <NotFoundView />;
   }
+
+  const githubLink = userLinks.find((link) => link.label === "github");
 
   return (
     <div className="flex-1 px-12 pb-16 max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 xl:gap-16">
@@ -42,18 +52,24 @@ const HomeView = ({ username }: HomeViewProps) => {
               // win the game for a cookie 🍪
             </div>
             <div>// find my profile on Github:</div>
-            <div className="flex flex-wrap items-center space-x-2 space-y-2 break-all">
-              <span className="text-indigo-500">const</span>
-              <span className="text-orange-300">githubLink</span>
-              <span className="text-white">=</span>
-              {/*<a*/}
-              {/*  href={user?.githubLink}*/}
-              {/*  target="_blank"*/}
-              {/*  rel="noopener noreferrer"*/}
-              {/*  className="text-green-400 break-all mb-1.5 hover:text-green-300 hover:underline cursor-pointer transition-colors"*/}
-              {/*>*/}
-              {/*  {user?.githubLink}*/}
-              {/*</a>*/}
+            <div className="flex flex-wrap items-center space-x-2 space-y-3 break-all">
+              {githubLink ? (
+                <>
+                  <span className="text-indigo-500">const</span>
+                  <span className="text-orange-300">githubLink</span>
+                  <span className="text-white">=</span>
+                  <a
+                    href={githubLink.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-green-400 break-all mb-3 hover:text-green-300 hover:underline cursor-pointer transition-colors"
+                  >
+                    {githubLink.url}
+                  </a>
+                </>
+              ) : (
+                <span className="text-white">Your Github link goes here</span>
+              )}
             </div>
           </div>
         </div>

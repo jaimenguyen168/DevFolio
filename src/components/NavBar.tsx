@@ -53,7 +53,7 @@ const NavBar = () => {
       {/* Desktop Navigation */}
       <div className="hidden lg:contents">
         <Link
-          href="/home"
+          href={`/${username}/home`}
           className="w-[300px] px-8 py-5 border-r border-gray-700 text-gray-400 block"
         >
           {user?.name || "No User"}

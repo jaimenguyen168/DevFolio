@@ -48,6 +48,7 @@ import {
   SiCypress,
   SiSwift,
 } from "react-icons/si";
+import { Doc } from "../../../../convex/_generated/dataModel";
 import { Project } from "@/modules/projects/types";
 
 export const TECH_STACK = {
@@ -317,7 +318,7 @@ export const TECH_STACK = {
 export const getUniqueTechnologies = (projects: Project[]): string[] => {
   const allTechs = new Set();
   projects.forEach((project: Project) => {
-    project.technologies?.forEach((tech) => allTechs.add(tech));
+    project.techStack?.forEach((tech: string) => allTechs.add(tech));
   });
 
   return (Array.from(allTechs) as string[]) || [];

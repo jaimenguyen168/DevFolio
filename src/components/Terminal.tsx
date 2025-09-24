@@ -50,12 +50,18 @@ const Terminal = () => {
   const userLinks = useQuery(api.functions.userLinks.getUserLinks, {
     username: username as string,
   });
+  const userProjects = useQuery(api.functions.projects.getProjects, {
+    username: username as string,
+  });
 
   // Mutations
   const updateUser = useMutation(api.functions.users.updateUser);
   const createUserLink = useMutation(api.functions.userLinks.createUserLink);
   const updateUserLink = useMutation(api.functions.userLinks.updateUserLink);
   const deleteUserLink = useMutation(api.functions.userLinks.deleteUserLink);
+  const createProject = useMutation(api.functions.projects.createProject);
+  const updateProject = useMutation(api.functions.projects.updateProject);
+  const deleteProject = useMutation(api.functions.projects.deleteProject);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalContentRef = useRef<HTMLDivElement>(null);
@@ -141,14 +147,24 @@ const Terminal = () => {
       createUserLink,
       updateUserLink,
       deleteUserLink,
+      createProject,
+      updateProject,
+      deleteProject,
     };
 
-    // Prepare data based on current table
     let data: any = null;
-    if (gitState.context.targetTable === "users") {
-      data = currentUser;
-    } else if (gitState.context.targetTable === "user-links") {
-      data = { userLinks, currentUser };
+    switch (gitState.context.targetTable) {
+      case "users":
+        data = currentUser;
+        break;
+      case "links":
+        data = { userLinks, currentUser };
+        break;
+      case "projects":
+        data = { userProjects, currentUser };
+        break;
+      default:
+        data = null;
     }
 
     try {
@@ -229,7 +245,6 @@ const Terminal = () => {
     return stagedIndicator;
   };
 
-  // Show loading state if user data is still loading
   if (currentUser === undefined) {
     return (
       <Drawer open={isOpen} onOpenChange={setIsOpen}>

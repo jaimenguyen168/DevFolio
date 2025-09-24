@@ -44,6 +44,13 @@ export interface TableGitOperations {
     mutations: any,
     data?: any,
   ) => Promise<string>;
+  image: (
+    args: string[],
+    state: GitState,
+    setState: (state: GitState) => void,
+    mutations: any,
+    data?: any,
+  ) => Promise<string>;
 }
 
 export interface TableConfig {

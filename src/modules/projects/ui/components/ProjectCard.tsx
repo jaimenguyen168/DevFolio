@@ -5,7 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getTechInfo } from "@/modules/projects/lib/techStacks";
 import { motion } from "motion/react";
 import { fetchRepoInfo } from "@/modules/projects/lib/github";
-import { GitForkIcon, Loader2 } from "lucide-react";
+import { GitForkIcon, Loader2, Star } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
+import Link from "next/link";
 
 interface ProjectCardProps {
   project: Project;
@@ -18,15 +20,14 @@ const ProjectCard = ({
   onViewProject,
   delay = 0,
 }: ProjectCardProps) => {
-  const { id, title, subtitle, description, image, technologies, githubUrl } =
-    project;
+  const { _id, name, description, techStack, url, github, status } = project;
 
   const [repoData, setRepoData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (githubUrl) {
-      fetchRepoInfo(githubUrl)
+    if (github) {
+      fetchRepoInfo(github)
         .then((data) => {
           setRepoData(data);
         })
@@ -39,7 +40,13 @@ const ProjectCard = ({
     } else {
       setLoading(false);
     }
-  }, [githubUrl]);
+  }, [github]);
+
+  const adjustedName = `_${name.toLowerCase().replace(/\s+/g, "-")}`;
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -52,9 +59,11 @@ const ProjectCard = ({
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="text-blue-400 font-medium">Project {id}</span>
+            <span className="text-blue-400 font-medium">
+              Project {_id.slice(-6)}
+            </span>
             <span className="text-gray-500">//</span>
-            <span className="text-gray-400 line-clamp-1">{subtitle}</span>
+            <span className="text-gray-400 line-clamp-1">{adjustedName}</span>
           </div>
         </div>
 
@@ -62,18 +71,29 @@ const ProjectCard = ({
           <CardContent className="p-0">
             {/* Image */}
             <div className="relative h-48 bg-gradient-to-tr from-slate-700 to-slate-800">
-              <img
-                src={image}
-                alt={title}
-                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
+              {/* Placeholder for now since image isn't in your data structure */}
+              <div className="w-full h-full bg-gradient-to-tr from-slate-700 to-slate-800 flex items-center justify-center">
+                <span className="text-gray-400 font-medium">{name}</span>
+              </div>
+
               {/* Overlay gradient */}
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-black/60" />
+              {github && (
+                <Link
+                  href={github}
+                  className="absolute top-4 left-4 flex items-center space-x-2"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <button className="rounded-full bg-indigo-200 backdrop-blur-sm flex items-center justify-center shadow-lg transition-transform hover:scale-110 gap-2 py-0.5 px-2">
+                    <FaGithub size={16} />
+                    <span>{repoData.star || 0}</span>
+                    <Star size={16} />
+                  </button>
+                </Link>
+              )}
               <div className="absolute top-4 right-4 flex items-center space-x-2">
-                {technologies.slice(0, 3).map((tech, index) => {
+                {(techStack || []).slice(0, 3).map((tech, index) => {
                   const techInfo = getTechInfo(tech);
                   const IconComponent = techInfo.icon;
                   return (

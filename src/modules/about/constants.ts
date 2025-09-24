@@ -1,3 +1,109 @@
+export const INTEREST_CATEGORIES = [
+  "technology",
+  "sports",
+  "arts",
+  "music",
+  "travel",
+  "food",
+  "reading",
+  "gaming",
+  "fitness",
+  "photography",
+  "cooking",
+  "fashion",
+  "science",
+  "business",
+  "education",
+  "health",
+  "environment",
+  "politics",
+  "finance",
+  "entertainment",
+] as const;
+
+export const SKILL_CATEGORIES = [
+  "frontend",
+  "backend",
+  "mobile",
+  "database",
+  "devops",
+  "cloud",
+  "design",
+  "testing",
+  "language",
+  "framework",
+  "tool",
+  "soft-skills",
+  "other",
+] as const;
+
+export const TECH_STACKS = [
+  // Frontend Frameworks
+  "React",
+  "Vue",
+  "Angular",
+  "Svelte",
+  // Meta Frameworks
+  "Next.js",
+  "Nuxt.js",
+  "Gatsby",
+  // Languages
+  "JavaScript",
+  "TypeScript",
+  "Python",
+  "Java",
+  "PHP",
+  "Go",
+  "Swift",
+  // Markup & Styling
+  "HTML",
+  "CSS",
+  "Tailwind",
+  "Bootstrap",
+  // Backend Frameworks
+  "Node.js",
+  "Express",
+  "NestJS",
+  "Django",
+  "Flask",
+  "Spring",
+  // Databases
+  "MongoDB",
+  "PostgreSQL",
+  "MySQL",
+  "Redis",
+  // API Technologies
+  "GraphQL",
+  // Mobile Development
+  "Flutter",
+  "React Native",
+  "Android",
+  "iOS",
+  // Cloud & DevOps
+  "AWS",
+  "Docker",
+  "Kubernetes",
+  // Backend as a Service
+  "Firebase",
+  "Supabase",
+  // Deployment Platforms
+  "Vercel",
+  "Netlify",
+  // Game Development
+  "Unity",
+  // Design Tools
+  "Blender",
+  "Figma",
+  // Build Tools
+  "Webpack",
+  "Vite",
+  // Testing
+  "Jest",
+  "Cypress",
+  // Version Control
+  "Git",
+] as const;
+
 export interface ContentMap {
   [key: string]: string;
 }

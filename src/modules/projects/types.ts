@@ -1,9 +1,4 @@
-export interface Project {
-  id: number;
-  title: string;
-  subtitle: string;
-  description: string;
-  image: string;
-  technologies: string[];
-  githubUrl?: string;
-}
+import { Doc, Id } from "../../../convex/_generated/dataModel";
+
+export type Project = Doc<"userProjects">;
+export type ProjectId = Id<"userProjects">;

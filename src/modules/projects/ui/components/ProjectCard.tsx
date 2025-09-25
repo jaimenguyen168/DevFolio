@@ -8,6 +8,9 @@ import { fetchRepoInfo } from "@/modules/projects/lib/github";
 import { GitForkIcon, Loader2, Star } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
+import Image from "next/image";
+
+const TECH_CUTOFF = 3;
 
 interface ProjectCardProps {
   project: Project;
@@ -20,14 +23,23 @@ const ProjectCard = ({
   onViewProject,
   delay = 0,
 }: ProjectCardProps) => {
-  const { _id, name, description, techStack, url, github, status } = project;
+  const {
+    _id,
+    name,
+    description,
+    techStack,
+    url,
+    githubUrl,
+    imageUrls,
+    status,
+  } = project;
 
   const [repoData, setRepoData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (github) {
-      fetchRepoInfo(github)
+    if (githubUrl) {
+      fetchRepoInfo(githubUrl)
         .then((data) => {
           setRepoData(data);
         })
@@ -40,9 +52,11 @@ const ProjectCard = ({
     } else {
       setLoading(false);
     }
-  }, [github]);
+  }, [githubUrl]);
 
   const adjustedName = `_${name.toLowerCase().replace(/\s+/g, "-")}`;
+
+  const mainImage = imageUrls?.[0];
 
   if (loading) {
     return null;
@@ -72,15 +86,24 @@ const ProjectCard = ({
             {/* Image */}
             <div className="relative h-48 bg-gradient-to-tr from-slate-700 to-slate-800">
               {/* Placeholder for now since image isn't in your data structure */}
-              <div className="w-full h-full bg-gradient-to-tr from-slate-700 to-slate-800 flex items-center justify-center">
-                <span className="text-gray-400 font-medium">{name}</span>
-              </div>
+              {mainImage ? (
+                <Image
+                  src={mainImage}
+                  alt="image background"
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-tr from-slate-700 to-slate-800 flex items-center justify-center">
+                  <span className="text-gray-400 font-medium">{name}</span>
+                </div>
+              )}
 
               {/* Overlay gradient */}
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-black/60" />
-              {github && (
+              {githubUrl && (
                 <Link
-                  href={github}
+                  href={githubUrl}
                   className="absolute top-4 left-4 flex items-center space-x-2"
                   rel="noopener noreferrer"
                   target="_blank"
@@ -93,7 +116,7 @@ const ProjectCard = ({
                 </Link>
               )}
               <div className="absolute top-4 right-4 flex items-center space-x-2">
-                {(techStack || []).slice(0, 3).map((tech, index) => {
+                {(techStack || []).slice(0, TECH_CUTOFF).map((tech, index) => {
                   const techInfo = getTechInfo(tech);
                   const IconComponent = techInfo.icon;
                   return (
@@ -105,6 +128,11 @@ const ProjectCard = ({
                     </div>
                   );
                 })}
+                {techStack && techStack.length > TECH_CUTOFF && (
+                  <div className="size-7 rounded-full bg-indigo-200 backdrop-blur-sm flex items-center justify-center shadow-lg text-xs font-semibold text-indigo-900">
+                    +{techStack.length - 3}
+                  </div>
+                )}
               </div>
             </div>
 

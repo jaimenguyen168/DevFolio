@@ -107,7 +107,7 @@ const NavBar = () => {
       {/* Mobile Navigation */}
       <div className="lg:hidden flex items-center justify-between w-full px-6 py-5">
         <div className="text-gray-400">
-          <Link href="/home">{user?.name || "No User"}</Link>
+          <Link href={`/${username}/home`}>{user?.name || "No User"}</Link>
         </div>
 
         {user && (
@@ -134,7 +134,7 @@ const NavBar = () => {
                 const isActive = pathname === link.href;
                 return (
                   <DropdownMenuItem
-                    key={link.href}
+                    key={`${username}/${link.href}`}
                     asChild
                     className={`px-0 py-0 text-[16px] text-white focus:bg-transparent hover:bg-transparent w-full rounded-none ${
                       isActive
@@ -143,7 +143,7 @@ const NavBar = () => {
                     }`}
                   >
                     <Link
-                      href={link.href}
+                      href={`/${username}/${link.href}`}
                       className="block px-6 py-4 transition-colors font-mono w-full border-b border-gray-700 text-lg"
                     >
                       {link.label}

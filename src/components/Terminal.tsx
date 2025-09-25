@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { TerminalSquare, X } from "lucide-react";
 import {
   Drawer,
@@ -7,7 +7,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { useQuery, useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useUsername } from "@/components/UsernameProvider";
 import { GitState } from "@/lib/git/types";
@@ -45,6 +45,8 @@ const Terminal = () => {
     stagedChanges: {},
   });
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Queries
   const currentUser = useQuery(api.functions.users.getCurrentUser);
   const userLinks = useQuery(api.functions.userLinks.getUserLinks, {
@@ -62,6 +64,12 @@ const Terminal = () => {
   const createProject = useMutation(api.functions.projects.createProject);
   const updateProject = useMutation(api.functions.projects.updateProject);
   const deleteProject = useMutation(api.functions.projects.deleteProject);
+  const generateUploadUrl = useMutation(api.functions.files.generateUploadUrl);
+  const uploadProjectImage = useMutation(
+    api.functions.projects.uploadProjectImage,
+  );
+  const getImageUrl = useMutation(api.functions.files.getImageUrl);
+  const deleteImage = useMutation(api.functions.files.deleteImage);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalContentRef = useRef<HTMLDivElement>(null);
@@ -125,6 +133,66 @@ const Terminal = () => {
 
     const gitSubCommand = args[0].toLowerCase();
 
+    // Check for upload command first, before other git commands
+    if (gitSubCommand === "upload" && args[1] === "image") {
+      return new Promise((resolve) => {
+        if (fileInputRef.current) {
+          fileInputRef.current.onchange = async (e) => {
+            const target = e.target as HTMLInputElement;
+            const file = target.files?.[0];
+
+            if (!file) {
+              resolve("No file selected.");
+              return;
+            }
+
+            if (!file.type.startsWith("image/")) {
+              resolve("Error: Please select an image file.");
+              return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+              resolve("Error: File size must be less than 5MB.");
+              return;
+            }
+
+            try {
+              setHistory((prev) => [
+                ...prev,
+                {
+                  type: "output",
+                  content: `Uploading ${file.name}...`,
+                },
+              ]);
+
+              const imageUrl = await handleFileUpload(file);
+
+              // Add to staged changes
+              setGitState((prev) => ({
+                ...prev,
+                stagedChanges: {
+                  ...prev.stagedChanges,
+                  _pendingImage: imageUrl,
+                },
+              }));
+
+              resolve(
+                `Image uploaded successfully: ${file.name}\nUse 'git add image="${imageUrl}"' to stage it for your project.`,
+              );
+            } catch (error) {
+              resolve(
+                `Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+              );
+            }
+          };
+
+          fileInputRef.current.click();
+        } else {
+          resolve("File upload not available.");
+        }
+      });
+    }
+
     if (TABLE_CONFIGS[gitSubCommand]) {
       return switchToTable(
         gitSubCommand,
@@ -150,6 +218,10 @@ const Terminal = () => {
       createProject,
       updateProject,
       deleteProject,
+      generateUploadUrl,
+      uploadProjectImage,
+      getImageUrl,
+      deleteImage,
     };
 
     let data: any = null;
@@ -245,6 +317,26 @@ const Terminal = () => {
     return stagedIndicator;
   };
 
+  const handleFileUpload = async (file: File): Promise<string | null> => {
+    try {
+      const uploadUrl = await generateUploadUrl();
+
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+
+      const { storageId } = await result.json();
+
+      return await getImageUrl({ storageId });
+    } catch (error) {
+      throw new Error(
+        `Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    }
+  };
+
   if (currentUser === undefined) {
     return (
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
@@ -264,6 +356,13 @@ const Terminal = () => {
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+      />
+
       <div className="flex items-center space-x-3">
         <div className="text-gray-400 hidden md:block">Edit Terminal</div>
         <DrawerTrigger asChild>

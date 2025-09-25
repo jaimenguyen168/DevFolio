@@ -21,7 +21,10 @@ export const userProjectsGitOperations: TableGitOperations = {
     ];
 
     if (args.length === 0) {
-      return "Usage: git add field=value or git add -m projectId";
+      return `Usage: 
+  git add field=value    - Stage a field change
+  git add -m projectId   - Target existing record for modification
+  git upload image       - Upload image from computer`;
     }
 
     const firstArg = args[0];
@@ -53,8 +56,15 @@ export const userProjectsGitOperations: TableGitOperations = {
     let processedValue: string | string[];
 
     if (field === "techStack") {
-      // Handle techStack as an array
       const techArray = cleanStringValue.split(",").map((tech) => tech.trim());
+
+      if (
+        techArray.length === 0 ||
+        (techArray.length === 1 && techArray[0] === "")
+      ) {
+        return "Error: techStack cannot be empty. Please provide at least one technology.";
+      }
+
       const invalidTechs = techArray.filter(
         (tech) => !TECH_STACKS.includes(tech as any),
       );
@@ -66,23 +76,27 @@ Valid technologies: ${TECH_STACKS.join(", ")}`;
 
       processedValue = techArray;
     } else if (field === "image") {
-      // Handle image upload
+      // Handle image - either URL or reference to uploaded image
       if (
         cleanStringValue.startsWith("http://") ||
         cleanStringValue.startsWith("https://")
       ) {
         // Direct URL provided
         processedValue = cleanStringValue;
-      } else {
-        // File path or base64 - mark for upload
+      } else if (state.stagedChanges._pendingImage) {
+        // Use the uploaded image
+        processedValue = state.stagedChanges._pendingImage as string;
+
+        // Clear the pending image
         setState({
           ...state,
           stagedChanges: {
             ...state.stagedChanges,
-            _imageUpload: cleanStringValue, // Store for later processing
+            _pendingImage: undefined,
           },
         });
-        return `Image staged for upload: ${cleanStringValue}. Commit to upload the image.`;
+      } else {
+        return `No uploaded image found. Use 'git upload image' first or provide a direct URL.`;
       }
     } else {
       // All other fields are strings
@@ -98,7 +112,7 @@ Valid technologies: ${TECH_STACKS.join(", ")}`;
       }
 
       if (
-        field === "github" &&
+        field === "githubUrl" &&
         processedValue &&
         !isValidGitHubUrl(processedValue)
       ) {
@@ -106,13 +120,27 @@ Valid technologies: ${TECH_STACKS.join(", ")}`;
       }
     }
 
-    setState({
-      ...state,
-      stagedChanges: {
-        ...state.stagedChanges,
-        [field]: processedValue,
-      },
-    });
+    if (field === "image") {
+      const currentImages = state.context.targetRecord?.imageUrls || [];
+      const stagedImages =
+        (state.stagedChanges.imageUrls as string[]) || currentImages;
+
+      setState({
+        ...state,
+        stagedChanges: {
+          ...state.stagedChanges,
+          imageUrls: [...stagedImages, processedValue as string],
+        },
+      });
+    } else {
+      setState({
+        ...state,
+        stagedChanges: {
+          ...state.stagedChanges,
+          [field]: processedValue,
+        },
+      });
+    }
 
     const targetInfo = state.context.targetRecord
       ? ` for project ${state.context.targetRecord._id}`
@@ -121,16 +149,27 @@ Valid technologies: ${TECH_STACKS.join(", ")}`;
     const displayValue =
       field === "techStack"
         ? `[${(processedValue as string[]).join(", ")}]`
-        : `"${processedValue}"`;
+        : field === "image"
+          ? `"${processedValue}" (added to image list)`
+          : `"${processedValue}"`;
 
     return `Staged change: ${field} = ${displayValue}${targetInfo}`;
   },
 
   status: (state: GitState, data?: any): string => {
-    const stagedKeys = Object.keys(state.stagedChanges);
+    const stagedKeys = Object.keys(state.stagedChanges).filter(
+      (key) => key !== "_pendingImage",
+    );
 
     if (stagedKeys.length === 0) {
-      return "No changes staged for commit.";
+      let status = "No changes staged for commit.";
+
+      if (state.stagedChanges._pendingImage) {
+        status += `\n\nPending uploaded image: ${state.stagedChanges._pendingImage}
+Use 'git add image=uploaded' to stage it for your project.`;
+      }
+
+      return status;
     }
 
     let status = "Changes staged for commit in User Projects:\n";
@@ -147,22 +186,110 @@ Valid technologies: ${TECH_STACKS.join(", ")}`;
         if (key === "techStack" && Array.isArray(recordValue)) {
           currentValue =
             recordValue.length > 0 ? `[${recordValue.join(", ")}]` : "(empty)";
+        } else if (key === "imageUrls" && Array.isArray(recordValue)) {
+          currentValue =
+            recordValue.length > 0
+              ? `[${recordValue.length} images]`
+              : "(empty)";
         } else {
           currentValue = recordValue || "(empty)";
         }
       }
 
       const newValue = state.stagedChanges[key];
-      const displayValue =
-        key === "techStack" && Array.isArray(newValue)
-          ? `[${newValue.join(", ")}]`
-          : newValue;
+      let displayValue;
+
+      if (key === "techStack" && Array.isArray(newValue)) {
+        displayValue = `[${newValue.join(", ")}]`;
+      } else if (key === "imageUrls" && Array.isArray(newValue)) {
+        displayValue = `[${newValue.length} images]`;
+      } else {
+        displayValue = newValue;
+      }
 
       status += `  modified: ${key}\n`;
       status += `    ${currentValue} → ${displayValue}\n`;
     });
 
+    if (state.stagedChanges._pendingImage) {
+      status += `\nPending uploaded image: ${state.stagedChanges._pendingImage}
+Use 'git add image=uploaded' to stage it.`;
+    }
+
     return status;
+  },
+
+  image: async (
+    args: string[],
+    state: GitState,
+    setState: (state: GitState) => void,
+    mutations: any,
+    data?: any,
+  ): Promise<string> => {
+    if (args.length === 0) {
+      return `Image operations:
+  git image list        - List current project images
+  git image remove <n>  - Stage removal of image at index n
+  git image clear       - Stage removal of all images
+  
+To add images:
+  git upload image      - Upload from computer
+  git add image="url"   - Add image URL`;
+    }
+
+    const subCommand = args[0].toLowerCase();
+
+    switch (subCommand) {
+      case "list":
+        if (!state.context.targetRecord) {
+          return "No project targeted. Use 'git add -m projectId' first.";
+        }
+        const images = state.context.targetRecord.imageUrls || [];
+        if (images.length === 0) {
+          return "No images found for this project.";
+        }
+        return `Project images:\n${images.map((url: string, index: number) => `  [${index}] ${url.substring(0, 60)}...`).join("\n")}`;
+
+      case "remove":
+        if (args.length < 2) {
+          return "Usage: git image remove <index>";
+        }
+        const index = parseInt(args[1]);
+        if (!state.context.targetRecord) {
+          return "No project targeted. Use 'git add -m projectId' first.";
+        }
+        const currentImages = state.context.targetRecord.imageUrls || [];
+        if (index < 0 || index >= currentImages.length) {
+          return `Invalid index. Available indices: 0-${currentImages.length - 1}`;
+        }
+        const newImages = currentImages.filter(
+          (_: string, i: number) => i !== index,
+        );
+        setState({
+          ...state,
+          stagedChanges: {
+            ...state.stagedChanges,
+            imageUrls: newImages,
+          },
+        });
+        return `Staged removal of image at index ${index}. Commit to apply changes.`;
+
+      case "clear":
+        if (!state.context.targetRecord) {
+          return "No project targeted. Use 'git add -m projectId' first.";
+        }
+        setState({
+          ...state,
+          stagedChanges: {
+            ...state.stagedChanges,
+            imageUrls: [],
+          },
+        });
+        return "Staged removal of all images. Commit to apply changes.";
+
+      default:
+        return `Unknown image command: ${subCommand}`;
+    }
   },
 
   commit: async (
@@ -187,8 +314,6 @@ Valid technologies: ${TECH_STACKS.join(", ")}`;
         try {
           const uploadUrl = await mutations.generateUploadUrl();
 
-          // For now, we'll simulate file upload - in a real implementation,
-          // you'd need to handle file reading from the filesystem
           const imageUrl = await handleImageUpload(
             state.stagedChanges._imageUpload,
             uploadUrl,
@@ -208,19 +333,38 @@ Valid technologies: ${TECH_STACKS.join(", ")}`;
       }
 
       if (state.context.targetRecord && state.context.isModifying) {
-        // Update existing project
+        if (commitData.techStack !== undefined) {
+          if (
+            !Array.isArray(commitData.techStack) ||
+            commitData.techStack.length === 0
+          ) {
+            return "Error: techStack cannot be empty. Please provide at least one technology.";
+          }
+        }
+
         await mutations.updateProject({
           projectId: state.context.targetRecord._id,
           updates: commitData,
         });
         result += `Updated project ${state.context.targetRecord._id}`;
       } else {
-        // Create new project - check required fields
-        if (!commitData.name || !commitData.description) {
+        if (
+          !commitData.name ||
+          !commitData.description ||
+          !commitData.techStack
+        ) {
           const missing = [];
           if (!commitData.name) missing.push("name");
           if (!commitData.description) missing.push("description");
-          return `Error: Missing required fields for creating new project: ${missing.join(", ")}. Both name and description are required.`;
+          if (!commitData.techStack) missing.push("techStack");
+          return `Error: Missing required fields for creating new project: ${missing.join(", ")}. name, description, and techStack are required.`;
+        }
+
+        if (
+          !Array.isArray(commitData.techStack) ||
+          commitData.techStack.length === 0
+        ) {
+          return "Error: techStack cannot be empty. Please provide at least one technology.";
         }
 
         if (!data?.currentUser) {
@@ -258,74 +402,6 @@ Valid technologies: ${TECH_STACKS.join(", ")}`;
 Updated fields: ${stagedKeys.filter((k) => k !== "_imageUpload").join(", ")}`;
     } catch (error) {
       return `Error committing changes: ${error instanceof Error ? error.message : "Unknown error"}`;
-    }
-  },
-
-  // Add new command for image operations
-  image: async (
-    args: string[],
-    state: GitState,
-    setState: (state: GitState) => void,
-    mutations: any,
-    data?: any,
-  ): Promise<string> => {
-    if (args.length === 0) {
-      return `Image operations:
-  git image add <file_path>     - Stage an image for upload
-  git image list                - List current project images
-  git image remove <index>      - Remove image by index`;
-    }
-
-    const subCommand = args[0].toLowerCase();
-
-    switch (subCommand) {
-      case "add":
-        if (args.length < 2) {
-          return "Usage: git image add <file_path>";
-        }
-        return userProjectsGitOperations.add(
-          ["image=" + args[1]],
-          state,
-          setState,
-          data,
-        );
-
-      case "list":
-        if (!state.context.targetRecord) {
-          return "No project targeted. Use 'git add -m projectId' first.";
-        }
-        const images = state.context.targetRecord.imageUrls || [];
-        if (images.length === 0) {
-          return "No images found for this project.";
-        }
-        return `Project images:\n${images.map((url: string, index: number) => `  [${index}] ${url}`).join("\n")}`;
-
-      case "remove":
-        if (args.length < 2) {
-          return "Usage: git image remove <index>";
-        }
-        const index = parseInt(args[1]);
-        if (!state.context.targetRecord) {
-          return "No project targeted. Use 'git add -m projectId' first.";
-        }
-        const currentImages = state.context.targetRecord.imageUrls || [];
-        if (index < 0 || index >= currentImages.length) {
-          return `Invalid index. Available indices: 0-${currentImages.length - 1}`;
-        }
-        const newImages = currentImages.filter(
-          (_: string, i: number) => i !== index,
-        );
-        setState({
-          ...state,
-          stagedChanges: {
-            ...state.stagedChanges,
-            imageUrls: newImages,
-          },
-        });
-        return `Staged removal of image at index ${index}. Commit to apply changes.`;
-
-      default:
-        return `Unknown image command: ${subCommand}`;
     }
   },
 

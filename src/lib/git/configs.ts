@@ -37,7 +37,15 @@ export const TABLE_CONFIGS: Record<string, TableConfig> = {
   projects: {
     name: "userProjects",
     displayName: "User Projects",
-    fields: ["name", "description", "url", "github", "status", "techStack"],
+    fields: [
+      "name",
+      "description",
+      "url",
+      "githubUrl",
+      "imageUrls",
+      "status",
+      "techStack",
+    ],
     queryFunction: api.functions.projects.getProjects,
     createFunction: api.functions.projects.createProject,
     updateFunction: api.functions.projects.updateProject,

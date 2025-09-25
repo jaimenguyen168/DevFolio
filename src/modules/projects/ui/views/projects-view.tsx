@@ -256,8 +256,8 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
             </p>
           </div>
         ) : (
-          <div className="flex-1 px-12 pt-6 overflow-y-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 gap-x-12 gap-y-6">
+          <div className="flex-1 px-16 2xl:px-64 pt-6 overflow-y-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-x-12 gap-y-6">
               <AnimatePresence>
                 {filteredProjects?.map((project, index) => (
                   <ProjectCard

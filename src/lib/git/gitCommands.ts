@@ -49,6 +49,24 @@ export const executeGitCommand = async (
         data,
       );
 
+    case "image":
+      if (tableOperations.image) {
+        return await tableOperations.image(
+          args.slice(1),
+          state,
+          setState,
+          mutations,
+          data,
+        );
+      }
+      return "Image commands not available for this table.";
+
+    case "upload":
+      if (args[0] === "image") {
+        return "TRIGGER_FILE_UPLOAD";
+      }
+      return `Unknown upload target: ${args[0]}. Available: image`;
+
     default:
       return `Unknown git command: ${gitCommand}`;
   }
@@ -121,17 +139,25 @@ export const generateHelpText = (): string => {
   git show              - Display all records in the current table
   git rm                - Delete targeted record (requires yes/no confirmation)
   
+  Image commands (for projects):
+  git image add <url>   - Stage an image URL for upload
+  git image list        - List current project images
+  git image remove <n>  - Stage removal of image at index n
+  
   Other commands:
   clear                 - Clear the terminal
   exit                  - Close terminal
   
 Examples:
-  git users             - Target users table
-  git show              - Display current user info
-  git add name="John"   - Stage username change
+  git projects          - Target projects table
+  git show              - Display all projects
+  git add name="My App" - Stage project name
+  git add description="Cool app" - Stage description
+  git add image="https://example.com/image.png" - Stage image URL
+  git commit "Create new project" - Commit all changes
   
-  git user-links        - Target user-links table
-  git show              - Display all user links
-  git add -m 12345      - Target specific link for editing
-  git add label=github  - Stage label change for targeted link`;
+  git add -m abc123     - Target specific project for editing
+  git image list        - See current images
+  git image remove 0    - Stage removal of first image
+  git commit            - Apply changes`;
 };

@@ -15,6 +15,7 @@ import NotFoundView from "@/modules/auth/ui/views/not-found-view";
 import { convertName } from "@/lib/utils";
 import BioView from "@/modules/about/ui/views/bio-view";
 import Loading from "@/components/Loading";
+import EducationView from "@/modules/about/ui/views/education-view";
 
 interface AboutMeViewProps {
   username: string;
@@ -72,7 +73,16 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
       case "work-experience":
         return <div>work-experience</div>;
       case "education":
-        return <div>education</div>;
+        const selectedEducation = educations?.find(
+          (edu) => edu.institution === activeName,
+        );
+        return selectedEducation ? (
+          <EducationView education={selectedEducation} />
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-gray-400">Education not found</p>
+          </div>
+        );
       default:
         return <div>bio</div>;
     }
@@ -169,9 +179,11 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
                       <Button
                         key={edu._id}
                         variant="ghost"
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onMouseDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
-                          e.stopPropagation();
-                          handleContentClick("_education", edu.institution);
+                          e.stopPropagation(); // stop bubbling here too
+                          handleContentClick("education", edu.institution);
                         }}
                         className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:text-blue-400 ${
                           activeName === edu.institution
@@ -324,9 +336,9 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
         )}
 
         {/* Content Area */}
-        <div className="flex-1 w-full h-full">
+        <div className="flex-1 w-full h-full overflow-y-auto overflow-x-hidden">
           {hasHeaderContent ? (
-            renderContent()
+            <div className="min-h-full">{renderContent()}</div>
           ) : (
             <div className="flex-1 flex h-full justify-center items-center">
               <p className="text-gray-400">

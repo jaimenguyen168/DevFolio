@@ -7,7 +7,15 @@ export const usersGitOperations: TableGitOperations = {
     setState: (state: GitState) => void,
     data?: any,
   ): Promise<string> => {
-    const validFields = ["name", "email", "title", "username", "phone", "bio"];
+    const validFields = [
+      "name",
+      "email",
+      "title",
+      "username",
+      "phone",
+      "bio",
+      "hashtags",
+    ];
 
     if (args.length === 0) {
       return "Usage: git add field=value";
@@ -26,15 +34,33 @@ export const usersGitOperations: TableGitOperations = {
       return `Invalid field: ${field}. Valid fields: ${validFields.join(", ")}`;
     }
 
+    // Handle hashtags as array
+    let processedValue: any = cleanValue;
+    if (field === "hashtags") {
+      // Get existing hashtags from staged changes or current data
+      const existingHashtags =
+        state.stagedChanges.hashtags || data?.hashtags || [];
+
+      // Split new hashtags by comma or space
+      const newHashtags = cleanValue
+        .split(/[,\s]+/)
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0)
+        .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`));
+
+      // Combine and remove duplicates
+      processedValue = [...new Set([...existingHashtags, ...newHashtags])];
+    }
+
     setState({
       ...state,
       stagedChanges: {
         ...state.stagedChanges,
-        [field]: cleanValue,
+        [field]: processedValue,
       },
     });
 
-    return `Staged change: ${field} = "${cleanValue}"`;
+    return `Staged change: ${field} = ${field === "hashtags" ? JSON.stringify(processedValue) : `"${cleanValue}"`}`;
   },
 
   status: (state: GitState, data?: any): string => {

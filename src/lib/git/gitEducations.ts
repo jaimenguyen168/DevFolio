@@ -255,7 +255,7 @@ Updated fields: ${stagedKeys.join(", ")}`;
   },
 
   show: (data?: any): string => {
-    const userEducation = data?.userEducation;
+    const userEducation = data?.userEducations;
 
     if (!userEducation || userEducation.length === 0) {
       return `No education records found.
@@ -293,7 +293,7 @@ Available types: ${VALID_EDUCATION_TYPES.join(", ")}`;
       return "Usage: git add -m educationId";
     }
 
-    const userEducation = data?.userEducation;
+    const userEducation = data?.userEducations;
 
     if (!userEducation || userEducation.length === 0) {
       return "No education records available to target.";

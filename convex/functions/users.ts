@@ -87,6 +87,7 @@ export const updateUser = mutation({
       username: v.optional(v.string()),
       phone: v.optional(v.string()),
       bio: v.optional(v.string()),
+      hashtags: v.optional(v.array(v.string())),
     }),
   },
   handler: async (ctx, { updates }) => {

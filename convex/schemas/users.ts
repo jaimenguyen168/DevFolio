@@ -15,6 +15,7 @@ export const users = defineTable({
   phone: v.optional(v.string()),
   externalId: v.optional(v.string()),
   bio: v.optional(v.string()),
+  hashtags: v.optional(v.array(v.string())),
 })
   .index("by_external_id", ["externalId"])
   .index("by_email", ["email"])

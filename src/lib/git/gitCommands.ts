@@ -41,12 +41,9 @@ export const executeGitCommand = async (
       return tableOperations.show(data);
 
     case "rm":
-      return tableOperations.rm(
-        args.slice(1),
-        state,
-        setState,
-        mutations,
-        data,
+      return (
+        tableOperations.rm?.(args.slice(1), state, setState, mutations, data) ||
+        ""
       );
 
     case "image":

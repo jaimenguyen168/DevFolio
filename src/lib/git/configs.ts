@@ -16,7 +16,7 @@ export const TABLE_CONFIGS: Record<string, TableConfig> = {
   users: {
     name: "users",
     displayName: "Users",
-    fields: ["name", "email", "title", "username", "phone", "bio"],
+    fields: ["name", "email", "title", "username", "phone", "bio", "hashtags"],
     queryFunction: api.functions.users.getCurrentUser,
     updateFunction: api.functions.users.updateUser,
     canUpdate: true,

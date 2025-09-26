@@ -34,15 +34,17 @@ const Footer = () => {
   return (
     <div className="border-t border-gray-700 backdrop-blur-sm">
       <div className="flex items-center space-x-4">
-        <div className="p-4 border-gray-700">
-          <span className="text-gray-400">find me in:</span>
+        <div className="p-3 border-gray-700">
+          <span className="text-gray-400 text-sm md:text-base">
+            find me in:
+          </span>
         </div>
 
         <div className="flex">
           {userLinks?.map((link, index) => (
             <div
               key={index}
-              className="flex items-center text-gray-400 hover:text-white transition-colors border-r border-gray-700 p-4 first:border-l"
+              className="flex items-center text-gray-400 hover:text-white transition-colors border-r border-gray-700 py-4 px-3 first:border-l"
             >
               <a href={link.url} target="_blank" rel="noopener noreferrer">
                 {getIconByLabel(link.label)}
@@ -59,7 +61,9 @@ const Footer = () => {
             </>
           )}
 
-          <span>© {new Date().getFullYear()}</span>
+          <span className="text-sm md:text-base">
+            © {new Date().getFullYear()}
+          </span>
         </div>
       </div>
     </div>

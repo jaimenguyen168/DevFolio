@@ -389,7 +389,9 @@ const Terminal = () => {
       />
 
       <div className="flex items-center space-x-3">
-        <div className="text-gray-400 hidden md:block">Edit Terminal</div>
+        <div className="text-gray-400 hidden md:block text-sm">
+          Edit Terminal
+        </div>
         <DrawerTrigger asChild>
           <button className="hover:bg-gray-700 p-1 rounded">
             <TerminalSquare size={24} />

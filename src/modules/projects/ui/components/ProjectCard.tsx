@@ -16,12 +16,14 @@ interface ProjectCardProps {
   project: Project;
   onViewProject: () => void;
   delay?: number;
+  index?: number;
 }
 
 const ProjectCard = ({
   project,
   onViewProject,
   delay = 0,
+  index = 0,
 }: ProjectCardProps) => {
   const {
     _id,
@@ -74,14 +76,14 @@ const ProjectCard = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <span className="text-blue-400 font-medium">
-              Project {_id.slice(-6)}
+              Project {index + 1}
             </span>
             <span className="text-gray-500">//</span>
             <span className="text-gray-400 line-clamp-1">{adjustedName}</span>
           </div>
         </div>
 
-        <Card className="bg-slate-900 border-gray-700 overflow-hidden hover:border-gray-600 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 animate-in slide-in-from-bottom-4 fade-in pt-0 pb-3">
+        <Card className="bg-slate-900 border-gray-700 overflow-hidden hover:border-gray-600 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 animate-in slide-in-from-bottom-4 fade-in py-0">
           <CardContent className="p-0">
             {/* Image */}
             <div className="relative h-48 bg-gradient-to-tr from-slate-700 to-slate-800">
@@ -101,7 +103,7 @@ const ProjectCard = ({
 
               {/* Overlay gradient */}
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-black/60" />
-              {githubUrl && (
+              {githubUrl && repoData && (
                 <Link
                   href={githubUrl}
                   className="absolute top-4 left-4 flex items-center space-x-2"
@@ -137,8 +139,8 @@ const ProjectCard = ({
             </div>
 
             {/* Content */}
-            <div className="p-6">
-              <p className="text-gray-400 text-sm mb-4 leading-relaxed line-clamp-2">
+            <div className="p-6 flex flex-col gap-y-6">
+              <p className="text-gray-400 text-sm leading-relaxed line-clamp-2">
                 {description}
               </p>
 
@@ -152,18 +154,19 @@ const ProjectCard = ({
                   view-project
                 </Button>
 
-                {loading ? (
-                  <div className="flex items-center justify-center w-12 h-6 text-gray-400 hover:bg-gray-700">
-                    <Loader2 size={16} className="animate-spin" />
-                  </div>
-                ) : (
-                  repoData && (
-                    <div className="flex items-center space-x-2 p-1 text-slate-500 hover:text-slate-400 transition-colors">
-                      <GitForkIcon size={16} />
-                      <span>{repoData.forks || 0}</span>
+                {githubUrl &&
+                  (loading ? (
+                    <div className="flex items-center justify-center w-12 h-6 text-gray-400 hover:bg-gray-700">
+                      <Loader2 size={16} className="animate-spin" />
                     </div>
-                  )
-                )}
+                  ) : (
+                    repoData && (
+                      <div className="flex items-center space-x-2 p-1 text-slate-500 hover:text-slate-400 transition-colors">
+                        <GitForkIcon size={16} />
+                        <span>{repoData.forks || 0}</span>
+                      </div>
+                    )
+                  ))}
               </div>
             </div>
           </CardContent>

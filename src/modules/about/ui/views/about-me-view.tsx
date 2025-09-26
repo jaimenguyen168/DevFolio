@@ -168,11 +168,11 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row h-full relative">
+    <div className="flex flex-col md:flex-row h-full relative">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 backdrop-blur-md z-40 sm:hidden"
+          className="fixed inset-0 backdrop-blur-md z-40 md:hidden"
           onClick={toggleSidebar}
         />
       )}
@@ -181,14 +181,14 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
       <div
         className={`
         ${/* Desktop styles */ ""}
-        sm:w-[300px] sm:border-r sm:border-gray-700 sm:flex sm:flex-col sm:h-full sm:relative sm:transform-none sm:transition-none
+        md:w-[360px] md:border-r md:border-gray-700 md:flex md:flex-col md:h-full md:relative md:transform-none md:transition-none
         ${/* Mobile styles */ ""}
-        fixed top-0 left-0 h-full w-[280px] bg-slate-900 border-r border-gray-700 flex flex-col z-50 transform transition-transform duration-300 ease-in-out
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"}
+        fixed top-0 left-0 h-full w-[360px] bg-slate-900 border-r border-gray-700 flex flex-col z-50 transform transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}
       >
         {/* Mobile Close Button */}
-        <div className="sm:hidden flex items-center justify-between p-4 border-b border-gray-700">
+        <div className="md:hidden flex items-center justify-between p-4 border-b border-gray-700">
           <span className="text-white font-medium">_about-me</span>
           <Button
             variant="ghost"
@@ -209,13 +209,13 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
         {/* Tab Header */}
         <div className="items-center border-b border-gray-700 sticky top-0 bg-slate-900 z-10">
-          <div className="px-4 py-3 flex items-center w-full sm:w-fit justify-between md:justify-start gap-3 sm:border-r sm:border-gray-700">
+          <div className="px-4 py-3 flex items-center w-full md:w-fit justify-between md:justify-start gap-3 md:border-r md:border-gray-700">
             <div className="flex items-center">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleSidebar}
-                className="sm:hidden text-gray-400 hover:bg-gray-700 hover:text-white p-1 mr-3"
+                className="md:hidden text-gray-400 hover:bg-gray-700 hover:text-white p-1 mr-3"
               >
                 <PanelRight size={20} />
               </Button>

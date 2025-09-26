@@ -166,11 +166,11 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
   );
 
   return (
-    <div className="flex flex-col sm:flex-row h-full relative w-full">
+    <div className="flex flex-col md:flex-row h-full relative w-full">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 backdrop-blur-md z-40 sm:hidden"
+          className="fixed inset-0 backdrop-blur-md z-40 lg:hidden"
           onClick={toggleSidebar}
         />
       )}
@@ -179,14 +179,14 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
       <div
         className={`
         ${/* Desktop styles */ ""}
-        sm:w-[300px] sm:border-r sm:border-gray-700 sm:flex sm:flex-col sm:h-full sm:relative sm:transform-none sm:transition-none
+        md:w-[360px] md:border-r md:border-gray-700 md:flex md:flex-col md:h-full md:relative md:transform-none md:transition-none
         ${/* Mobile styles */ ""}
-        fixed top-0 left-0 h-full w-[280px] bg-slate-900 border-r border-gray-700 flex flex-col z-50 transform transition-transform duration-300 ease-in-out
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"}
+        fixed top-0 left-0 h-full w-[360px] bg-slate-900 border-r border-gray-700 flex flex-col z-50 transform transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}
       >
         {/* Mobile Close Button */}
-        <div className="sm:hidden flex items-center justify-between p-4 border-b border-gray-700">
+        <div className="md:hidden flex items-center justify-between p-4 border-b border-gray-700">
           <span className="text-white font-medium">_projects</span>
           <Button
             variant="ghost"
@@ -204,12 +204,12 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-0 w-full">
+      <div className="flex-1 flex flex-col h-full w-full">
         {/* Tab Header */}
         {!isEmpty && (
           <div className="items-center border-b border-gray-700 sticky top-0 bg-slate-900 z-10">
             <div
-              className={`px-4 py-3 flex items-center w-full sm:w-fit justify-between md:justify-start gap-3 ${!isCleared ? "sm:border-r sm:border-gray-700" : ""}`}
+              className={`px-4 py-3 flex items-center w-full md:w-fit justify-between md:justify-start gap-3 ${!isCleared ? "md:border-r md:border-gray-700" : ""}`}
             >
               <div className="flex items-center">
                 <Button
@@ -256,8 +256,8 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
             </p>
           </div>
         ) : (
-          <div className="flex-1 px-16 2xl:px-64 pt-6 overflow-y-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-x-12 gap-y-6">
+          <div className="flex-1 px-4 lg:px-12 pt-6 overflow-y-auto ">
+            <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 max-w-7xl mx-auto ">
               <AnimatePresence>
                 {filteredProjects?.map((project, index) => (
                   <ProjectCard
@@ -265,6 +265,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
                     project={project}
                     onViewProject={() => handleViewProject(project._id)}
                     delay={index}
+                    index={index}
                   />
                 ))}
               </AnimatePresence>

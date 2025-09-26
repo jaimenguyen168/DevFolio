@@ -19,6 +19,7 @@ import {
 } from "@/lib/git/gitCommands";
 import { TABLE_CONFIGS, TABLE_OPERATIONS } from "@/lib/git/configs";
 import { useRouter } from "next/navigation";
+import { handleTabCompletion, TECH_STACKS } from "@/modules/about/constants";
 
 interface HistoryEntry {
   type: "input" | "output";
@@ -39,6 +40,7 @@ const Terminal = () => {
   const [currentInput, setCurrentInput] = useState<string>("");
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const [gitState, setGitState] = useState<GitState>({
     context: {},
@@ -295,6 +297,18 @@ const Terminal = () => {
           setCurrentInput(commandHistory[newIndex]);
         }
       }
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+
+      const input = e.currentTarget.value;
+      const cursorPos = e.currentTarget.selectionStart || 0;
+
+      const completed = handleTabCompletion(input, cursorPos);
+      setCurrentInput(completed);
+
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
     }
   };
 

@@ -37,14 +37,14 @@ export interface TableGitOperations {
     setState: (state: GitState) => void,
     data?: any,
   ) => string;
-  rm: (
+  rm?: (
     args: string[],
     state: GitState,
     setState: (state: GitState) => void,
     mutations: any,
     data?: any,
   ) => Promise<string>;
-  image: (
+  image?: (
     args: string[],
     state: GitState,
     setState: (state: GitState) => void,

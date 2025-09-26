@@ -40,7 +40,6 @@ const Terminal = () => {
   const [currentInput, setCurrentInput] = useState<string>("");
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const [gitState, setGitState] = useState<GitState>({
     context: {},
@@ -55,6 +54,9 @@ const Terminal = () => {
     username: username as string,
   });
   const userProjects = useQuery(api.functions.projects.getProjects, {
+    username: username as string,
+  });
+  const userEducations = useQuery(api.functions.educations.getEducations, {
     username: username as string,
   });
 
@@ -72,6 +74,9 @@ const Terminal = () => {
   );
   const getImageUrl = useMutation(api.functions.files.getImageUrl);
   const deleteImage = useMutation(api.functions.files.deleteImage);
+  const createEducation = useMutation(api.functions.educations.createEducation);
+  const updateEducation = useMutation(api.functions.educations.updateEducation);
+  const deleteEducation = useMutation(api.functions.educations.deleteEducation);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalContentRef = useRef<HTMLDivElement>(null);
@@ -224,6 +229,9 @@ const Terminal = () => {
       uploadProjectImage,
       getImageUrl,
       deleteImage,
+      createEducation,
+      updateEducation,
+      deleteEducation,
     };
 
     let data: any = null;
@@ -236,6 +244,9 @@ const Terminal = () => {
         break;
       case "projects":
         data = { userProjects, currentUser };
+        break;
+      case "educations":
+        data = { userEducations, currentUser };
         break;
       default:
         data = null;

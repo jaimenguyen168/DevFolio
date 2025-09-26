@@ -20,6 +20,14 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "**", // Allows all HTTP hostnames
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "img.clerk.com",
+      },
     ],
   },
 };

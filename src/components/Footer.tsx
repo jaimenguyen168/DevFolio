@@ -34,7 +34,7 @@ const Footer = () => {
   return (
     <div className="border-t border-gray-700 backdrop-blur-sm">
       <div className="flex items-center space-x-4">
-        <div className="p-4 border-gray-700 flex-none">
+        <div className="p-4 border-gray-700">
           <span className="text-gray-400">find me in:</span>
         </div>
 
@@ -51,7 +51,7 @@ const Footer = () => {
           ))}
         </div>
 
-        <div className="flex items-center justify-end text-gray-400 space-x-4 p-4 flex-1">
+        <div className="flex items-center justify-end text-gray-400 space-x-4 px-4 flex-1">
           {isCurrentUser && (
             <>
               <Terminal />

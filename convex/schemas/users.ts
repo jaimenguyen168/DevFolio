@@ -38,8 +38,12 @@ export const userInterests = defineTable({
 export const userEducation = defineTable({
   userId: v.id("users"),
   institution: v.string(),
+  logoUrl: v.optional(v.string()),
   degree: v.optional(v.string()),
   field: v.optional(v.string()),
+  location: v.optional(v.string()),
+  grade: v.optional(v.string()),
+  gpa: v.optional(v.number()),
   startYear: v.optional(v.number()),
   endYear: v.optional(v.number()),
   description: v.optional(v.string()),

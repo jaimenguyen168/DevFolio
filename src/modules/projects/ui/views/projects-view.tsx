@@ -27,7 +27,7 @@ import { AnimatePresence } from "motion/react";
 import { api } from "../../../../../convex/_generated/api";
 import { useQuery } from "convex/react";
 import NotFoundView from "@/modules/auth/ui/views/not-found-view";
-import { ProjectId } from "@/modules/projects/types";
+import { ProjectId } from "@/modules/types";
 
 interface ProjectsViewProps {
   username: string;

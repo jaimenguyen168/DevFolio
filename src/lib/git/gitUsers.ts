@@ -7,7 +7,7 @@ export const usersGitOperations: TableGitOperations = {
     setState: (state: GitState) => void,
     data?: any,
   ): Promise<string> => {
-    const validFields = ["name", "email", "title", "username", "phone"];
+    const validFields = ["name", "email", "title", "username", "phone", "bio"];
 
     if (args.length === 0) {
       return "Usage: git add field=value";

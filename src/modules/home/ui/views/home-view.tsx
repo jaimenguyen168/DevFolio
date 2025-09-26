@@ -6,6 +6,7 @@ import { api } from "../../../../../convex/_generated/api";
 import GameSection from "@/modules/home/ui/components/GameSection";
 import NotFoundView from "@/modules/auth/ui/views/not-found-view";
 import { Loader2 } from "lucide-react";
+import Loading from "@/components/Loading";
 
 interface HomeViewProps {
   username: string;
@@ -20,11 +21,7 @@ const HomeView = ({ username }: HomeViewProps) => {
   });
 
   if (user === undefined || userLinks === undefined) {
-    return (
-      <div className="flex flex-1 items-center justify-center h-screen text-white">
-        <Loader2 className="animate-spin" size={36} />
-      </div>
-    );
+    return <Loading />;
   }
 
   if (user === null || userLinks === null) {

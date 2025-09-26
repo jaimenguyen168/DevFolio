@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Project } from "@/modules/projects/types";
+import { Project } from "@/modules/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTechInfo } from "@/modules/projects/lib/techStacks";
 import { motion } from "motion/react";
@@ -9,6 +9,7 @@ import { GitForkIcon, Loader2, Star } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
+import { convertName } from "@/lib/utils";
 
 const TECH_CUTOFF = 3;
 
@@ -25,16 +26,7 @@ const ProjectCard = ({
   delay = 0,
   index = 0,
 }: ProjectCardProps) => {
-  const {
-    _id,
-    name,
-    description,
-    techStack,
-    url,
-    githubUrl,
-    imageUrls,
-    status,
-  } = project;
+  const { name, description, techStack, githubUrl, imageUrls } = project;
 
   const [repoData, setRepoData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -56,9 +48,8 @@ const ProjectCard = ({
     }
   }, [githubUrl]);
 
-  const adjustedName = `_${name.toLowerCase().replace(/\s+/g, "-")}`;
-
   const mainImage = imageUrls?.[0];
+  const adjustedName = convertName(name);
 
   if (loading) {
     return null;

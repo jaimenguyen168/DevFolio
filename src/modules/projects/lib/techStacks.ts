@@ -96,7 +96,7 @@ import {
   SiAmazons3,
 } from "react-icons/si";
 import { TbBrandCSharp } from "react-icons/tb";
-import { Project } from "@/modules/projects/types";
+import { Project } from "@/modules/types";
 
 export const TECH_STACK = {
   // Frontend Frameworks

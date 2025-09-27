@@ -1,0 +1,113 @@
+import { TableConfig, TableGitOperations } from "@/lib/git/types";
+import { api } from "../../../convex/_generated/api";
+import { usersGitOperations } from "@/lib/git/gitUsers";
+import { userLinksGitOperations } from "@/lib/git/gitUserLinks";
+import { userProjectsGitOperations } from "@/lib/git/gitProjects";
+import { userEducationGitOperations } from "@/lib/git/gitEducations";
+import { userWorkExperienceGitOperations } from "@/lib/git/gitWorkExp";
+
+export const TABLE_OPERATIONS: Record<string, TableGitOperations> = {
+  users: usersGitOperations,
+  links: userLinksGitOperations,
+  projects: userProjectsGitOperations,
+  educations: userEducationGitOperations,
+  work: userWorkExperienceGitOperations,
+};
+
+export const TABLE_CONFIGS: Record<string, TableConfig> = {
+  users: {
+    name: "users",
+    displayName: "Users",
+    fields: ["name", "email", "title", "username", "phone", "bio", "hashtags"],
+    queryFunction: api.functions.users.getCurrentUser,
+    updateFunction: api.functions.users.updateUser,
+    canUpdate: true,
+    identifierField: "id",
+  },
+  links: {
+    name: "userLinks",
+    displayName: "User Links",
+    fields: ["url", "label"],
+    queryFunction: api.functions.userLinks.getUserLinks,
+    createFunction: api.functions.userLinks.createUserLink,
+    updateFunction: api.functions.userLinks.updateUserLink,
+    deleteFunction: api.functions.userLinks.deleteUserLink,
+    requiresUserId: true,
+    canCreate: true,
+    canUpdate: true,
+    canDelete: true,
+    identifierField: "_id",
+  },
+  projects: {
+    name: "userProjects",
+    displayName: "User Projects",
+    fields: [
+      "name",
+      "description",
+      "url",
+      "githubUrl",
+      "imageUrls",
+      "status",
+      "techStack",
+    ],
+    queryFunction: api.functions.projects.getProjects,
+    createFunction: api.functions.projects.createProject,
+    updateFunction: api.functions.projects.updateProject,
+    deleteFunction: api.functions.projects.deleteProject,
+    requiresUserId: true,
+    canCreate: true,
+    canUpdate: true,
+    canDelete: true,
+    identifierField: "_id",
+  },
+  educations: {
+    name: "userEducations",
+    displayName: "User Education",
+    fields: [
+      "institution",
+      "logoUrl",
+      "degree",
+      "field",
+      "location",
+      "grade",
+      "gpa",
+      "startYear",
+      "endYear",
+      "details",
+      "type",
+    ],
+    queryFunction: api.functions.educations.getEducations,
+    createFunction: api.functions.educations.createEducation,
+    updateFunction: api.functions.educations.updateEducation,
+    deleteFunction: api.functions.educations.deleteEducation,
+    requiresUserId: true,
+    canCreate: true,
+    canUpdate: true,
+    canDelete: true,
+    identifierField: "_id",
+  },
+  work: {
+    name: "userWorkExperience",
+    displayName: "Work Experience",
+    fields: [
+      "company",
+      "position",
+      "startDate",
+      "endDate",
+      "description",
+      "location",
+      "logoUrl",
+      "type",
+      "responsibilities",
+    ],
+    queryFunction: api.functions.workExperience.getWorkExperiences,
+    createFunction: api.functions.workExperience.createWorkExperience,
+    updateFunction: api.functions.workExperience.updateWorkExperience,
+    deleteFunction: api.functions.workExperience.deleteWorkExperience,
+    requiresUserId: true,
+    canCreate: true,
+    canUpdate: true,
+    canDelete: true,
+    identifierField: "_id",
+  },
+};

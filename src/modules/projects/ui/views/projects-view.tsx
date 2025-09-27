@@ -27,6 +27,7 @@ import { AnimatePresence } from "motion/react";
 import { api } from "../../../../../convex/_generated/api";
 import { useQuery } from "convex/react";
 import NotFoundView from "@/modules/auth/ui/views/not-found-view";
+import { ProjectId } from "@/modules/types";
 
 interface ProjectsViewProps {
   username: string;
@@ -41,53 +42,19 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
   const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
   const [availableTechs, setAvailableTechs] = useState<string[]>([]);
 
-  const projects = [
-    {
-      id: 1,
-      title: "ui-animations",
-      subtitle: "ui-animations",
-      description: "Duis aute irure dolor in velit esse cillum dolore.",
-      image:
-        "https://images.unsplash.com/photo-1587440871875-191322ee64b0?q=80&w=2671&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      technologies: ["React", "TypeScript", "Tailwind"],
-      githubUrl: "https://github.com/jaimenguyen168/NextJS-Learnify",
-    },
-    {
-      id: 2,
-      title: "tetris-game",
-      subtitle: "tetris-game",
-      description: "Duis aute irure dolor in velit esse cillum dolore.",
-      image:
-        "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      technologies: ["Vue", "JavaScript", "CSS", "Swift"],
-      githubUrl: "https://github.com/vkurko/calendar",
-    },
-    {
-      id: 3,
-      title: "nimbus",
-      subtitle: "nimbus",
-      description: "Duis aute irure dolor in velit esse cillum dolore.",
-      image:
-        "https://images.unsplash.com/photo-1621839673705-6617adf9e890?q=80&w=2664&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      technologies: ["Flutter", "Dart"],
-      githubUrl: "https://github.com/jaimenguyen168/NextJS-Learnify",
-    },
-    {
-      id: 4,
-      title: "weather-app",
-      subtitle: "weather-app",
-      description: "A beautiful weather application with real-time data.",
-      image:
-        "https://images.unsplash.com/photo-1487014679447-9f8336841d58?q=80&w=2610&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      technologies: ["Next.js", "TypeScript", "Node.js"],
-    },
-  ];
+  const projects = useQuery(api.functions.projects.getProjects, {
+    username: username,
+  });
+
+  console.log(JSON.stringify(projects, null, 2));
 
   useEffect(() => {
-    const uniqueTechs = getUniqueTechnologies(projects);
-    setAvailableTechs(uniqueTechs);
-    setSelectedTechs(uniqueTechs);
-  }, []);
+    if (projects) {
+      const uniqueTechs = getUniqueTechnologies(projects);
+      setAvailableTechs(uniqueTechs);
+      setSelectedTechs(uniqueTechs);
+    }
+  }, [projects]);
 
   const handleClearAll = () => {
     setSelectedTechs([]);
@@ -107,21 +74,22 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
     );
   };
 
-  const filteredProjects = projects.filter((project) =>
-    project.technologies.some((tech) => selectedTechs.includes(tech)),
+  const filteredProjects = projects?.filter((project) =>
+    project.techStack?.some((tech) => selectedTechs.includes(tech)),
   );
 
-  const isEmpty = filteredProjects.length === 0;
+  const isEmpty = projects?.length === 0;
+  const isCleared = filteredProjects?.length === 0;
 
-  const handleViewProject = (projectId: number) => {
+  const handleViewProject = (projectId: ProjectId) => {
     console.log(`Viewing project ${projectId}`);
   };
 
-  if (user === undefined) {
+  if (user === undefined || projects === undefined) {
     return null;
   }
 
-  if (!user) {
+  if (!user || !projects) {
     return <NotFoundView />;
   }
 
@@ -167,29 +135,30 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
               );
             })}
 
-            {isEmpty ? (
-              <>
-                <Separator className="bg-gray-700" />
-                <button
-                  onClick={handleSelectAll}
-                  className="flex items-center justify-start w-full space-x-6 text-gray-400"
-                >
-                  <Layers size={16} />
-                  <span>Select all</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <Separator className="bg-gray-700" />
-                <button
-                  onClick={handleClearAll}
-                  className="flex items-center justify-start w-full space-x-6 text-gray-400"
-                >
-                  <Trash2 size={16} />
-                  <span>Clear all</span>
-                </button>
-              </>
-            )}
+            {!isEmpty &&
+              (isCleared ? (
+                <>
+                  <Separator className="bg-gray-700" />
+                  <button
+                    onClick={handleSelectAll}
+                    className="flex items-center justify-start w-full space-x-6 text-gray-400"
+                  >
+                    <Layers size={16} />
+                    <span>Select all</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Separator className="bg-gray-700" />
+                  <button
+                    onClick={handleClearAll}
+                    className="flex items-center justify-start w-full space-x-6 text-gray-400"
+                  >
+                    <Trash2 size={16} />
+                    <span>Clear all</span>
+                  </button>
+                </>
+              ))}
           </div>
         </AccordionContent>
       </AccordionItem>
@@ -197,11 +166,11 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
   );
 
   return (
-    <div className="flex flex-col sm:flex-row h-full relative w-full">
+    <div className="flex flex-col md:flex-row h-full relative w-full">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 backdrop-blur-md z-40 sm:hidden"
+          className="fixed inset-0 backdrop-blur-md z-40 lg:hidden"
           onClick={toggleSidebar}
         />
       )}
@@ -210,14 +179,14 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
       <div
         className={`
         ${/* Desktop styles */ ""}
-        sm:w-[300px] sm:border-r sm:border-gray-700 sm:flex sm:flex-col sm:h-full sm:relative sm:transform-none sm:transition-none
+        md:w-[360px] md:border-r md:border-gray-700 md:flex md:flex-col md:h-full md:relative md:transform-none md:transition-none
         ${/* Mobile styles */ ""}
-        fixed top-0 left-0 h-full w-[280px] bg-slate-900 border-r border-gray-700 flex flex-col z-50 transform transition-transform duration-300 ease-in-out
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"}
+        fixed top-0 left-0 h-full w-[360px] bg-slate-900 border-r border-gray-700 flex flex-col z-50 transform transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}
       >
         {/* Mobile Close Button */}
-        <div className="sm:hidden flex items-center justify-between p-4 border-b border-gray-700">
+        <div className="md:hidden flex items-center justify-between p-4 border-b border-gray-700">
           <span className="text-white font-medium">_projects</span>
           <Button
             variant="ghost"
@@ -235,59 +204,68 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-0 w-full">
+      <div className="flex-1 flex flex-col h-full w-full">
         {/* Tab Header */}
-        <div className="items-center border-b border-gray-700 sticky top-0 bg-slate-900 z-10">
-          <div
-            className={`px-4 py-3 flex items-center w-full sm:w-fit justify-between md:justify-start gap-3 ${!isEmpty ? "sm:border-r sm:border-gray-700" : ""}`}
-          >
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleSidebar}
-                className="sm:hidden text-gray-400 hover:bg-gray-700 hover:text-white p-1 mr-3"
-              >
-                <PanelRight size={20} />
-              </Button>
-              {selectedTechs.length === availableTechs.length ? (
-                <span className="text-gray-400 text-sm">all stack</span>
+        {!isEmpty && (
+          <div className="items-center border-b border-gray-700 sticky top-0 bg-slate-900 z-10">
+            <div
+              className={`px-4 py-3 flex items-center w-full md:w-fit justify-between md:justify-start gap-3 ${!isCleared ? "md:border-r md:border-gray-700" : ""}`}
+            >
+              <div className="flex items-center">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleSidebar}
+                  className="sm:hidden text-gray-400 hover:bg-gray-700 hover:text-white p-1 mr-3"
+                >
+                  <PanelRight size={20} />
+                </Button>
+                {selectedTechs.length === availableTechs.length ? (
+                  <span className="text-gray-400 text-sm">all stack</span>
+                ) : (
+                  <span className="text-gray-400 text-sm">
+                    {selectedTechs.length > 3
+                      ? `${selectedTechs.slice(0, 3).join(", ")}...`
+                      : selectedTechs.join(", ")}
+                  </span>
+                )}
+              </div>
+
+              {!isCleared ? (
+                <button className="text-gray-500 hover:text-white cursor-pointer">
+                  ×
+                </button>
               ) : (
-                <span className="text-gray-400 text-sm">
-                  {selectedTechs.length > 3
-                    ? `${selectedTechs.slice(0, 3).join(", ")}...`
-                    : selectedTechs.join(", ")}
-                </span>
+                <div className="flex-1 w-full h-6" />
               )}
             </div>
-
-            {!isEmpty ? (
-              <button className="text-gray-500 hover:text-white cursor-pointer">
-                ×
-              </button>
-            ) : (
-              <div className="flex-1 w-full h-6" />
-            )}
           </div>
-        </div>
+        )}
 
         {/* Projects Grid or Empty State */}
         {isEmpty ? (
+          <div className="flex-1 flex justify-center items-center w-full flex-shrink-0">
+            <p className="text-gray-500 text-lg px-6 text-center">
+              No projects found
+            </p>
+          </div>
+        ) : isCleared ? (
           <div className="flex-1 flex justify-center items-center w-full flex-shrink-0">
             <p className="text-gray-500 text-lg px-6 text-center">
               No projects found for selected technologies
             </p>
           </div>
         ) : (
-          <div className="flex-1 px-12 pt-6 overflow-y-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 gap-x-12 gap-y-6">
+          <div className="flex-1 px-4 lg:px-12 pt-6 overflow-y-auto ">
+            <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 max-w-7xl mx-auto ">
               <AnimatePresence>
-                {filteredProjects.map((project, index) => (
+                {filteredProjects?.map((project, index) => (
                   <ProjectCard
-                    key={project.id}
+                    key={project._id}
                     project={project}
-                    onViewProject={() => handleViewProject(project.id)}
+                    onViewProject={() => handleViewProject(project._id)}
                     delay={index}
+                    index={index}
                   />
                 ))}
               </AnimatePresence>

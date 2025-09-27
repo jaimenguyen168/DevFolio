@@ -49,7 +49,7 @@ http.route({
       case "user.created":
         // Create a new user in Convex based on data
         await ctx.runMutation(internal.functions.auth.upsertFromClerk, {
-          data: data.data, // Clerk webhook structure has data nested in data property
+          data: data.data,
         });
         break;
       case "user.updated":
@@ -59,11 +59,9 @@ http.route({
         });
         break;
       case "user.deleted":
-        // Delete user from Convex
-        // You'll need to implement this mutation
-        // await ctx.runMutation(internal.functions.auth.deleteFromClerk, {
-        //   externalId: data.data.id,
-        // });
+        await ctx.runMutation(internal.functions.auth.deleteFromClerk, {
+          externalId: data.data.id,
+        });
         break;
     }
 

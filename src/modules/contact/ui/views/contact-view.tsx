@@ -31,12 +31,12 @@ import { api } from "../../../../../convex/_generated/api";
 import NotFoundView from "@/modules/auth/ui/views/not-found-view";
 
 const contactFormSchema = z.object({
-  name: z
+  senderName: z
     .string()
     .min(2, { message: "Name must be at least 2 characters." })
     .max(50, { message: "Name must not exceed 50 characters." }),
-  email: z.email({ message: "Please enter a valid email address." }),
-  message: z
+  senderEmail: z.email({ message: "Please enter a valid email address." }),
+  senderMessage: z
     .string()
     .min(10, { message: "Message must be at least 10 characters." })
     .max(500, { message: "Message must not exceed 500 characters." }),
@@ -61,9 +61,9 @@ const ContactView = ({ username }: ContactViewProps) => {
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      message: "",
+      senderName: "",
+      senderEmail: "",
+      senderMessage: "",
     },
   });
 
@@ -80,7 +80,11 @@ const ContactView = ({ username }: ContactViewProps) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          recipientEmail: user?.email,
+          recipientName: user?.name,
+        }),
       });
 
       const result = await response.json();
@@ -104,9 +108,9 @@ const ContactView = ({ username }: ContactViewProps) => {
     setSubmitStatus("idle");
     form.reset(
       {
-        name: "",
-        email: "",
-        message: "",
+        senderName: "",
+        senderEmail: "",
+        senderMessage: "",
       },
       {
         keepErrors: false,
@@ -135,9 +139,9 @@ const ContactView = ({ username }: ContactViewProps) => {
 const button = document.getElementById('submit-button');
 
 const message = {${`
-  name: "${watchedValues.name}",
-  email: "${watchedValues.email}",
-  message: "${watchedValues.message}",
+  name: "${watchedValues.senderName}",
+  email: "${watchedValues.senderEmail}",
+  message: "${watchedValues.senderMessage}",
   date: "${date}",
 }`}
 
@@ -248,9 +252,9 @@ button.addEventListener('click', () => {
       <div
         className={`
         ${/* Desktop styles */ ""}
-        sm:w-[300px] sm:border-r sm:border-gray-700 sm:flex sm:flex-col sm:h-full sm:relative sm:transform-none sm:transition-none
+        sm:w-[360px] sm:border-r sm:border-gray-700 sm:flex sm:flex-col sm:h-full sm:relative sm:transform-none sm:transition-none
         ${/* Mobile styles */ ""}
-        fixed top-0 left-0 h-full w-[280px] bg-slate-900 border-r border-gray-700 flex flex-col z-50 transform transition-transform duration-300 ease-in-out
+        fixed top-0 left-0 h-full w-[360px] bg-slate-900 border-r border-gray-700 flex flex-col z-50 transform transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"}
       `}
       >
@@ -310,7 +314,7 @@ button.addEventListener('click', () => {
                   {/* Name Field */}
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="senderName"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-gray-300 text-sm">
@@ -331,7 +335,7 @@ button.addEventListener('click', () => {
                   {/* Email Field */}
                   <FormField
                     control={form.control}
-                    name="email"
+                    name="senderEmail"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-gray-300 text-sm">
@@ -353,7 +357,7 @@ button.addEventListener('click', () => {
                   {/* Message Field */}
                   <FormField
                     control={form.control}
-                    name="message"
+                    name="senderMessage"
                     render={({ field }) => (
                       <FormItem className="min-w-1/2">
                         <FormLabel className="text-gray-300 text-sm">

@@ -1,5 +1,6 @@
-import { query } from "../_generated/server";
+import { mutation, query } from "../_generated/server";
 import { ConvexError, v } from "convex/values";
+import { validateUser } from "../utils";
 
 export const getUser = query({
   args: {
@@ -38,10 +39,7 @@ export const isCurrentUser = query({
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "You are not authenticated",
-      });
+      return null;
     }
 
     const currentUser = await ctx.db
@@ -57,18 +55,6 @@ export const isCurrentUser = query({
     }
 
     return currentUser.username === args.username;
-  },
-});
-
-export const getUserLinks = query({
-  args: {
-    userId: v.id("users"),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("userLinks")
-      .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
-      .collect();
   },
 });
 
@@ -89,5 +75,26 @@ export const searchUsers = query({
         q.gte("username", searchTerm).lt("username", searchTerm + "\uFFFF"),
       )
       .take(10);
+  },
+});
+
+export const updateUser = mutation({
+  args: {
+    updates: v.object({
+      name: v.optional(v.string()),
+      email: v.optional(v.string()),
+      title: v.optional(v.string()),
+      username: v.optional(v.string()),
+      phone: v.optional(v.string()),
+      bio: v.optional(v.string()),
+      hashtags: v.optional(v.array(v.string())),
+    }),
+  },
+  handler: async (ctx, { updates }) => {
+    const user = await validateUser(ctx);
+
+    await ctx.db.patch(user._id, updates);
+
+    return await ctx.db.get(user._id);
   },
 });

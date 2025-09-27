@@ -98,7 +98,7 @@ export default bio;`;
         </div>
 
         {/* Bio Content - CodeMirror Card */}
-        <div className="bg-slate-800 lg:absolute left-84 top-16 rounded-3xl p-6 lg:-ml-24 mt-4 lg:mt-16 shadow-lg flex-1 min-w-0 lg:max-w-3xl z-10 w-full">
+        <div className="bg-slate-800 lg:absolute left-84 top-16 rounded-3xl p-6 lg:-ml-24 mt-4 lg:mt-16 shadow-lg flex-1 lg:max-w-3xl z-10">
           <div className="h-auto">
             <CodeMirror
               value={generateBioCode()}

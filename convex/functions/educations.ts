@@ -39,7 +39,7 @@ export const createEducation = mutation({
     gpa: v.optional(v.number()),
     startYear: v.optional(v.number()),
     endYear: v.optional(v.number()),
-    description: v.optional(v.string()),
+    details: v.optional(v.string()),
     type: v.union(...EDUCATION_TYPES.map((type) => v.literal(type))),
   },
   handler: async (ctx, args) => {
@@ -55,7 +55,7 @@ export const createEducation = mutation({
       gpa: args.gpa,
       startYear: args.startYear,
       endYear: args.endYear,
-      description: args.description,
+      details: args.details,
       type: args.type,
     });
   },
@@ -74,7 +74,7 @@ export const updateEducation = mutation({
       gpa: v.optional(v.number()),
       startYear: v.optional(v.number()),
       endYear: v.optional(v.number()),
-      description: v.optional(v.string()),
+      details: v.optional(v.string()),
       type: v.optional(
         v.union(...EDUCATION_TYPES.map((type) => v.literal(type))),
       ),

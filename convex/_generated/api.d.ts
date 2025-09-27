@@ -20,6 +20,7 @@ import type * as functions_interests from "../functions/interests.js";
 import type * as functions_projects from "../functions/projects.js";
 import type * as functions_userLinks from "../functions/userLinks.js";
 import type * as functions_users from "../functions/users.js";
+import type * as functions_workExperience from "../functions/workExperience.js";
 import type * as http from "../http.js";
 import type * as schemas_users from "../schemas/users.js";
 import type * as utils from "../utils.js";
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   "functions/projects": typeof functions_projects;
   "functions/userLinks": typeof functions_userLinks;
   "functions/users": typeof functions_users;
+  "functions/workExperience": typeof functions_workExperience;
   http: typeof http;
   "schemas/users": typeof schemas_users;
   utils: typeof utils;

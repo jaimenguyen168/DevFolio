@@ -47,7 +47,7 @@ export const userEducation = defineTable({
   gpa: v.optional(v.number()),
   startYear: v.optional(v.number()),
   endYear: v.optional(v.number()),
-  description: v.optional(v.string()),
+  details: v.optional(v.string()),
   type: v.union(
     v.literal("high-school"),
     v.literal("university"),
@@ -63,11 +63,24 @@ export const userWorkExperience = defineTable({
   userId: v.id("users"),
   company: v.string(),
   position: v.string(),
-  startDate: v.number(),
-  endDate: v.optional(v.number()),
+  startDate: v.string(),
+  endDate: v.optional(v.string()),
   description: v.optional(v.string()),
   location: v.optional(v.string()),
-}).index("by_user_id", ["userId"]);
+  logoUrl: v.optional(v.string()),
+  type: v.union(
+    v.literal("full-time"),
+    v.literal("part-time"),
+    v.literal("contract"),
+    v.literal("internship"),
+    v.literal("freelance"),
+    v.literal("consulting"),
+    v.literal("other"),
+  ),
+  responsibilities: v.optional(v.array(v.string())),
+})
+  .index("by_user_id", ["userId"])
+  .index("by_user_and_type", ["userId", "type"]);
 
 export const userSkills = defineTable({
   userId: v.id("users"),

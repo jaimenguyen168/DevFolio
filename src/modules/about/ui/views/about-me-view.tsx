@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { Folder, File, Mail, Phone, User, X, PanelRight } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  User,
+  X,
+  PanelRight,
+  ScanFace,
+  BriefcaseBusiness,
+  LibraryBig,
+  Mails,
+} from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -16,6 +26,7 @@ import { convertName } from "@/lib/utils";
 import BioView from "@/modules/about/ui/views/bio-view";
 import Loading from "@/components/Loading";
 import EducationView from "@/modules/about/ui/views/education-view";
+import WorkExperienceView from "@/modules/about/ui/views/work-experience-view";
 
 interface AboutMeViewProps {
   username: string;
@@ -28,19 +39,18 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
   const educations = useQuery(api.functions.educations.getEducations, {
     username: username,
   });
-  const workExperiences: any[] = [];
+  const workExperiences = useQuery(
+    api.functions.workExperience.getWorkExperiences,
+    {
+      username: username,
+    },
+  );
 
   const [activeContent, setActiveContent] = useState("bio");
-  const [activeName, setActiveName] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const handleContentClick = (contentKey: string, name?: string) => {
+  const handleContentClick = (contentKey: string) => {
     setActiveContent(contentKey);
-    if (name) {
-      setActiveName(name);
-    } else {
-      setActiveName(null);
-    }
     setIsSidebarOpen(false);
   };
 
@@ -57,8 +67,8 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
   }
 
   const isBioEmpty = !user.bio || user.bio === "";
-  const isWorkExperienceEmpty = workExperiences?.length === 0;
   const isEducationEmpty = educations?.length === 0;
+  const isWorkExperienceEmpty = workExperiences?.length === 0;
   const hasHeaderContent =
     (!isBioEmpty && activeContent === "bio") ||
     (!isWorkExperienceEmpty && activeContent === "work-experience") ||
@@ -71,18 +81,9 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
       case "interests":
         return <div>interests</div>;
       case "work-experience":
-        return <div>work-experience</div>;
+        return <WorkExperienceView workExperiences={workExperiences} />;
       case "education":
-        const selectedEducation = educations?.find(
-          (edu) => edu.institution === activeName,
-        );
-        return selectedEducation ? (
-          <EducationView education={selectedEducation} />
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-gray-400">Education not found</p>
-          </div>
-        );
+        return <EducationView educations={educations} />;
       default:
         return <div>bio</div>;
     }
@@ -103,7 +104,7 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
         </AccordionTrigger>
         <AccordionContent className="pb-2">
           <div className="mt-2 space-y-2 ml-7">
-            {/* Bio - Direct button, no accordion */}
+            {/* Bio */}
             <Button
               variant="ghost"
               onClick={() => handleContentClick("bio")}
@@ -111,131 +112,52 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
                 activeContent === "bio" ? "text-orange-400" : "text-gray-400"
               }`}
             >
-              <File size={14} />
+              <ScanFace size={14} />
               <span>_bio.md</span>
             </Button>
-            {/* Work Experience - Accordion */}
-            <Accordion type="multiple" className="w-full">
-              <AccordionItem
-                value="work-experience"
-                className="border-none ml-3"
-              >
-                <AccordionTrigger
-                  className={`flex items-center space-x-2 transition-colors hover:no-underline py-1 hover:bg-transparent mb-2 hover:!text-purple-400 ${
-                    activeContent === "work-experience"
-                      ? "!text-purple-400"
-                      : "text-gray-400"
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleContentClick("work-experience");
-                  }}
-                >
-                  <span className="flex items-center">
-                    <Folder size={16} className="mr-2" />
-                    <span className="text-md">_work-experience</span>
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-1">
-                  <div className="space-y-1 ml-3">
-                    {workExperiences?.map((work) => (
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleContentClick("work-experience")}
-                        className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:text-purple-400 ${
-                          activeContent === "work-experience"
-                            ? "text-purple-400"
-                            : "text-gray-400"
-                        }`}
-                      >
-                        <File size={12} />
-                        <span className="text-sm">
-                          {convertName(work.company)}.md
-                        </span>
-                      </Button>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-            {/* Education Accordion - Only if there are education records */}
-            <Accordion type="multiple" className="w-full">
-              <AccordionItem value="education" className="border-none ml-3">
-                <AccordionTrigger
-                  className={`flex items-center space-x-2 transition-colors hover:no-underline py-1 hover:bg-transparent mb-2 hover:!text-blue-400 ${
-                    activeContent === "education"
-                      ? "!text-blue-400 "
-                      : "text-gray-400"
-                  }`}
-                >
-                  <span className="flex items-center">
-                    <Folder size={16} className="mr-2" />
-                    <span className="text-md">_education</span>
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-1">
-                  <div className="space-y-1 ml-3">
-                    {educations?.map((edu) => (
-                      <Button
-                        key={edu._id}
-                        variant="ghost"
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onClick={(e) => {
-                          e.stopPropagation(); // stop bubbling here too
-                          handleContentClick("education", edu.institution);
-                        }}
-                        className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:text-blue-400 ${
-                          activeName === edu.institution
-                            ? "text-blue-400"
-                            : "text-gray-400 hover:text-blue-400"
-                        }`}
-                      >
-                        <File size={12} />
-                        <span className="text-sm truncate">
-                          {convertName(edu.institution)}.md
-                        </span>
-                      </Button>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+
+            {/* Work Experience */}
+            <Button
+              variant="ghost"
+              onClick={() => handleContentClick("work-experience")}
+              className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:!text-purple-400 ${
+                activeContent === "work-experience"
+                  ? "text-purple-400"
+                  : "text-gray-400"
+              }`}
+            >
+              <BriefcaseBusiness size={14} />
+              <span>_work-experience.md</span>
+            </Button>
+
+            {/* Education */}
+            <Button
+              variant="ghost"
+              onClick={() => handleContentClick("education")}
+              className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:!text-blue-400 ${
+                activeContent === "education"
+                  ? "text-blue-400"
+                  : "text-gray-400"
+              }`}
+            >
+              <LibraryBig size={14} />
+              <span>_education.md</span>
+            </Button>
 
             {/* TODO: Interests */}
-            {/* Interests - Accordion */}
-            {/*<Accordion type="multiple" className="w-full">*/}
-            {/*  <AccordionItem value="interests" className="border-none ml-3">*/}
-            {/*    <AccordionTrigger*/}
-            {/*      className={`flex items-center space-x-2 transition-colors hover:no-underline py-1 hover:bg-transparent mb-2 hover:!text-green-400 ${*/}
-            {/*        activeContent === "interests"*/}
-            {/*          ? "!text-green-400"*/}
-            {/*          : "text-gray-400"*/}
-            {/*      }`}*/}
-            {/*    >*/}
-            {/*      <span className="flex items-center">*/}
-            {/*        <Folder size={16} className="mr-2" />*/}
-            {/*        <span className="text-md">_interests</span>*/}
-            {/*      </span>*/}
-            {/*    </AccordionTrigger>*/}
-            {/*    <AccordionContent className="pb-1">*/}
-            {/*      <div className="space-y-1 ml-3">*/}
-            {/*        <Button*/}
-            {/*          variant="ghost"*/}
-            {/*          onClick={() => handleContentClick("interests")}*/}
-            {/*          className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:text-green-400 ${*/}
-            {/*            activeContent === "interests"*/}
-            {/*              ? "text-green-400"*/}
-            {/*              : "text-gray-400"*/}
-            {/*          }`}*/}
-            {/*        >*/}
-            {/*          <File size={12} />*/}
-            {/*          <span className="text-sm">interests.md</span>*/}
-            {/*        </Button>*/}
-            {/*      </div>*/}
-            {/*    </AccordionContent>*/}
-            {/*  </AccordionItem>*/}
-            {/*</Accordion>*/}
+            {/* Interests */}
+            {/*<Button*/}
+            {/*  variant="ghost"*/}
+            {/*  onClick={() => handleContentClick("interests")}*/}
+            {/*  className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:!text-green-400 ${*/}
+            {/*    activeContent === "interests"*/}
+            {/*      ? "text-green-400"*/}
+            {/*      : "text-gray-400"*/}
+            {/*  }`}*/}
+            {/*>*/}
+            {/*  <File size={14} />*/}
+            {/*  <span>_interests.md</span>*/}
+            {/*</Button>*/}
           </div>
         </AccordionContent>
       </AccordionItem>
@@ -244,7 +166,7 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
       <AccordionItem value="contacts" className="border-gray-700">
         <AccordionTrigger className="flex items-center space-x-2 text-white hover:text-orange-400 transition-colors hover:no-underline py-3.5 border-b border-gray-700 rounded-none px-4">
           <span className="flex items-center">
-            <User size={16} className="mr-2" /> _contact
+            <Mails size={16} className="mr-2" /> _contact
           </span>
         </AccordionTrigger>
         <AccordionContent className="pb-2">
@@ -264,10 +186,6 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
       </AccordionItem>
     </Accordion>
   );
-
-  if (educations === undefined) {
-    return null;
-  }
 
   if (!user) {
     return <NotFoundView />;
@@ -324,7 +242,7 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
                   <PanelRight size={20} />
                 </Button>
                 <span className="text-gray-400 text-sm">
-                  {convertName(activeName || activeContent)}.md
+                  {convertName(activeContent)}.md
                 </span>
               </div>
 
@@ -336,7 +254,7 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
         )}
 
         {/* Content Area */}
-        <div className="flex-1 w-full h-full overflow-y-auto overflow-x-hidden">
+        <div className="flex-1 w-full h-full overflow-y-auto">
           {hasHeaderContent ? (
             <div className="min-h-full">{renderContent()}</div>
           ) : (

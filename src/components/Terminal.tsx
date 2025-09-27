@@ -59,6 +59,12 @@ const Terminal = () => {
   const userEducations = useQuery(api.functions.educations.getEducations, {
     username: username as string,
   });
+  const userWorkExperiences = useQuery(
+    api.functions.workExperience.getWorkExperiences,
+    {
+      username: username as string,
+    },
+  );
 
   // Mutations
   const updateUser = useMutation(api.functions.users.updateUser);
@@ -77,6 +83,15 @@ const Terminal = () => {
   const createEducation = useMutation(api.functions.educations.createEducation);
   const updateEducation = useMutation(api.functions.educations.updateEducation);
   const deleteEducation = useMutation(api.functions.educations.deleteEducation);
+  const createWorkExperience = useMutation(
+    api.functions.workExperience.createWorkExperience,
+  );
+  const updateWorkExperience = useMutation(
+    api.functions.workExperience.updateWorkExperience,
+  );
+  const deleteWorkExperience = useMutation(
+    api.functions.workExperience.deleteWorkExperience,
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalContentRef = useRef<HTMLDivElement>(null);
@@ -232,6 +247,9 @@ const Terminal = () => {
       createEducation,
       updateEducation,
       deleteEducation,
+      createWorkExperience,
+      updateWorkExperience,
+      deleteWorkExperience,
     };
 
     let data: any = null;
@@ -247,6 +265,9 @@ const Terminal = () => {
         break;
       case "educations":
         data = { userEducations, currentUser };
+        break;
+      case "work":
+        data = { userWorkExperiences, currentUser };
         break;
       default:
         data = null;

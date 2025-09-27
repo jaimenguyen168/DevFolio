@@ -4,12 +4,14 @@ import { usersGitOperations } from "@/lib/git/gitUsers";
 import { userLinksGitOperations } from "@/lib/git/gitUserLinks";
 import { userProjectsGitOperations } from "@/lib/git/gitProjects";
 import { userEducationGitOperations } from "@/lib/git/gitEducations";
+import { userWorkExperienceGitOperations } from "@/lib/git/gitWorkExp";
 
 export const TABLE_OPERATIONS: Record<string, TableGitOperations> = {
   users: usersGitOperations,
   links: userLinksGitOperations,
   projects: userProjectsGitOperations,
   educations: userEducationGitOperations,
+  work: userWorkExperienceGitOperations,
 };
 
 export const TABLE_CONFIGS: Record<string, TableConfig> = {
@@ -71,13 +73,37 @@ export const TABLE_CONFIGS: Record<string, TableConfig> = {
       "gpa",
       "startYear",
       "endYear",
-      "description",
+      "details",
       "type",
     ],
     queryFunction: api.functions.educations.getEducations,
     createFunction: api.functions.educations.createEducation,
     updateFunction: api.functions.educations.updateEducation,
     deleteFunction: api.functions.educations.deleteEducation,
+    requiresUserId: true,
+    canCreate: true,
+    canUpdate: true,
+    canDelete: true,
+    identifierField: "_id",
+  },
+  work: {
+    name: "userWorkExperience",
+    displayName: "Work Experience",
+    fields: [
+      "company",
+      "position",
+      "startDate",
+      "endDate",
+      "description",
+      "location",
+      "logoUrl",
+      "type",
+      "responsibilities",
+    ],
+    queryFunction: api.functions.workExperience.getWorkExperiences,
+    createFunction: api.functions.workExperience.createWorkExperience,
+    updateFunction: api.functions.workExperience.updateWorkExperience,
+    deleteFunction: api.functions.workExperience.deleteWorkExperience,
     requiresUserId: true,
     canCreate: true,
     canUpdate: true,

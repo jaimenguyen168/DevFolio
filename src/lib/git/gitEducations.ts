@@ -25,7 +25,7 @@ export const userEducationGitOperations: TableGitOperations = {
       "gpa",
       "startYear",
       "endYear",
-      "description",
+      "details",
       "type",
     ];
 
@@ -181,7 +181,7 @@ export const userEducationGitOperations: TableGitOperations = {
           gpa: commitData.gpa,
           startYear: commitData.startYear,
           endYear: commitData.endYear,
-          description: commitData.description,
+          details: commitData.details,
           type: commitData.type,
         });
         result = "Created new education";

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { usePathname } from "next/navigation";
 import { useUsername } from "@/components/UsernameProvider";
+import Image from "next/image";
 
 const navLinks = [
   { label: "_hello", href: "/home" },
@@ -52,12 +53,23 @@ const NavBar = () => {
     <nav className="flex items-center w-full border-b border-gray-700">
       {/* Desktop Navigation */}
       <div className="hidden lg:contents">
-        <Link
-          href={`/${username}/home`}
-          className="w-[360px] px-8 py-5 border-r border-gray-700 text-gray-400 block"
-        >
-          {user?.name || "No User"}
-        </Link>
+        <div className="w-[360px] flex items-center space-x-4  px-8 py-5 border-r border-gray-700 ">
+          <Link href="/">
+            <Image
+              src="/icon.png"
+              alt="devfolio logo"
+              width={25}
+              height={25}
+              className="size-7"
+            />
+          </Link>
+          <Link
+            href={`/${username}/home`}
+            className="text-orange-400 hover:!text-orange-300 transition-colors"
+          >
+            {user?.name || "No User"}
+          </Link>
+        </div>
 
         {user && (
           <>
@@ -106,8 +118,22 @@ const NavBar = () => {
 
       {/* Mobile Navigation */}
       <div className="lg:hidden flex items-center justify-between w-full px-6 py-5">
-        <div className="text-gray-400">
-          <Link href={`/${username}/home`}>{user?.name || "No User"}</Link>
+        <div className="flex items-center space-x-3">
+          <Link href="/" className="text-gray-400">
+            <Image
+              src="/icon.png"
+              alt="devfolio logo"
+              width={25}
+              height={25}
+              className="size-7"
+            />
+          </Link>
+          <Link
+            href={`/${username}/home`}
+            className="text-orange-400 hover:!text-orange-300 transition-colors"
+          >
+            {user?.name || "No User"}
+          </Link>
         </div>
 
         {user && (

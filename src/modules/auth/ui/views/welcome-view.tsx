@@ -21,6 +21,8 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import Image from "next/image";
+import Link from "next/link";
 
 const WelcomeView = () => {
   const router = useRouter();
@@ -133,10 +135,19 @@ const WelcomeView = () => {
       <div className="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 font-mono border border-gray-700 rounded-lg overflow-hidden h-full flex flex-col">
         {/* Header */}
         <div className="border-b border-gray-700 p-6 flex items-center justify-between">
-          <div className="flex items-center space-x-2 text-gray-400">
-            <Code size={24} />
-            <span className="text-lg">DevFolio</span>
-          </div>
+          <Link href="/" className="flex items-center space-x-3">
+            <Image
+              src="/icon.png"
+              alt="devfolio logo"
+              width={25}
+              height={25}
+              className="size-7"
+            />
+
+            <span className="text-lg font-semibold text-orange-400">
+              DevFolio
+            </span>
+          </Link>
 
           <div className="flex items-center space-x-2 text-gray-400">
             <span className="text-gray-400">Built with</span>
@@ -188,10 +199,10 @@ const WelcomeView = () => {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="bg-transparent border-gray-600 text-gray-300 hover:text-orange-300 hover:border-orange-400 transition-all duration-300 px-8 py-6 text-lg font-mono group"
+                    className="bg-transparent hover:bg-white/20 border-gray-600 text-gray-300 hover:text-orange-300 hover:border-orange-400 transition-all duration-300 px-8 py-6 text-lg font-mono group"
                   >
                     <Search
-                      className="mr-3 group-hover:text-orange-300"
+                      className="mr-3 group-hover:text-orange-300 group-hover:rotate-12"
                       size={20}
                     />
                     Browse Portfolios

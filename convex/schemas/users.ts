@@ -102,6 +102,7 @@ export const userSkills = defineTable({
 export const userProjects = defineTable({
   userId: v.id("users"),
   name: v.string(),
+  slug: v.string(),
   description: v.string(),
   url: v.optional(v.string()),
   githubUrl: v.optional(v.string()),
@@ -116,4 +117,12 @@ export const userProjects = defineTable({
   techStack: v.optional(
     v.array(v.union(...TECH_STACKS.map((tech) => v.literal(tech)))),
   ),
-}).index("by_user_id", ["userId"]);
+  features: v.optional(v.array(v.string())),
+  futureFeatures: v.optional(v.array(v.string())),
+  contributors: v.optional(v.id("users")),
+  views: v.optional(v.number()),
+})
+  .index("by_user_id", ["userId"])
+  .index("by_user_and_slug", ["userId", "slug"])
+  .index("by_user_and_name", ["userId", "name"])
+  .index("by_slug", ["slug"]);

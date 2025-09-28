@@ -137,7 +137,7 @@ const WelcomeView = () => {
         <div className="border-b border-gray-700 p-6 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3">
             <Image
-              src="/logo.png"
+              src="/icon.png"
               alt="devfolio logo"
               width={25}
               height={25}

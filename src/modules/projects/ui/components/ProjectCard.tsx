@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Project } from "@/modules/types";
+import { Project, ProjectId } from "@/modules/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTechInfo } from "@/modules/projects/lib/techStacks";
 import { motion } from "motion/react";
@@ -10,26 +10,30 @@ import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 import { convertName } from "@/lib/utils";
+import { useMutation } from "convex/react";
+import { api } from "../../../../../convex/_generated/api";
 
 const TECH_CUTOFF = 3;
 
 interface ProjectCardProps {
   project: Project;
-  onViewProject: () => void;
+  username: string;
   delay?: number;
   index?: number;
 }
 
 const ProjectCard = ({
   project,
-  onViewProject,
+  username,
   delay = 0,
   index = 0,
 }: ProjectCardProps) => {
-  const { name, description, techStack, githubUrl, imageUrls } = project;
+  const { _id, name, description, techStack, githubUrl, imageUrls } = project;
 
   const [repoData, setRepoData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  const updateViews = useMutation(api.functions.projects.updateProjectViews);
 
   useEffect(() => {
     if (githubUrl) {
@@ -55,12 +59,16 @@ const ProjectCard = ({
     return null;
   }
 
+  const handleViewProject = async () => {
+    await updateViews({ projectId: _id });
+  };
+
   return (
     <motion.div
       initial={{ y: 50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 50, opacity: 0 }}
-      transition={{ delay: delay * 0.1, duration: 0.5 }}
+      transition={{ delay: delay * 0.05, duration: 0.5 }}
     >
       <div className="flex flex-col space-y-4 m-4">
         {/* Header */}
@@ -136,14 +144,18 @@ const ProjectCard = ({
               </p>
 
               <div className="flex items-center justify-between">
-                <Button
-                  onClick={onViewProject}
-                  variant="outline"
-                  size="sm"
-                  className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white transition-all duration-200 hover:shadow-md"
+                <Link
+                  href={`/${username}/projects/${project.slug}`}
+                  onClick={handleViewProject}
                 >
-                  view-project
-                </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white transition-all duration-200 hover:shadow-md"
+                  >
+                    view-project
+                  </Button>
+                </Link>
 
                 {githubUrl &&
                   (loading ? (

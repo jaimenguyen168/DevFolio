@@ -27,7 +27,7 @@ import { AnimatePresence } from "motion/react";
 import { api } from "../../../../../convex/_generated/api";
 import { useQuery } from "convex/react";
 import NotFoundView from "@/modules/auth/ui/views/not-found-view";
-import { ProjectId } from "@/modules/types";
+import Loading from "@/components/Loading";
 
 interface ProjectsViewProps {
   username: string;
@@ -45,8 +45,6 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
   const projects = useQuery(api.functions.projects.getProjects, {
     username: username,
   });
-
-  console.log(JSON.stringify(projects, null, 2));
 
   useEffect(() => {
     if (projects) {
@@ -81,12 +79,8 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
   const isEmpty = projects?.length === 0;
   const isCleared = filteredProjects?.length === 0;
 
-  const handleViewProject = (projectId: ProjectId) => {
-    console.log(`Viewing project ${projectId}`);
-  };
-
   if (user === undefined || projects === undefined) {
-    return null;
+    return <Loading />;
   }
 
   if (!user || !projects) {
@@ -206,7 +200,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-full w-full">
         {/* Tab Header */}
-        {!isEmpty && (
+        {!isEmpty && !isCleared && (
           <div className="items-center border-b border-gray-700 sticky top-0 bg-slate-900 z-10">
             <div
               className={`px-4 py-3 flex items-center w-full md:w-fit justify-between md:justify-start gap-3 ${!isCleared ? "md:border-r md:border-gray-700" : ""}`}
@@ -231,13 +225,12 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
                 )}
               </div>
 
-              {!isCleared ? (
-                <button className="text-gray-500 hover:text-white cursor-pointer">
-                  ×
-                </button>
-              ) : (
-                <div className="flex-1 w-full h-6" />
-              )}
+              <button
+                onClick={handleClearAll}
+                className="text-gray-500 hover:text-white cursor-pointer"
+              >
+                ×
+              </button>
             </div>
           </div>
         )}
@@ -263,7 +256,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
                   <ProjectCard
                     key={project._id}
                     project={project}
-                    onViewProject={() => handleViewProject(project._id)}
+                    username={username}
                     delay={index}
                     index={index}
                   />

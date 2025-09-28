@@ -56,7 +56,7 @@ const NavBar = () => {
         <div className="w-[360px] flex items-center space-x-4  px-8 py-5 border-r border-gray-700 ">
           <Link href="/">
             <Image
-              src="/logo.png"
+              src="/icon.png"
               alt="devfolio logo"
               width={25}
               height={25}
@@ -121,7 +121,7 @@ const NavBar = () => {
         <div className="flex items-center space-x-3">
           <Link href="/" className="text-gray-400">
             <Image
-              src="/logo.png"
+              src="/icon.png"
               alt="devfolio logo"
               width={25}
               height={25}

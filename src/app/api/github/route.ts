@@ -1,3 +1,19 @@
+export interface GitHubRepoData {
+  name: string;
+  description: string;
+  stars: number;
+  forks: number;
+  language: string;
+  languages: Record<string, number>;
+  lastCommit: string;
+  lastCommitDate: string | null;
+  lastCommitAuthor: string | null;
+  createdAt: string;
+  updatedAt: string;
+  homepage: string | null;
+  topics: string[];
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const githubUrl = searchParams.get("url");
@@ -28,20 +44,20 @@ export async function GET(request: Request) {
     // Get basic repo info
     const repoResponse = await fetch(
       `https://api.github.com/repos/${owner}/${repo}`,
-      { headers },
+      { headers, next: { revalidate: 3600 } },
     );
     const repoData = await repoResponse.json();
 
     // Get languages
     const languagesResponse = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/languages`,
-      { headers },
+      { headers, next: { revalidate: 3600 } },
     );
     const languagesData = await languagesResponse.json();
 
     const commitsResponse = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`,
-      { headers },
+      { headers, next: { revalidate: 900 } },
     );
     const commitsData = await commitsResponse.json();
 
@@ -52,7 +68,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const result = {
+    const result: GitHubRepoData = {
       name: repoData.name,
       description: repoData.description,
       stars: repoData.stargazers_count,
@@ -68,7 +84,11 @@ export async function GET(request: Request) {
       topics: repoData.topics || [],
     };
 
-    return Response.json(result);
+    return Response.json(result, {
+      headers: {
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200",
+      },
+    });
   } catch (error) {
     return Response.json(
       { error: "Failed to fetch repository data" },

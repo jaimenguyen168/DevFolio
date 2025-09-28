@@ -31,7 +31,7 @@ const HomeView = ({ username }: HomeViewProps) => {
   const githubLink = userLinks.find((link) => link.label === "github");
 
   return (
-    <div className="flex-1 px-12 pb-16 max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 xl:gap-16">
+    <div className="flex-1 px-12 pb-16 max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 xl:gap-16 pt-40 lg:pt-16">
       {/* Left Side - Intro */}
       <div className="col-span-1 flex flex-col justify-center items-center">
         <div>

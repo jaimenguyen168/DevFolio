@@ -17,7 +17,10 @@ export const userProjectsGitOperations: TableGitOperations = {
       "githubUrl",
       "status",
       "techStack",
-      "image",
+      "imageUrls",
+      "features",
+      "futureFeatures",
+      "contributors",
     ];
 
     if (args.length === 0) {
@@ -98,6 +101,58 @@ Valid technologies: ${TECH_STACKS.join(", ")}`;
       } else {
         return `No uploaded image found. Use 'git upload image' first or provide a direct URL.`;
       }
+    } else if (field === "imageUrls") {
+      // Handle imageUrls as an array that should be appended to
+      const currentImages = state.context.targetRecord?.imageUrls || [];
+      const stagedImages =
+        (state.stagedChanges.imageUrls as string[]) || currentImages;
+
+      // Parse the value as array or single URL
+      let newImages: string[];
+      if (cleanStringValue.startsWith("[") && cleanStringValue.endsWith("]")) {
+        try {
+          newImages = JSON.parse(cleanStringValue);
+          if (!Array.isArray(newImages)) {
+            return `Invalid imageUrls format. Use array format: ["url1", "url2"]`;
+          }
+        } catch {
+          return `Invalid JSON array format for imageUrls`;
+        }
+      } else {
+        // Treat as single URL
+        newImages = [cleanStringValue];
+      }
+
+      // Validate URLs
+      const invalidUrls = newImages.filter((url) => !isValidUrl(url));
+      if (invalidUrls.length > 0) {
+        return `Invalid URL format in imageUrls: ${invalidUrls.join(", ")}`;
+      }
+
+      // Append new URLs to existing ones (remove duplicates)
+      const combined = [...stagedImages, ...newImages];
+      processedValue = Array.from(new Set(combined));
+    } else if (field === "features" || field === "futureFeatures") {
+      const currentFeatures = state.context.targetRecord?.[field] || [];
+      const stagedFeatures =
+        (state.stagedChanges[field] as string[]) || currentFeatures;
+
+      let newFeatures: string[];
+      if (cleanStringValue.startsWith("[") && cleanStringValue.endsWith("]")) {
+        try {
+          newFeatures = JSON.parse(cleanStringValue);
+          if (!Array.isArray(newFeatures)) {
+            return `Invalid ${field} format. Use array format: ["feature1", "feature2"]`;
+          }
+        } catch {
+          return `Invalid JSON array format for ${field}`;
+        }
+      } else {
+        newFeatures = [cleanStringValue];
+      }
+
+      const combined = [...stagedFeatures, ...newFeatures];
+      processedValue = Array.from(new Set(combined));
     } else {
       // All other fields are strings
       processedValue = cleanStringValue;
@@ -611,12 +666,6 @@ async function handleImageUpload(
   imagePath: string,
   uploadUrl: string,
 ): Promise<string> {
-  // This is a simplified version - in a real implementation, you'd need to:
-  // 1. Check if it's a file path or base64
-  // 2. Read the file from the filesystem (if it's a path)
-  // 3. Upload to the generated URL
-  // 4. Return the final image URL
-
   // For now, return a placeholder
   throw new Error(
     "Image upload not fully implemented. Please use direct URLs for now.",

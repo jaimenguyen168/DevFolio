@@ -53,10 +53,13 @@ const WelcomeView = () => {
   };
 
   const handleGetStarted = () => {
-    if (isSignedIn) {
-      router.push(`/${user?.username}`);
-    } else {
+    if (!isSignedIn) {
       router.push("/sign-in");
+      return;
+    }
+
+    if (user?.username) {
+      router.push(`/${user.username}`);
     }
   };
 
@@ -238,12 +241,13 @@ const WelcomeView = () => {
                 size="lg"
                 className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-6 text-lg font-mono transition-all duration-300 group"
                 onClick={handleGetStarted}
+                disabled={isSignedIn && !user?.username}
               >
                 <Code
                   className="mr-3 group-hover:rotate-12 transition-transform"
                   size={20}
                 />
-                Get Started
+                {isSignedIn && !user?.username ? "Loading..." : "Get Started"}
                 <ArrowRight
                   className="ml-3 group-hover:translate-x-1 transition-transform"
                   size={20}

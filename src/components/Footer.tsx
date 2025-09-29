@@ -6,8 +6,9 @@ import { linkConfigs } from "@/constants/linkConfigs";
 import { ExternalLink } from "lucide-react";
 import { useQuery } from "convex/react";
 import { useUsername } from "@/components/UsernameProvider";
-import { UserButton } from "@clerk/nextjs";
 import Terminal from "@/components/Terminal";
+import CustomUserButton from "@/modules/auth/ui/components/CustomUserButton";
+import { User } from "@/modules/types";
 
 const Footer = () => {
   const { username } = useUsername();
@@ -15,6 +16,8 @@ const Footer = () => {
   const isCurrentUser = useQuery(api.functions.users.isCurrentUser, {
     username: username as string,
   });
+
+  const currentUser = useQuery(api.functions.users.getCurrentUser);
 
   const userLinks = useQuery(api.functions.userLinks.getUserLinks, {
     username: username as string,
@@ -57,7 +60,7 @@ const Footer = () => {
           {isCurrentUser && (
             <>
               <Terminal />
-              <UserButton />
+              <CustomUserButton currentUser={currentUser as User} />
             </>
           )}
 

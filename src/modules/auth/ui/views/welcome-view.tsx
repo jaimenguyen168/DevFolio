@@ -203,6 +203,7 @@ const WelcomeView = () => {
                     variant="outline"
                     size="lg"
                     className="bg-transparent hover:bg-white/20 border-gray-600 text-gray-300 hover:text-orange-300 hover:border-orange-400 transition-all duration-300 px-8 py-6 text-lg font-mono group"
+                    suppressHydrationWarning
                   >
                     <Search
                       className="mr-3 group-hover:text-orange-300 group-hover:rotate-12"

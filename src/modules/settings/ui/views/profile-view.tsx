@@ -6,10 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
@@ -31,6 +29,8 @@ import { toast } from "sonner";
 import { formatRelativeTime } from "@/lib/utils";
 import UserProfileImage from "@/components/UserProfileImage";
 import Loading from "@/components/Loading";
+import CustomFormField from "@/components/CustomFormField";
+import { useRouter } from "next/navigation";
 
 interface ProfileViewProps {
   username: string;
@@ -44,11 +44,14 @@ const profileFormSchema = z.object({
   phone: z.string().optional(),
   bio: z.string().optional(),
   hashtags: z.array(z.string()).optional(),
+  imageUrl: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 const ProfileView = ({ username }: ProfileViewProps) => {
+  const router = useRouter();
+
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hashtagInput, setHashtagInput] = useState("");
@@ -61,6 +64,7 @@ const ProfileView = ({ username }: ProfileViewProps) => {
   const user = useQuery(api.functions.users.getUser, { username });
   const updateUser = useMutation(api.functions.users.updateUser);
   const generateUploadUrl = useMutation(api.functions.files.generateUploadUrl);
+  const getImageUrl = useMutation(api.functions.files.getImageUrl);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -72,6 +76,7 @@ const ProfileView = ({ username }: ProfileViewProps) => {
       phone: "",
       bio: "",
       hashtags: [],
+      imageUrl: "",
     },
   });
 
@@ -85,12 +90,15 @@ const ProfileView = ({ username }: ProfileViewProps) => {
         phone: user.phone || "",
         bio: user.bio || "",
         hashtags: user.hashtags || [],
+        imageUrl: user.imageUrl || "",
       });
     }
   }, [user, form]);
 
   const onSubmit = async (data: ProfileFormValues) => {
     setIsSubmitting(true);
+    const usernameChanged = data.username !== user?.username;
+
     try {
       await updateUser({
         updates: {
@@ -103,6 +111,11 @@ const ProfileView = ({ username }: ProfileViewProps) => {
           hashtags: data.hashtags,
         },
       });
+
+      if (usernameChanged && data.username) {
+        router.replace(`/${data.username}/settings`);
+      }
+
       toast.success("Profile updated successfully");
       setIsEditing(false);
     } catch (error) {
@@ -132,10 +145,8 @@ const ProfileView = ({ username }: ProfileViewProps) => {
 
     setIsUploadingImage(true);
     try {
-      // Get upload URL from Convex
       const uploadUrl = await generateUploadUrl();
 
-      // Upload the file
       const result = await fetch(uploadUrl, {
         method: "POST",
         headers: { "Content-Type": selectedFile.type },
@@ -144,10 +155,11 @@ const ProfileView = ({ username }: ProfileViewProps) => {
 
       const { storageId } = await result.json();
 
-      // Update user with the storage ID
+      const publicImageUrl = await getImageUrl({ storageId });
+
       await updateUser({
         updates: {
-          imageUrl: storageId,
+          imageUrl: publicImageUrl as string,
         },
       });
 
@@ -240,7 +252,7 @@ const ProfileView = ({ username }: ProfileViewProps) => {
                 <Button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full bg-gray-800 hover:bg-gray-700 text-white border border-gray-600"
+                  className="w-full bg-gray-800 hover:bg-gray-700 hover:text-gray-200 text-white border border-gray-600"
                   variant="outline"
                 >
                   <Upload className="mr-2 h-4 w-4" />
@@ -306,7 +318,7 @@ const ProfileView = ({ username }: ProfileViewProps) => {
 
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row items-start justify-between gap-4 mb-8 lg:mb-12">
-        <div className="flex items-center space-x-3 sm:space-x-6 w-full sm:w-auto">
+        <div className="flex items-center space-x-3 sm:space-x-6 w-full sm:w-auto  mb-4 lg:mb-0">
           <div
             className={`relative size-16 sm:size-20 lg:size-24 rounded-full overflow-hidden bg-gray-700 border-2 border-gray-600 flex-shrink-0 ${isEditing ? "cursor-pointer hover:opacity-80 transition-opacity group" : ""}`}
             onClick={() => isEditing && setIsImageDialogOpen(true)}
@@ -314,7 +326,7 @@ const ProfileView = ({ username }: ProfileViewProps) => {
             <UserProfileImage user={user} />
             {isEditing && (
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center">
-                <Upload className="text-white opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6" />
+                <Upload className="text-white opacity-50 group-hover:opacity-100 transition-opacity h-6 w-6" />
               </div>
             )}
           </div>
@@ -349,143 +361,62 @@ const ProfileView = ({ username }: ProfileViewProps) => {
         >
           {/* Name and Username Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <FormField
+            <CustomFormField
               control={form.control}
               name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white text-sm sm:text-base">
-                    Full Name
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Your First Name"
-                      disabled={!isEditing}
-                      className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 disabled:opacity-70 disabled:cursor-not-allowed text-sm sm:text-base"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-400 text-xs sm:text-sm" />
-                </FormItem>
-              )}
+              label="Full Name"
+              placeholder="Your First Name"
+              disabled={!isEditing}
             />
 
-            <FormField
+            <CustomFormField
               control={form.control}
               name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white text-sm sm:text-base">
-                    Username
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Your Username"
-                      disabled={!isEditing}
-                      className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 disabled:opacity-70 disabled:cursor-not-allowed text-sm sm:text-base"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-400 text-xs sm:text-sm" />
-                </FormItem>
-              )}
+              label="Username"
+              placeholder="Your Username"
+              disabled={!isEditing}
             />
           </div>
 
-          {/* Email and Image URL Row */}
+          {/* Email and Title */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <FormItem>
-              <FormLabel className="text-white text-sm sm:text-base">
-                Email
-              </FormLabel>
-              <FormControl>
-                <Input
-                  value={user.email}
-                  disabled
-                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 disabled:opacity-70 disabled:cursor-not-allowed text-sm sm:text-base"
-                />
-              </FormControl>
-            </FormItem>
+            <CustomFormField
+              control={form.control}
+              name="email"
+              label="Email"
+              placeholder="Your Email"
+              disabled={!isEditing}
+            />
 
-            <FormItem>
-              <FormLabel className="text-white text-sm sm:text-base">
-                Image URL
-              </FormLabel>
-              <FormControl>
-                <Input
-                  value={user.imageUrl || "No image set"}
-                  disabled
-                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 disabled:opacity-70 disabled:cursor-not-allowed text-sm sm:text-base truncate"
-                />
-              </FormControl>
-            </FormItem>
-          </div>
-
-          {/* Title and Phone Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <FormField
+            <CustomFormField
               control={form.control}
               name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white text-sm sm:text-base">
-                    Title
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="e.g. Software Engineer"
-                      disabled={!isEditing}
-                      className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 disabled:opacity-70 disabled:cursor-not-allowed text-sm sm:text-base"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-400 text-xs sm:text-sm" />
-                </FormItem>
-              )}
+              label="Title"
+              placeholder="e.g. Software Engineer"
+              disabled={!isEditing}
             />
+          </div>
 
-            <FormField
+          {/* Phone Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <CustomFormField
               control={form.control}
               name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white text-sm sm:text-base">
-                    Phone
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="+1 (555) 000-0000"
-                      disabled={!isEditing}
-                      className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 disabled:opacity-70 disabled:cursor-not-allowed text-sm sm:text-base"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-400 text-xs sm:text-sm" />
-                </FormItem>
-              )}
+              label="Phone"
+              placeholder="+1 (555) 000-0000"
+              disabled={!isEditing}
             />
           </div>
 
           {/* Bio */}
-          <FormField
+          <CustomFormField
             control={form.control}
             name="bio"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white text-sm sm:text-base">
-                  Bio
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Tell us about yourself..."
-                    disabled={!isEditing}
-                    className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 disabled:opacity-70 disabled:cursor-not-allowed min-h-[100px] text-sm sm:text-base resize-none"
-                  />
-                </FormControl>
-                <FormMessage className="text-red-400 text-xs sm:text-sm" />
-              </FormItem>
-            )}
+            label="Bio"
+            placeholder="Tell us about yourself..."
+            disabled={!isEditing}
+            multiline
+            minHeight="100px"
           />
 
           {/* Hashtags */}
@@ -549,7 +480,7 @@ const ProfileView = ({ username }: ProfileViewProps) => {
           />
 
           <p className="text-gray-400 text-xs sm:text-sm">
-            Added {formatRelativeTime(user._creationTime)}
+            Created {formatRelativeTime(user._creationTime)}
           </p>
 
           {/* Submit Button */}

@@ -8,19 +8,19 @@ interface UserProfileImageProps {
 
 const UserProfileImage = ({ user }: UserProfileImageProps) => {
   return (
-    <div className="rounded-full bg-gray-700 hover:bg-gray-600 border border-gray-600 p-0 transition-colors">
+    <div className="rounded-full bg-gray-700 hover:bg-gray-600 border border-gray-600 transition-colors flex items-center justify-center w-full h-full">
       {user.imageUrl ? (
         <Image
           src={user.imageUrl}
           alt="profile image"
           width={50}
           height={50}
-          className="rounded-full object-cover size-full"
+          className="rounded-full object-cover w-full h-full"
         />
       ) : (
-        <div className="flex items-center justify-center w-full h-full text-white font-semibold">
+        <span className="lg:text-4xl text-white font-semibold text-2xl">
           {user.name?.charAt(0) || user.email?.charAt(0).toUpperCase()}
-        </div>
+        </span>
       )}
     </div>
   );

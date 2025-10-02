@@ -14,14 +14,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Loader2, GraduationCap, Upload } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
@@ -32,6 +24,7 @@ import { Education, EducationId } from "@/modules/types";
 import CustomFormField from "@/components/CustomFormField";
 import ImageUploadDialog from "@/modules/settings/ui/components/ImageUploadDialog";
 import { EDUCATION_TYPES } from "@/modules/settings/constants";
+import SelectFormField from "@/components/SelectFormField";
 
 interface EducationEditViewProps {
   username: string;
@@ -151,25 +144,6 @@ const EducationEditView = ({
 
   const currentLogoUrl = form.watch("logoUrl");
 
-  const renderTypeLabel = (type: string) => {
-    switch (type) {
-      case "high-school":
-        return "High School";
-      case "college":
-        return "College";
-      case "university":
-        return "University";
-      case "certification":
-        return "Certification";
-      case "bootcamp":
-        return "Bootcamp";
-      case "online-course":
-        return "Online Course";
-      default:
-        return "Unknown";
-    }
-  };
-
   return (
     <div className="p-4 sm:p-6 lg:p-8 w-full lg:max-w-5xl mx-auto">
       <ImageUploadDialog
@@ -256,35 +230,11 @@ const EducationEditView = ({
               placeholder="e.g. Computer Science"
             />
 
-            <FormField
+            <SelectFormField
               control={form.control}
               name="type"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel className="text-white text-base">
-                    Education Type <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="bg-gray-800 border-gray-700 text-white w-full">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-gray-800 border-gray-700 w-full">
-                      {EDUCATION_TYPES.map((type) => (
-                        <SelectItem
-                          key={type}
-                          value={type}
-                          className="text-white hover:bg-gray-700 focus:bg-gray-700"
-                        >
-                          {renderTypeLabel(type)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage className="text-red-400" />
-                </FormItem>
-              )}
+              label="Education Type"
+              options={EDUCATION_TYPES}
             />
           </div>
 
@@ -395,22 +345,12 @@ const EducationEditView = ({
           />
 
           {/* Details */}
-          <FormField
+          <CustomFormField
             control={form.control}
             name="details"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white text-base">Details</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Add any additional details about your education, achievements, honors, or relevant coursework..."
-                    className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 min-h-[120px] resize-none"
-                  />
-                </FormControl>
-                <FormMessage className="text-red-400" />
-              </FormItem>
-            )}
+            label="Details"
+            placeholder="Add any additional details about your education, achievements, honors, or relevant coursework..."
+            multiline
           />
 
           {/* Submit Buttons */}

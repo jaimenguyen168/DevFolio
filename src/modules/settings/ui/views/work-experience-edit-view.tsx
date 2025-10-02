@@ -8,20 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Form,
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Plus, X, Building2, Upload } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
@@ -31,7 +22,9 @@ import Image from "next/image";
 import { WorkExperience, WorkExperienceId } from "@/modules/types";
 import CustomFormField from "@/components/CustomFormField";
 import ImageUploadDialog from "@/modules/settings/ui/components/ImageUploadDialog";
-import { WORK_TYPES } from "@/modules/settings/constants";
+import { renderWorkTypeLabel, WORK_TYPES } from "@/modules/settings/constants";
+import DateTimeFormField from "@/components/DateTimeFormField";
+import SelectFormField from "@/components/SelectFormField";
 
 interface WorkExperienceEditViewProps {
   username: string;
@@ -167,27 +160,6 @@ const WorkExperienceEditView = ({
 
   const currentLogoUrl = form.watch("logoUrl");
 
-  const renderLabel = (type: string) => {
-    switch (type) {
-      case "full-time":
-        return "Full-time";
-      case "part-time":
-        return "Part-time";
-      case "contract":
-        return "Contract";
-      case "internship":
-        return "Internship";
-      case "freelance":
-        return "Freelance";
-      case "consulting":
-        return "Consulting";
-      case "other":
-        return "Other";
-      default:
-        return "Unknown";
-    }
-  };
-
   return (
     <div className="p-4 sm:p-6 lg:p-8 w-full lg:max-w-5xl mx-auto">
       <ImageUploadDialog
@@ -268,35 +240,14 @@ const WorkExperienceEditView = ({
 
           {/* Type and Location */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
+            <SelectFormField
               control={form.control}
               name="type"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel className="text-white text-base">
-                    Employment Type <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="bg-gray-800 border-gray-700 text-white w-full">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-gray-800 border-gray-700 w-full">
-                      {WORK_TYPES.map((type) => (
-                        <SelectItem
-                          key={type}
-                          value={type}
-                          className="text-white hover:bg-gray-700 focus:bg-gray-700"
-                        >
-                          {renderLabel(type)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage className="text-red-400" />
-                </FormItem>
-              )}
+              label="Employment Type"
+              placeholder="Select type"
+              options={WORK_TYPES}
+              renderLabel={renderWorkTypeLabel}
+              required
             />
 
             <CustomFormField
@@ -309,70 +260,31 @@ const WorkExperienceEditView = ({
 
           {/* Start Date and End Date */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
+            <DateTimeFormField
               control={form.control}
               name="startDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white text-base">
-                    Start Date <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="month"
-                      className="bg-gray-800 border-gray-700 text-white"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-400" />
-                </FormItem>
-              )}
+              label="Start Date"
+              placeholder="Pick start date"
+              required
+              disabled={false}
             />
 
-            <FormField
+            <DateTimeFormField
               control={form.control}
               name="endDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white text-base">
-                    End Date
-                    {!isCurrentlyWorking && (
-                      <span className="text-red-500"> *</span>
-                    )}
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="month"
-                      disabled={isCurrentlyWorking}
-                      className="bg-gray-800 border-gray-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-400" />
-                </FormItem>
-              )}
+              label="End Date"
+              placeholder="Pick end date"
+              disabled={false}
             />
           </div>
 
           {/* Description */}
-          <FormField
+          <CustomFormField
             control={form.control}
             name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white text-base">
-                  Description
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Describe your role, achievements, and impact..."
-                    className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 min-h-[120px] resize-none"
-                  />
-                </FormControl>
-                <FormMessage className="text-red-400" />
-              </FormItem>
-            )}
+            label="Description"
+            multiline
+            placeholder="Describe your role, achievements, and impact..."
           />
 
           {/* Responsibilities */}
@@ -443,7 +355,7 @@ const WorkExperienceEditView = ({
           />
 
           {/* Submit Buttons */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-800">
+          <div className="flex justify-end gap-3 py-3 border-t border-gray-800">
             <Button
               type="button"
               variant="outline"

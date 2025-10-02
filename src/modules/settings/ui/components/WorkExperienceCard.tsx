@@ -39,7 +39,7 @@ const WorkExperienceCard = ({
   };
 
   return (
-    <Card className="bg-slate-900 border-gray-700 hover:border-orange-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10">
+    <Card className="bg-slate-900 border-gray-700 hover:border-orange-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10 py-3">
       <CardContent className="p-4 sm:p-6">
         {/* Header with Logo and Company Info */}
         <div className="flex items-start gap-3 sm:gap-4 mb-4">

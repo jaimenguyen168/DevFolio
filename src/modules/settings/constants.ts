@@ -62,6 +62,27 @@ export const WORK_TYPES = [
   "other",
 ] as const;
 
+export const renderWorkTypeLabel = (type: (typeof WORK_TYPES)[number]) => {
+  switch (type) {
+    case "full-time":
+      return "Full-time";
+    case "part-time":
+      return "Part-time";
+    case "contract":
+      return "Contract";
+    case "internship":
+      return "Internship";
+    case "freelance":
+      return "Freelance";
+    case "consulting":
+      return "Consulting";
+    case "other":
+      return "Other";
+    default:
+      return "Unknown";
+  }
+};
+
 export const EDUCATION_TYPES = [
   "high-school",
   "college",
@@ -70,3 +91,24 @@ export const EDUCATION_TYPES = [
   "bootcamp",
   "online-course",
 ] as const;
+
+export const renderEducationTypeLabel = (
+  type: (typeof EDUCATION_TYPES)[number],
+) => {
+  switch (type) {
+    case "high-school":
+      return "High School";
+    case "college":
+      return "College";
+    case "university":
+      return "University";
+    case "certification":
+      return "Certification";
+    case "bootcamp":
+      return "Bootcamp";
+    case "online-course":
+      return "Online Course";
+    default:
+      return "Unknown";
+  }
+};

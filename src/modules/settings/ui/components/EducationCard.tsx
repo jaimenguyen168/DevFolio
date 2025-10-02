@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { Education } from "@/modules/types";
+import { renderEducationTypeLabel } from "@/modules/settings/constants";
 
 interface EducationCardProps {
   education: Education;
@@ -32,37 +33,19 @@ const EducationCard = ({ education, onEdit, onDelete }: EducationCardProps) => {
     return colors[type as keyof typeof colors] || colors["university"];
   };
 
-  const renderTypeLabel = (type: string) => {
-    switch (type) {
-      case "high-school":
-        return "High School";
-      case "college":
-        return "College";
-      case "university":
-        return "University";
-      case "certification":
-        return "Certification";
-      case "bootcamp":
-        return "Bootcamp";
-      case "online-course":
-        return "Online Course";
-      default:
-        return "Unknown";
-    }
-  };
-
   return (
-    <Card className="bg-slate-900 border-gray-700 hover:border-orange-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10">
+    <Card className="bg-slate-900 border-gray-700 hover:border-orange-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10 py-3">
       <CardContent className="p-4 sm:p-6">
         {/* Header with Logo and Institution Info */}
-        <div className="flex items-start gap-3 sm:gap-4 mb-4">
+        <div className="flex items-center gap-3 sm:gap-4 mb-4">
           {education.logoUrl ? (
             <div className="relative size-12 sm:size-14 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0">
               <Image
                 src={education.logoUrl}
                 alt={education.institution}
-                fill
-                className="object-cover"
+                width={500}
+                height={500}
+                className="object-cover size-full"
               />
             </div>
           ) : (
@@ -93,7 +76,7 @@ const EducationCard = ({ education, onEdit, onDelete }: EducationCardProps) => {
             className={`${getTypeBadgeColor(education.type)} text-xs`}
             variant="outline"
           >
-            {renderTypeLabel(education.type)}
+            {renderEducationTypeLabel(education.type)}
           </Badge>
           <div className="flex items-center gap-1">
             <Button

@@ -24,6 +24,7 @@ import CustomFormField from "@/components/CustomFormField";
 import { useRouter } from "next/navigation";
 import ImageUploadDialog from "@/modules/settings/ui/components/ImageUploadDialog";
 import Image from "next/image";
+import HashtagFormField from "@/components/HashtagFormField";
 
 interface ProfileViewProps {
   username: string;
@@ -272,63 +273,12 @@ const ProfileView = ({ username }: ProfileViewProps) => {
           />
 
           {/* Hashtags */}
-          <FormField
+          <HashtagFormField
             control={form.control}
             name="hashtags"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white text-sm sm:text-base">
-                  Hashtags
-                </FormLabel>
-                <div className="space-y-3">
-                  {field.value && field.value.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {field.value.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center gap-1 bg-orange-400/20 text-orange-400 px-3 py-1 rounded-full text-xs sm:text-sm"
-                        >
-                          {tag}
-                          {isEditing && (
-                            <button
-                              type="button"
-                              onClick={() => removeHashtag(index)}
-                              className="ml-1 hover:text-orange-300"
-                            >
-                              ×
-                            </button>
-                          )}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  {isEditing && (
-                    <div className="flex gap-2">
-                      <Input
-                        value={hashtagInput}
-                        onChange={(e) => setHashtagInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            addHashtag();
-                          }
-                        }}
-                        placeholder="Add a hashtag..."
-                        className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 text-sm sm:text-base"
-                      />
-                      <Button
-                        type="button"
-                        onClick={addHashtag}
-                        className="bg-orange-400 hover:bg-orange-300 text-white px-3 sm:px-4 text-sm sm:text-base"
-                      >
-                        Add
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                <FormMessage className="text-red-400 text-xs sm:text-sm" />
-              </FormItem>
-            )}
+            label="Hashtags"
+            placeholder="Add a hashtag..."
+            disabled={!isEditing}
           />
 
           <p className="text-gray-400 text-xs sm:text-sm">

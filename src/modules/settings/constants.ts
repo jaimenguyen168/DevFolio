@@ -5,7 +5,6 @@ import {
   FolderGit2,
   LibraryBig,
   LucideIcon,
-  Mail,
   Settings,
   UserCircle,
   User,
@@ -47,7 +46,6 @@ export const MENU_SECTIONS: MenuSection[] = [
       },
       { key: "education", label: "_education.md", icon: LibraryBig },
       { key: "projects", label: "_projects.md", icon: FolderGit2 },
-      { key: "contact", label: "_contact.md", icon: Mail },
     ],
   },
 ];

@@ -5,15 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Loader2, Plus, X, Building2, Upload } from "lucide-react";
+import { Form } from "@/components/ui/form";
+import { Loader2, Building2, Upload } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { toast } from "sonner";
@@ -25,6 +18,7 @@ import ImageUploadDialog from "@/modules/settings/ui/components/ImageUploadDialo
 import { renderWorkTypeLabel, WORK_TYPES } from "@/modules/settings/constants";
 import DateTimeFormField from "@/components/DateTimeFormField";
 import SelectFormField from "@/components/SelectFormField";
+import TextListFormField from "@/components/TextListFormField";
 
 interface WorkExperienceEditViewProps {
   username: string;
@@ -52,7 +46,6 @@ const WorkExperienceEditView = ({
   onClose,
 }: WorkExperienceEditViewProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [responsibilityInput, setResponsibilityInput] = useState("");
   const [isCurrentlyWorking, setIsCurrentlyWorking] = useState(false);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
 
@@ -133,25 +126,6 @@ const WorkExperienceEditView = ({
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const addResponsibility = () => {
-    if (responsibilityInput.trim()) {
-      const current = form.getValues("responsibilities") || [];
-      form.setValue("responsibilities", [
-        ...current,
-        responsibilityInput.trim(),
-      ]);
-      setResponsibilityInput("");
-    }
-  };
-
-  const removeResponsibility = (index: number) => {
-    const current = form.getValues("responsibilities") || [];
-    form.setValue(
-      "responsibilities",
-      current.filter((_, i) => i !== index),
-    );
   };
 
   const handleImageUploaded = (imageUrl: string) => {
@@ -267,6 +241,7 @@ const WorkExperienceEditView = ({
               placeholder="Pick start date"
               required
               disabled={false}
+              dateType="month"
             />
 
             <DateTimeFormField
@@ -275,6 +250,7 @@ const WorkExperienceEditView = ({
               label="End Date"
               placeholder="Pick end date"
               disabled={false}
+              dateType="month"
             />
           </div>
 
@@ -288,70 +264,12 @@ const WorkExperienceEditView = ({
           />
 
           {/* Responsibilities */}
-          <FormField
+          <TextListFormField
             control={form.control}
             name="responsibilities"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white text-base">
-                  Key Responsibilities
-                </FormLabel>
-                <div className="space-y-3">
-                  {field.value && field.value.length > 0 && (
-                    <div className="space-y-2">
-                      {field.value.map((responsibility, index) => (
-                        <div
-                          key={index}
-                          className="flex items-start gap-3 p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors group"
-                        >
-                          <span className="text-orange-400 mt-0.5 flex-shrink-0">
-                            •
-                          </span>
-                          <span className="flex-1 text-gray-300 text-sm">
-                            {responsibility}
-                          </span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeResponsibility(index)}
-                            className="text-gray-400 hover:text-red-400 hover:bg-gray-700 h-6 w-6 p-0 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <div className="flex gap-2">
-                    <Input
-                      value={responsibilityInput}
-                      onChange={(e) => setResponsibilityInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          addResponsibility();
-                        }
-                      }}
-                      placeholder="Add a responsibility and press Enter..."
-                      className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 flex-1"
-                    />
-                    <Button
-                      type="button"
-                      onClick={addResponsibility}
-                      disabled={!responsibilityInput.trim()}
-                      className="bg-orange-400 hover:bg-orange-300 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Press Enter or click the + button to add each responsibility
-                  </p>
-                </div>
-                <FormMessage className="text-red-400" />
-              </FormItem>
-            )}
+            label="Key Responsibilities"
+            placeholder="Add a responsibility and press Enter..."
+            helperText="Press Enter or click the + button to add each responsibility"
           />
 
           {/* Submit Buttons */}

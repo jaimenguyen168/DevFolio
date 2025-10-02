@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, PanelRight } from "lucide-react";
 import {
   Accordion,
@@ -16,20 +16,42 @@ import WorkExperienceListView from "@/modules/settings/ui/views/work-experience-
 import { MENU_SECTIONS } from "@/modules/settings/constants";
 import EducationEditView from "@/modules/settings/ui/views/education-edit-view";
 import EducationListView from "@/modules/settings/ui/views/education-list-view";
+import ProjectListView from "@/modules/settings/ui/views/project-list-view";
+import ProjectEditView from "@/modules/settings/ui/views/project-edit-view";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface SettingsViewProps {
   username: string;
 }
 
 const SettingsView = ({ username }: SettingsViewProps) => {
-  const [activeView, setActiveView] = useState("profile");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const getInitialView = () => {
+    const section = searchParams.get("section");
+    return section || "profile";
+  };
+
+  const [activeView, setActiveView] = useState(getInitialView());
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editMode, setEditMode] = useState<{ item?: any } | null>(null);
+
+  useEffect(() => {
+    const section = searchParams.get("section");
+    if (section && section !== activeView) {
+      setActiveView(section);
+      setEditMode(null);
+    }
+  }, [searchParams]);
 
   const handleMenuClick = (viewKey: string) => {
     setActiveView(viewKey);
     setEditMode(null);
     setIsSidebarOpen(false);
+
+    router.push(`${pathname}?section=${viewKey}`, { scroll: false });
   };
 
   const handleEdit = (item?: any) => {
@@ -39,6 +61,8 @@ const SettingsView = ({ username }: SettingsViewProps) => {
   const handleClose = () => {
     if (editMode) {
       setEditMode(null);
+    } else {
+      router.push(`/${username}`, { scroll: true });
     }
   };
 
@@ -93,17 +117,13 @@ const SettingsView = ({ username }: SettingsViewProps) => {
 
     if (activeView === "projects") {
       return editMode ? (
-        <PlaceholderView title="Edit Project" />
+        <ProjectEditView
+          username={username}
+          project={editMode.item}
+          onClose={handleClose}
+        />
       ) : (
-        <PlaceholderView title="Projects List" />
-      );
-    }
-
-    if (activeView === "contact") {
-      return editMode ? (
-        <PlaceholderView title="Edit Contact" />
-      ) : (
-        <PlaceholderView title="Contact Information" />
+        <ProjectListView username={username} onEdit={handleEdit} />
       );
     }
 

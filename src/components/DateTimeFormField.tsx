@@ -27,6 +27,7 @@ interface DateTimeFormFieldProps<T extends Record<string, any>> {
   required?: boolean;
   disablePastDates?: boolean;
   disableFutureDates?: boolean;
+  dateType?: "date" | "month" | "year";
 }
 
 const DateTimeFormField = <T extends Record<string, any>>({
@@ -38,7 +39,20 @@ const DateTimeFormField = <T extends Record<string, any>>({
   required = false,
   disablePastDates = false,
   disableFutureDates = false,
+  dateType = "date",
 }: DateTimeFormFieldProps<T>) => {
+  const getFormatString = () => {
+    switch (dateType) {
+      case "year":
+        return "yyyy";
+      case "month":
+        return "MMM yyyy";
+      case "date":
+      default:
+        return "PPP";
+    }
+  };
+
   return (
     <FormField
       control={control}
@@ -62,16 +76,16 @@ const DateTimeFormField = <T extends Record<string, any>>({
                     variant="outline"
                     disabled={disabled}
                     className={cn(
-                      "w-full pl-3 text-left font-normal bg-gray-800 border-gray-700 text-white hover:bg-gray-700 hover:text-white disabled:opacity-70 disabled:cursor-not-allowed text-sm sm:text-base",
+                      "w-full pl-3 pr-10 text-left font-normal bg-gray-800 border-gray-700 text-white hover:bg-gray-700 hover:text-white disabled:opacity-70 disabled:cursor-not-allowed text-sm sm:text-base justify-start relative",
                       !dateValue && "text-gray-500",
                     )}
                   >
-                    {dateValue ? (
-                      format(dateValue, "PPP")
-                    ) : (
-                      <span>{placeholder}</span>
-                    )}
-                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    <span className="block truncate max-w-[calc(100%-2rem)]">
+                      {dateValue
+                        ? format(dateValue, getFormatString())
+                        : placeholder}
+                    </span>
+                    <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
                   </Button>
                 </FormControl>
               </PopoverTrigger>

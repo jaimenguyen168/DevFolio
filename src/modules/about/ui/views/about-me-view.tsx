@@ -27,12 +27,15 @@ import BioView from "@/modules/about/ui/views/bio-view";
 import Loading from "@/components/Loading";
 import EducationView from "@/modules/about/ui/views/education-view";
 import WorkExperienceView from "@/modules/about/ui/views/work-experience-view";
+import { useRouter } from "next/navigation";
 
 interface AboutMeViewProps {
   username: string;
 }
 
 const AboutMeView = ({ username }: AboutMeViewProps) => {
+  const router = useRouter();
+
   const user = useQuery(api.functions.users.getUser, {
     username: username,
   });
@@ -246,7 +249,10 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
                 </span>
               </div>
 
-              <button className="text-gray-500 hover:text-white cursor-pointer">
+              <button
+                className="text-gray-500 hover:text-white cursor-pointer"
+                onClick={() => router.push(`/${username}`)}
+              >
                 ×
               </button>
             </div>

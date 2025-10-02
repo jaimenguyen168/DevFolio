@@ -7,18 +7,9 @@ import { motion, AnimatePresence } from "motion/react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { toast } from "sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { WorkExperience, WorkExperienceId } from "@/modules/types";
 import WorkExperienceCard from "@/modules/settings/ui/components/WorkExperienceCard";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 interface WorkExperienceListViewProps {
   username: string;
@@ -106,28 +97,17 @@ const WorkExperienceListView = ({
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent className="bg-gray-900 border-gray-700 text-white">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Work Experience</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-400">
-              Are you sure you want to delete this work experience? This action
-              cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-red-500 hover:bg-red-600 text-white"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete Project"
+        description="Are you sure you want to delete this work experience? This action
+              cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
     </div>
   );
 };

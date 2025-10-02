@@ -5,6 +5,10 @@ import {
   SKILL_CATEGORIES,
   TECH_STACKS,
 } from "../../src/modules/about/constants";
+import {
+  EDUCATION_TYPES,
+  WORK_TYPES,
+} from "../../src/modules/settings/constants";
 
 export const users = defineTable({
   name: v.string(),
@@ -48,13 +52,7 @@ export const userEducation = defineTable({
   startYear: v.optional(v.number()),
   endYear: v.optional(v.number()),
   details: v.optional(v.string()),
-  type: v.union(
-    v.literal("high-school"),
-    v.literal("university"),
-    v.literal("certification"),
-    v.literal("bootcamp"),
-    v.literal("online-course"),
-  ),
+  type: v.union(...EDUCATION_TYPES.map((type) => v.literal(type))),
 })
   .index("by_user_id", ["userId"])
   .index("by_user_and_type", ["userId", "type"]);
@@ -68,15 +66,7 @@ export const userWorkExperience = defineTable({
   description: v.optional(v.string()),
   location: v.optional(v.string()),
   logoUrl: v.optional(v.string()),
-  type: v.union(
-    v.literal("full-time"),
-    v.literal("part-time"),
-    v.literal("contract"),
-    v.literal("internship"),
-    v.literal("freelance"),
-    v.literal("consulting"),
-    v.literal("other"),
-  ),
+  type: v.union(v.union(...WORK_TYPES.map((type) => v.literal(type)))),
   responsibilities: v.optional(v.array(v.string())),
 })
   .index("by_user_id", ["userId"])

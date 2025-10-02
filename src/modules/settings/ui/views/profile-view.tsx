@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -13,16 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Upload } from "lucide-react";
+import { Building2, Loader2, Upload } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { toast } from "sonner";
@@ -31,6 +22,8 @@ import UserProfileImage from "@/components/UserProfileImage";
 import Loading from "@/components/Loading";
 import CustomFormField from "@/components/CustomFormField";
 import { useRouter } from "next/navigation";
+import ImageUploadDialog from "@/modules/settings/ui/components/ImageUploadDialog";
+import Image from "next/image";
 
 interface ProfileViewProps {
   username: string;
@@ -56,15 +49,9 @@ const ProfileView = ({ username }: ProfileViewProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hashtagInput, setHashtagInput] = useState("");
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [imageUrl, setImageUrl] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const user = useQuery(api.functions.users.getUser, { username });
   const updateUser = useMutation(api.functions.users.updateUser);
-  const generateUploadUrl = useMutation(api.functions.files.generateUploadUrl);
-  const getImageUrl = useMutation(api.functions.files.getImageUrl);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -95,6 +82,12 @@ const ProfileView = ({ username }: ProfileViewProps) => {
     }
   }, [user, form]);
 
+  const currentImageUrl = form.watch("imageUrl");
+
+  const handleImageUploaded = (imageUrl: string) => {
+    form.setValue("imageUrl", imageUrl);
+  };
+
   const onSubmit = async (data: ProfileFormValues) => {
     setIsSubmitting(true);
     const usernameChanged = data.username !== user?.username;
@@ -109,6 +102,7 @@ const ProfileView = ({ username }: ProfileViewProps) => {
           phone: data.phone,
           bio: data.bio,
           hashtags: data.hashtags,
+          imageUrl: data.imageUrl,
         },
       });
 
@@ -123,79 +117,6 @@ const ProfileView = ({ username }: ProfileViewProps) => {
       console.error(error);
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("File size must be less than 5MB");
-        return;
-      }
-      setSelectedFile(file);
-    }
-  };
-
-  const handleUploadImage = async () => {
-    if (!selectedFile) {
-      toast.error("Please select a file");
-      return;
-    }
-
-    setIsUploadingImage(true);
-    try {
-      const uploadUrl = await generateUploadUrl();
-
-      const result = await fetch(uploadUrl, {
-        method: "POST",
-        headers: { "Content-Type": selectedFile.type },
-        body: selectedFile,
-      });
-
-      const { storageId } = await result.json();
-
-      const publicImageUrl = await getImageUrl({ storageId });
-
-      await updateUser({
-        updates: {
-          imageUrl: publicImageUrl as string,
-        },
-      });
-
-      toast.success("Profile image uploaded successfully");
-      setIsImageDialogOpen(false);
-      setSelectedFile(null);
-    } catch (error) {
-      toast.error("Failed to upload image");
-      console.error(error);
-    } finally {
-      setIsUploadingImage(false);
-    }
-  };
-
-  const handleUrlSubmit = async () => {
-    if (!imageUrl.trim()) {
-      toast.error("Please enter a valid URL");
-      return;
-    }
-
-    setIsUploadingImage(true);
-    try {
-      await updateUser({
-        updates: {
-          imageUrl: imageUrl.trim(),
-        },
-      });
-
-      toast.success("Profile image updated successfully");
-      setIsImageDialogOpen(false);
-      setImageUrl("");
-    } catch (error) {
-      toast.error("Failed to update image");
-      console.error(error);
-    } finally {
-      setIsUploadingImage(false);
     }
   };
 
@@ -225,96 +146,13 @@ const ProfileView = ({ username }: ProfileViewProps) => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 w-full lg:max-w-5xl mx-auto">
       {/* Image Upload Dialog */}
-      <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700 text-white sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Update Profile Image</DialogTitle>
-            <DialogDescription className="text-gray-400">
-              Upload an image or provide a URL for your profile picture
-            </DialogDescription>
-          </DialogHeader>
-
-          <Tabs defaultValue="upload" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-800">
-              <TabsTrigger value="upload">Upload</TabsTrigger>
-              <TabsTrigger value="url">URL</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="upload" className="space-y-4">
-              <div className="space-y-4">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                />
-                <Button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full bg-gray-800 hover:bg-gray-700 hover:text-gray-200 text-white border border-gray-600"
-                  variant="outline"
-                >
-                  <Upload className="mr-2 h-4 w-4" />
-                  {selectedFile ? selectedFile.name : "Choose File"}
-                </Button>
-                {selectedFile && (
-                  <div className="text-sm text-gray-400">
-                    Size: {(selectedFile.size / 1024).toFixed(2)} KB
-                  </div>
-                )}
-              </div>
-
-              <DialogFooter>
-                <Button
-                  type="button"
-                  onClick={handleUploadImage}
-                  disabled={!selectedFile || isUploadingImage}
-                  className="bg-orange-400 hover:bg-orange-300 text-white w-full"
-                >
-                  {isUploadingImage ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Uploading...
-                    </>
-                  ) : (
-                    "Upload Image"
-                  )}
-                </Button>
-              </DialogFooter>
-            </TabsContent>
-
-            <TabsContent value="url" className="space-y-4">
-              <div className="space-y-4">
-                <Input
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://example.com/image.jpg"
-                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
-                />
-              </div>
-
-              <DialogFooter>
-                <Button
-                  type="button"
-                  onClick={handleUrlSubmit}
-                  disabled={!imageUrl.trim() || isUploadingImage}
-                  className="bg-orange-400 hover:bg-orange-300 text-white w-full"
-                >
-                  {isUploadingImage ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Updating...
-                    </>
-                  ) : (
-                    "Set Image URL"
-                  )}
-                </Button>
-              </DialogFooter>
-            </TabsContent>
-          </Tabs>
-        </DialogContent>
-      </Dialog>
+      <ImageUploadDialog
+        open={isImageDialogOpen}
+        onOpenChange={setIsImageDialogOpen}
+        onImageUploaded={handleImageUploaded}
+        title="Update Company Logo"
+        description="Upload an image or provide a URL for the company logo"
+      />
 
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row items-start justify-between gap-4 mb-8 lg:mb-12">
@@ -323,11 +161,25 @@ const ProfileView = ({ username }: ProfileViewProps) => {
             className={`relative size-16 sm:size-20 lg:size-24 rounded-full overflow-hidden bg-gray-700 border-2 border-gray-600 flex-shrink-0 ${isEditing ? "cursor-pointer hover:opacity-80 transition-opacity group" : ""}`}
             onClick={() => isEditing && setIsImageDialogOpen(true)}
           >
-            <UserProfileImage user={user} />
-            {isEditing && (
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center">
-                <Upload className="text-white opacity-50 group-hover:opacity-100 transition-opacity h-6 w-6" />
-              </div>
+            {isEditing ? (
+              <>
+                {currentImageUrl ? (
+                  <Image
+                    src={currentImageUrl}
+                    alt="profile image"
+                    height={500}
+                    width={500}
+                    className="object-cover size-full"
+                  />
+                ) : (
+                  <Building2 className="h-8 w-8 text-gray-600" />
+                )}
+                <div className="absolute inset-0 bg-black/50 group-hover:bg-opacity-100 transition-all flex items-center justify-center">
+                  <Upload className="text-white opacity-70 group-hover:opacity-0 transition-opacity duration-300 size-8 cursor-pointer bg-gray-800 rounded-full p-2" />
+                </div>
+              </>
+            ) : (
+              <UserProfileImage user={user} />
             )}
           </div>
           <div className="min-w-0 flex-1 space-y-1">

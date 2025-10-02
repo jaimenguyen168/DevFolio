@@ -18,6 +18,7 @@ interface CustomFormFieldProps<T extends Record<string, any>> {
   disabled?: boolean;
   multiline?: boolean;
   minHeight?: string;
+  required?: boolean;
 }
 
 const CustomFormField = <T extends Record<string, any>>({
@@ -28,6 +29,7 @@ const CustomFormField = <T extends Record<string, any>>({
   disabled = false,
   multiline = false,
   minHeight = "100px",
+  required = false,
 }: CustomFormFieldProps<T>) => (
   <FormField
     control={control}
@@ -35,7 +37,7 @@ const CustomFormField = <T extends Record<string, any>>({
     render={({ field }) => (
       <FormItem>
         <FormLabel className="text-white text-sm sm:text-base">
-          {label}
+          {label} {required && <span className="text-red-500">*</span>}
         </FormLabel>
         <FormControl>
           {multiline ? (

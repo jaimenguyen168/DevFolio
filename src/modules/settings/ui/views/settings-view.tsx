@@ -1,20 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  User,
-  X,
-  PanelRight,
-  Settings,
-  BarChart3,
-  Edit3,
-  ScanFace,
-  BriefcaseBusiness,
-  LibraryBig,
-  FolderGit2,
-  Mail,
-  UserCircle,
-} from "lucide-react";
+import { X, PanelRight } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -24,242 +11,104 @@ import {
 import { Button } from "@/components/ui/button";
 import { convertName } from "@/lib/utils";
 import ProfileView from "@/modules/settings/ui/views/profile-view";
+import WorkExperienceEditView from "@/modules/settings/ui/views/work-experience-edit-view";
+import WorkExperienceListView from "@/modules/settings/ui/views/work-experience-list-view";
+import { MENU_SECTIONS } from "@/modules/settings/constants";
+import EducationEditView from "@/modules/settings/ui/views/education-edit-view";
+import EducationListView from "@/modules/settings/ui/views/education-list-view";
 
 interface SettingsViewProps {
   username: string;
 }
 
 const SettingsView = ({ username }: SettingsViewProps) => {
-  const [activeContent, setActiveContent] = useState("profile");
+  const [activeView, setActiveView] = useState("profile");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [editMode, setEditMode] = useState<{ item?: any } | null>(null);
 
-  const handleContentClick = (contentKey: string) => {
-    setActiveContent(contentKey);
+  const handleMenuClick = (viewKey: string) => {
+    setActiveView(viewKey);
+    setEditMode(null);
     setIsSidebarOpen(false);
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+  const handleEdit = (item?: any) => {
+    setEditMode({ item });
   };
 
-  const renderContent = () => {
-    switch (activeContent) {
-      case "profile":
-        return <ProfileView username={username} />;
-      case "settings":
-        return (
-          <div className="p-8">
-            <h2 className="text-2xl font-semibold text-white mb-4">Settings</h2>
-            <p className="text-gray-400">General settings coming soon...</p>
-          </div>
-        );
-      case "stats":
-        return (
-          <div className="p-8">
-            <h2 className="text-2xl font-semibold text-white mb-4">
-              Statistics
-            </h2>
-            <p className="text-gray-400">Stats dashboard coming soon...</p>
-          </div>
-        );
-      case "edit-bio":
-        return (
-          <div className="p-8">
-            <h2 className="text-2xl font-semibold text-white mb-4">Edit Bio</h2>
-            <p className="text-gray-400">Bio editor coming soon...</p>
-          </div>
-        );
-      case "edit-work-experience":
-        return (
-          <div className="p-8">
-            <h2 className="text-2xl font-semibold text-white mb-4">
-              Edit Work Experience
-            </h2>
-            <p className="text-gray-400">
-              Work experience editor coming soon...
-            </p>
-          </div>
-        );
-      case "edit-education":
-        return (
-          <div className="p-8">
-            <h2 className="text-2xl font-semibold text-white mb-4">
-              Edit Education
-            </h2>
-            <p className="text-gray-400">Education editor coming soon...</p>
-          </div>
-        );
-      case "edit-projects":
-        return (
-          <div className="p-8">
-            <h2 className="text-2xl font-semibold text-white mb-4">
-              Edit Projects
-            </h2>
-            <p className="text-gray-400">Projects editor coming soon...</p>
-          </div>
-        );
-      case "edit-contact":
-        return (
-          <div className="p-8">
-            <h2 className="text-2xl font-semibold text-white mb-4">
-              Edit Contact
-            </h2>
-            <p className="text-gray-400">Contact editor coming soon...</p>
-          </div>
-        );
-      default:
-        return (
-          <div className="p-8">
-            <p className="text-gray-400">Select an option from the sidebar</p>
-          </div>
-        );
+  const handleClose = () => {
+    if (editMode) {
+      setEditMode(null);
     }
   };
 
-  const SidebarContent = () => (
-    <Accordion
-      type="multiple"
-      defaultValue={["user", "edit"]}
-      className="w-full"
-    >
-      {/* User Section */}
-      <AccordionItem value="user" className="border-gray-700">
-        <AccordionTrigger className="flex items-center space-x-2 text-white hover:text-orange-400 transition-colors hover:no-underline py-3.5 border-b border-gray-700 rounded-none px-4">
-          <span className="flex items-center">
-            <User size={16} className="mr-2" /> _user-info
-          </span>
-        </AccordionTrigger>
-        <AccordionContent className="pb-2">
-          <div className="mt-2 space-y-2 ml-7">
-            {/* Profile */}
-            <Button
-              variant="ghost"
-              onClick={() => handleContentClick("profile")}
-              className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:!text-orange-400 group ${
-                activeContent === "profile"
-                  ? "text-orange-400"
-                  : "text-gray-400"
-              }`}
-            >
-              <UserCircle size={14} className="group-hover:text-orange-400" />
-              <span>_profile.md</span>
-            </Button>
+  const getViewTitle = () => {
+    if (editMode) {
+      return editMode.item ? `_edit-${activeView}.md` : `_add-${activeView}.md`;
+    }
+    return `${convertName(activeView)}.md`;
+  };
 
-            {/* Settings */}
-            <Button
-              variant="ghost"
-              onClick={() => handleContentClick("settings")}
-              className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:!text-purple-400 group ${
-                activeContent === "settings"
-                  ? "text-purple-400"
-                  : "text-gray-400"
-              }`}
-            >
-              <Settings size={14} className="group-hover:text-purple-400" />
-              <span>_settings.md</span>
-            </Button>
-
-            {/* Stats */}
-            <Button
-              variant="ghost"
-              onClick={() => handleContentClick("stats")}
-              className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:!text-blue-400 group ${
-                activeContent === "stats" ? "text-blue-400" : "text-gray-400"
-              }`}
-            >
-              <BarChart3 size={14} className="group-hover:text-blue-400" />
-              <span>_stats.md</span>
-            </Button>
-          </div>
-        </AccordionContent>
-      </AccordionItem>
-
-      {/* Edit Section */}
-      <AccordionItem value="edit" className="border-gray-700">
-        <AccordionTrigger className="flex items-center space-x-2 text-white hover:text-orange-400 transition-colors hover:no-underline py-3.5 border-b border-gray-700 rounded-none px-4">
-          <span className="flex items-center">
-            <Edit3 size={16} className="mr-2" /> _manage-user
-          </span>
-        </AccordionTrigger>
-        <AccordionContent className="pb-2">
-          <div className="mt-2 space-y-2 ml-7">
-            {/* Bio */}
-            <Button
-              variant="ghost"
-              onClick={() => handleContentClick("edit-bio")}
-              className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:!text-orange-400 group ${
-                activeContent === "edit-bio"
-                  ? "text-orange-400"
-                  : "text-gray-400"
-              }`}
-            >
-              <ScanFace size={14} className="group-hover:text-orange-400" />
-              <span>_bio.md</span>
-            </Button>
-
-            {/* Work Experience */}
-            <Button
-              variant="ghost"
-              onClick={() => handleContentClick("edit-work-experience")}
-              className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:!text-purple-400 group ${
-                activeContent === "edit-work-experience"
-                  ? "text-purple-400"
-                  : "text-gray-400"
-              }`}
-            >
-              <BriefcaseBusiness
-                size={14}
-                className="group-hover:text-purple-400"
-              />
-              <span>_work-experience.md</span>
-            </Button>
-
-            {/* Education */}
-            <Button
-              variant="ghost"
-              onClick={() => handleContentClick("edit-education")}
-              className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:!text-blue-400 group ${
-                activeContent === "edit-education"
-                  ? "text-blue-400"
-                  : "text-gray-400"
-              }`}
-            >
-              <LibraryBig size={14} className="group-hover:text-blue-400" />
-              <span>_education.md</span>
-            </Button>
-
-            {/* Projects */}
-            <Button
-              variant="ghost"
-              onClick={() => handleContentClick("edit-projects")}
-              className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:!text-green-400 group ${
-                activeContent === "edit-projects"
-                  ? "text-green-400"
-                  : "text-gray-400"
-              }`}
-            >
-              <FolderGit2 size={14} className="group-hover:text-green-400" />
-              <span>_projects.md</span>
-            </Button>
-
-            {/* Contact */}
-            <Button
-              variant="ghost"
-              onClick={() => handleContentClick("edit-contact")}
-              className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:!text-pink-400 group ${
-                activeContent === "edit-contact"
-                  ? "text-pink-400"
-                  : "text-gray-400"
-              }`}
-            >
-              <Mail size={14} className="group-hover:text-pink-400" />
-              <span>_contact.md</span>
-            </Button>
-          </div>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+  const PlaceholderView = ({ title }: { title: string }) => (
+    <div className="p-8">
+      <h2 className="text-2xl font-semibold text-white mb-4">{title}</h2>
+      <p className="text-gray-400">Coming soon...</p>
+    </div>
   );
+
+  const renderView = () => {
+    if (activeView === "profile") {
+      return <ProfileView username={username} />;
+    }
+    if (activeView === "customization") {
+      return <PlaceholderView title="Customization" />;
+    }
+    if (activeView === "stats") {
+      return <PlaceholderView title="Statistics" />;
+    }
+
+    if (activeView === "work-experience") {
+      return editMode ? (
+        <WorkExperienceEditView
+          username={username}
+          experience={editMode.item}
+          onClose={handleClose}
+        />
+      ) : (
+        <WorkExperienceListView username={username} onEdit={handleEdit} />
+      );
+    }
+
+    if (activeView === "education") {
+      return editMode ? (
+        <EducationEditView
+          username={username}
+          education={editMode.item}
+          onClose={handleClose}
+        />
+      ) : (
+        <EducationListView username={username} onEdit={handleEdit} />
+      );
+    }
+
+    if (activeView === "projects") {
+      return editMode ? (
+        <PlaceholderView title="Edit Project" />
+      ) : (
+        <PlaceholderView title="Projects List" />
+      );
+    }
+
+    if (activeView === "contact") {
+      return editMode ? (
+        <PlaceholderView title="Edit Contact" />
+      ) : (
+        <PlaceholderView title="Contact Information" />
+      );
+    }
+
+    return <PlaceholderView title="Select an option" />;
+  };
 
   return (
     <div className="flex flex-col md:flex-row h-full relative w-full">
@@ -267,7 +116,7 @@ const SettingsView = ({ username }: SettingsViewProps) => {
       {isSidebarOpen && (
         <div
           className="fixed inset-0 backdrop-blur-md z-40 md:hidden"
-          onClick={toggleSidebar}
+          onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
@@ -284,7 +133,7 @@ const SettingsView = ({ username }: SettingsViewProps) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={toggleSidebar}
+            onClick={() => setIsSidebarOpen(false)}
             className="text-gray-400 hover:bg-gray-700 hover:text-white p-1"
           >
             <X size={20} />
@@ -292,7 +141,47 @@ const SettingsView = ({ username }: SettingsViewProps) => {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <SidebarContent />
+          <Accordion
+            type="multiple"
+            defaultValue={MENU_SECTIONS.map((section) => section.id)}
+            className="w-full"
+          >
+            {MENU_SECTIONS.map((section) => (
+              <AccordionItem
+                key={section.id}
+                value={section.id}
+                className="border-gray-700"
+              >
+                <AccordionTrigger className="flex items-center space-x-2 text-white hover:text-orange-400 transition-colors hover:no-underline py-3.5 border-b border-gray-700 rounded-none px-4">
+                  <span className="flex items-center">
+                    <section.icon size={16} className="mr-2" /> {section.title}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-2">
+                  <div className="mt-2 space-y-2 ml-7">
+                    {section.items.map((item) => (
+                      <Button
+                        key={item.key}
+                        variant="ghost"
+                        onClick={() => handleMenuClick(item.key)}
+                        className={`flex items-center transition-colors w-full justify-start hover:bg-transparent hover:!text-orange-400 group ${
+                          activeView === item.key && !editMode
+                            ? "text-orange-400"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        <item.icon
+                          size={14}
+                          className="group-hover:text-orange-400"
+                        />
+                        <span>{item.label}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </div>
 
@@ -305,17 +194,18 @@ const SettingsView = ({ username }: SettingsViewProps) => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={toggleSidebar}
+                onClick={() => setIsSidebarOpen(true)}
                 className="md:hidden text-gray-400 hover:bg-gray-700 hover:text-white p-1 mr-3"
               >
                 <PanelRight size={20} />
               </Button>
-              <span className="text-gray-400 text-sm">
-                {convertName(activeContent)}.md
-              </span>
+              <span className="text-gray-400 text-sm">{getViewTitle()}</span>
             </div>
 
-            <button className="text-gray-500 hover:text-white cursor-pointer">
+            <button
+              onClick={handleClose}
+              className="text-gray-500 hover:text-white cursor-pointer"
+            >
               ×
             </button>
           </div>
@@ -323,7 +213,7 @@ const SettingsView = ({ username }: SettingsViewProps) => {
 
         {/* Content Area */}
         <div className="flex-1 w-full h-full overflow-y-auto">
-          <div className="min-h-full">{renderContent()}</div>
+          <div className="min-h-full">{renderView()}</div>
         </div>
       </div>
     </div>

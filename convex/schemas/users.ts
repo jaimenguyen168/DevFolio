@@ -123,4 +123,6 @@ export const userCustomizations = defineTable({
     useDefault: v.boolean(),
     customHtml: v.optional(v.string()),
   }),
+  hideEmail: v.optional(v.boolean()),
+  hidePhone: v.optional(v.boolean()),
 }).index("by_user_id", ["userId"]);

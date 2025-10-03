@@ -1,6 +1,37 @@
 import { mutation, query } from "../_generated/server";
 import { v } from "convex/values";
-import { validateUser } from "../utils";
+import { getUserByUsername, validateUser } from "../utils";
+
+export const getCustomizationsByUsername = query({
+  args: {
+    username: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await getUserByUsername(ctx, args.username);
+
+    if (!user) {
+      return null;
+    }
+
+    const customizations = await ctx.db
+      .query("userCustomizations")
+      .withIndex("by_user_id", (q) => q.eq("userId", user._id))
+      .unique();
+
+    if (!customizations) {
+      return {
+        confirmationEmail: {
+          useDefault: true,
+          customHtml: undefined,
+        },
+        hideEmail: false,
+        hidePhone: false,
+      };
+    }
+
+    return customizations;
+  },
+});
 
 export const getCustomizations = query({
   args: {},
@@ -31,6 +62,8 @@ export const getCustomizations = query({
           useDefault: true,
           customHtml: undefined,
         },
+        hideEmail: false,
+        hidePhone: false,
       };
     }
 
@@ -40,10 +73,8 @@ export const getCustomizations = query({
 
 export const updateCustomizations = mutation({
   args: {
-    confirmationEmail: v.object({
-      useDefault: v.boolean(),
-      customHtml: v.optional(v.string()),
-    }),
+    hideEmail: v.optional(v.boolean()),
+    hidePhone: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const user = await validateUser(ctx);
@@ -53,18 +84,30 @@ export const updateCustomizations = mutation({
       .withIndex("by_user_id", (q) => q.eq("userId", user._id))
       .unique();
 
+    // Prepare update object with only provided fields
+    const updateData: any = {};
+    if (args.hideEmail !== undefined) {
+      updateData.hideEmail = args.hideEmail;
+    }
+    if (args.hidePhone !== undefined) {
+      updateData.hidePhone = args.hidePhone;
+    }
+
     // If customizations exist, update them
     if (existingCustomizations) {
-      await ctx.db.patch(existingCustomizations._id, {
-        confirmationEmail: args.confirmationEmail,
-      });
+      await ctx.db.patch(existingCustomizations._id, updateData);
       return existingCustomizations._id;
     }
 
-    // Otherwise, create new customizations
+    // Otherwise, create new customizations with defaults
     return await ctx.db.insert("userCustomizations", {
       userId: user._id,
-      confirmationEmail: args.confirmationEmail,
+      confirmationEmail: {
+        useDefault: true,
+        customHtml: undefined,
+      },
+      hideEmail: args.hideEmail ?? false,
+      hidePhone: args.hidePhone ?? false,
     });
   },
 });

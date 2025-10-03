@@ -170,7 +170,7 @@ const WelcomeView = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex items-center justify-center px-12">
+        <div className="flex-1 flex items-center justify-center px-12 overflow-y-auto">
           <div className="text-center max-w-4xl">
             <div className="mb-12">
               <div className="mb-4 text-gray-400 text-lg">Welcome to</div>

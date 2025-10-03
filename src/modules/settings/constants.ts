@@ -30,8 +30,7 @@ export const MENU_SECTIONS: MenuSection[] = [
     icon: User,
     items: [
       { key: "profile", label: "_profile.md", icon: UserCircle },
-      { key: "customization", label: "_customization.md", icon: Settings },
-      { key: "stats", label: "_stats.md", icon: BarChart3 },
+      { key: "customizations", label: "_customizations.md", icon: Settings },
     ],
   },
   {

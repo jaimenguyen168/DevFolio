@@ -19,6 +19,7 @@ import EducationListView from "@/modules/settings/ui/views/education-list-view";
 import ProjectListView from "@/modules/settings/ui/views/project-list-view";
 import ProjectEditView from "@/modules/settings/ui/views/project-edit-view";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import CustomizationsView from "@/modules/settings/ui/views/customizations-view";
 
 interface SettingsViewProps {
   username: string;
@@ -84,8 +85,8 @@ const SettingsView = ({ username }: SettingsViewProps) => {
     if (activeView === "profile") {
       return <ProfileView username={username} />;
     }
-    if (activeView === "customization") {
-      return <PlaceholderView title="Customization" />;
+    if (activeView === "customizations") {
+      return <CustomizationsView />;
     }
     if (activeView === "stats") {
       return <PlaceholderView title="Statistics" />;

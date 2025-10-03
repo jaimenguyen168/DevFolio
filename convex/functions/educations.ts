@@ -1,14 +1,7 @@
 import { mutation, query } from "../_generated/server";
 import { ConvexError, v } from "convex/values";
 import { getUserByUsername, validateUser } from "../utils";
-
-const EDUCATION_TYPES = [
-  "high-school",
-  "university",
-  "certification",
-  "bootcamp",
-  "online-course",
-] as const;
+import { EDUCATION_TYPES } from "../../src/modules/settings/constants";
 
 export const getEducations = query({
   args: {

@@ -1,0 +1,309 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
+import { Loader2, Building2, Upload } from "lucide-react";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "../../../../../convex/_generated/api";
+import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
+import { WorkExperience, WorkExperienceId } from "@/modules/types";
+import CustomFormField from "@/components/CustomFormField";
+import ImageUploadDialog from "@/modules/settings/ui/components/ImageUploadDialog";
+import { renderWorkTypeLabel, WORK_TYPES } from "@/modules/settings/constants";
+import DateTimeFormField from "@/components/DateTimeFormField";
+import SelectFormField from "@/components/SelectFormField";
+import TextListFormField from "@/components/TextListFormField";
+
+interface WorkExperienceEditViewProps {
+  username: string;
+  experience?: WorkExperience;
+  onClose?: () => void;
+}
+
+const workExperienceSchema = z.object({
+  company: z.string().min(1, "Company name is required"),
+  position: z.string().min(1, "Position is required"),
+  type: z.enum(WORK_TYPES),
+  startDate: z.string().min(1, "Start date is required"),
+  endDate: z.string().optional(),
+  location: z.string().optional(),
+  description: z.string().optional(),
+  logoUrl: z.string().optional(),
+  responsibilities: z.array(z.string()).optional(),
+});
+
+type WorkExperienceFormValues = z.infer<typeof workExperienceSchema>;
+
+const WorkExperienceEditView = ({
+  username,
+  experience,
+  onClose,
+}: WorkExperienceEditViewProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCurrentlyWorking, setIsCurrentlyWorking] = useState(false);
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
+
+  const user = useQuery(api.functions.users.getUser, { username });
+  const createExperience = useMutation(
+    api.functions.workExperience.createWorkExperience,
+  );
+  const updateExperience = useMutation(
+    api.functions.workExperience.updateWorkExperience,
+  );
+
+  const form = useForm<WorkExperienceFormValues>({
+    resolver: zodResolver(workExperienceSchema),
+    defaultValues: {
+      company: "",
+      position: "",
+      type: "full-time",
+      startDate: "",
+      endDate: "",
+      location: "",
+      description: "",
+      logoUrl: "",
+      responsibilities: [],
+    },
+  });
+
+  useEffect(() => {
+    if (experience) {
+      const isCurrently = !experience.endDate;
+      setIsCurrentlyWorking(isCurrently);
+
+      form.reset({
+        company: experience.company,
+        position: experience.position,
+        type: experience.type,
+        startDate: experience.startDate,
+        endDate: experience.endDate || "",
+        location: experience.location || "",
+        description: experience.description || "",
+        logoUrl: experience.logoUrl || "",
+        responsibilities: experience.responsibilities || [],
+      });
+    }
+  }, [experience, form]);
+
+  const onSubmit = async (data: WorkExperienceFormValues) => {
+    if (!user) return;
+
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        company: data.company,
+        position: data.position,
+        type: data.type,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        location: data.location,
+        description: data.description,
+        logoUrl: data.logoUrl,
+        responsibilities: data.responsibilities,
+      };
+
+      if (experience) {
+        await updateExperience({
+          workExperienceId: experience._id as WorkExperienceId,
+          updates: payload,
+        });
+        toast.success("Work experience updated successfully");
+      } else {
+        await createExperience(payload);
+        toast.success("Work experience added successfully");
+      }
+
+      onClose?.();
+    } catch (error) {
+      toast.error("Failed to save work experience");
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleImageUploaded = (imageUrl: string) => {
+    form.setValue("logoUrl", imageUrl);
+  };
+
+  const currentLogoUrl = form.watch("logoUrl");
+
+  return (
+    <div className="p-4 sm:p-6 lg:p-8 w-full lg:max-w-5xl mx-auto">
+      <ImageUploadDialog
+        open={isImageDialogOpen}
+        onOpenChange={setIsImageDialogOpen}
+        onImageUploaded={handleImageUploaded}
+        title="Update Company Logo"
+        description="Upload an image or provide a URL for the company logo"
+      />
+
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-2xl font-bold text-white">
+          {experience ? "Edit Work Experience" : "Add Work Experience"}
+        </h1>
+      </div>
+
+      {/* Form */}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Company Logo Section */}
+          <Card className="bg-slate-900 border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div
+                    className="relative size-16 rounded-lg overflow-hidden bg-gray-800 flex items-center justify-center flex-shrink-0 p-1 cursor-pointer hover:opacity-80 transition-opacity group"
+                    onClick={() => setIsImageDialogOpen(true)}
+                  >
+                    {currentLogoUrl ? (
+                      <Image
+                        src={currentLogoUrl}
+                        alt="Company logo"
+                        height={100}
+                        width={100}
+                        className="object-cover"
+                      />
+                    ) : (
+                      <Building2 className="h-8 w-8 text-gray-600" />
+                    )}
+                    <div className="absolute inset-0 bg-black/50 bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center">
+                      <Upload className="text-white opacity-70 group-hover:opacity-0 transition-opacity duration-300 size-8 cursor-pointer bg-gray-800 rounded-full p-2" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-white mb-1">
+                      Company Logo
+                    </h3>
+                    <p className="text-xs text-gray-400">
+                      {currentLogoUrl
+                        ? "Click to change logo"
+                        : "Click to add a company logo"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Company and Position */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CustomFormField
+              control={form.control}
+              name="company"
+              label="Company"
+              placeholder="e.g. Google"
+              required
+            />
+
+            <CustomFormField
+              control={form.control}
+              name="position"
+              label="Position"
+              placeholder="e.g. Software Engineer"
+              required
+            />
+          </div>
+
+          {/* Type and Location */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SelectFormField
+              control={form.control}
+              name="type"
+              label="Employment Type"
+              placeholder="Select type"
+              options={WORK_TYPES}
+              renderLabel={renderWorkTypeLabel}
+              required
+            />
+
+            <CustomFormField
+              control={form.control}
+              name="location"
+              label="Location"
+              placeholder="e.g. San Francisco, CA"
+            />
+          </div>
+
+          {/* Start Date and End Date */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <DateTimeFormField
+              control={form.control}
+              name="startDate"
+              label="Start Date"
+              placeholder="Pick start date"
+              required
+              disabled={false}
+              dateType="month"
+            />
+
+            <DateTimeFormField
+              control={form.control}
+              name="endDate"
+              label="End Date"
+              placeholder="Pick end date"
+              disabled={false}
+              dateType="month"
+            />
+          </div>
+
+          {/* Description */}
+          <CustomFormField
+            control={form.control}
+            name="description"
+            label="Description"
+            multiline
+            placeholder="Describe your role, achievements, and impact..."
+          />
+
+          {/* Responsibilities */}
+          <TextListFormField
+            control={form.control}
+            name="responsibilities"
+            label="Key Responsibilities"
+            placeholder="Add a responsibility and press Enter..."
+            helperText="Press Enter or click the + button to add each responsibility"
+          />
+
+          {/* Submit Buttons */}
+          <div className="flex justify-end gap-3 py-3 border-t border-gray-800">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSubmitting}
+              onClick={onClose}
+              className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700 hover:text-white"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-orange-400 hover:bg-orange-300 text-white px-8 min-w-[140px]"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : experience ? (
+                "Update Experience"
+              ) : (
+                "Add Experience"
+              )}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+};
+
+export default WorkExperienceEditView;

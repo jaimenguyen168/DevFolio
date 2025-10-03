@@ -1,5 +1,6 @@
 import { defineSchema } from "convex/server";
 import {
+  userCustomizations,
   userEducation,
   userInterests,
   userLinks,
@@ -17,4 +18,5 @@ export default defineSchema({
   userSkills: userSkills,
   userWorkExperience: userWorkExperience,
   userEducation: userEducation,
+  userCustomizations: userCustomizations,
 });

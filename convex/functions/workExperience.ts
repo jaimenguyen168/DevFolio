@@ -1,16 +1,7 @@
 import { mutation, query } from "../_generated/server";
 import { ConvexError, v } from "convex/values";
 import { getUserByUsername, validateUser } from "../utils";
-
-const WORK_TYPES = [
-  "full-time",
-  "part-time",
-  "contract",
-  "internship",
-  "freelance",
-  "consulting",
-  "other",
-] as const;
+import { WORK_TYPES } from "../../src/modules/settings/constants";
 
 export const getWorkExperiences = query({
   args: {

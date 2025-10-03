@@ -15,8 +15,9 @@ const DAY = 24 * HOUR;
 const MONTH = 30 * DAY;
 const YEAR = 365 * DAY;
 
-export const formatRelativeTime = (dateString: string) => {
-  const date = new Date(dateString);
+export const formatRelativeTime = (dateInput: string | number) => {
+  const date =
+    typeof dateInput === "number" ? new Date(dateInput) : new Date(dateInput);
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 

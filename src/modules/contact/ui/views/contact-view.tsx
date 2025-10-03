@@ -53,6 +53,10 @@ const ContactView = ({ username }: ContactViewProps) => {
     username: username,
   });
 
+  const customizations = useQuery(
+    api.functions.customizations.getCustomizations,
+  );
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "success" | "error"
@@ -75,6 +79,11 @@ const ContactView = ({ username }: ContactViewProps) => {
     setSubmitStatus("idle");
 
     try {
+      const shouldUseCustom =
+        customizations &&
+        !customizations.confirmationEmail.useDefault &&
+        customizations.confirmationEmail.customHtml;
+
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
@@ -84,6 +93,9 @@ const ContactView = ({ username }: ContactViewProps) => {
           ...data,
           recipientEmail: user?.email,
           recipientName: user?.name,
+          ...(shouldUseCustom && {
+            customConfirmationHtml: customizations.confirmationEmail.customHtml,
+          }),
         }),
       });
 

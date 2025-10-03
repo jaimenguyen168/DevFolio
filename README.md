@@ -78,8 +78,8 @@ Make sure you have the following installed on your machine:
 **Cloning the Repository**
 
 ```bash
-git clone https://github.com/yourusername/devfolio.git
-cd devfolio
+git clone https://github.com/jaimenguyen168/DevFolio.git
+cd DevFolio
 ```
 
 **Installation**
@@ -98,25 +98,10 @@ npm install
 
 **Set Up Environment Variables**
 
-Create a new file named `.env.local` in the root of your project by copying from the example:
+Create a new file named `.env.local` in the root of your project by copying from the example and add the required API keys to your `.env.local` file:
 
 ```bash
 cp .env.example .env.local
-```
-
-Add the required API keys to your `.env.local` file:
-
-```env
-# Convex
-CONVEX_DEPLOYMENT=
-NEXT_PUBLIC_CONVEX_URL=
-
-# Clerk
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-
-# Resend
-RESEND_API_KEY=
 ```
 
 **Getting API Keys:**

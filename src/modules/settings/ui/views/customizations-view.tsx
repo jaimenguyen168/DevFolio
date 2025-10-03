@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Eye, Code } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DEFAULT_CONFIRMATION_EMAIL } from "@/constants/confirmationEmail";
+import { useQuery, useMutation } from "convex/react";
+import { toast } from "sonner";
+import { api } from "../../../../../convex/_generated/api";
+import Loading from "@/components/Loading";
 
 const CustomizationsView = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -14,6 +18,26 @@ const CustomizationsView = () => {
   );
   const [customHtml, setCustomHtml] = useState("");
   const [initialCustomHtml, setInitialCustomHtml] = useState("");
+
+  const customizations = useQuery(
+    api.functions.customizations.getCustomizations,
+  );
+  const updateConfirmationEmail = useMutation(
+    api.functions.customizations.updateConfirmationEmail,
+  );
+
+  useEffect(() => {
+    if (customizations) {
+      const useDefault = customizations.confirmationEmail.useDefault;
+      setEmailOption(useDefault ? "default" : "custom");
+
+      // Always load the custom HTML if it exists, regardless of which option is selected
+      if (customizations.confirmationEmail.customHtml) {
+        setCustomHtml(customizations.confirmationEmail.customHtml);
+        setInitialCustomHtml(customizations.confirmationEmail.customHtml);
+      }
+    }
+  }, [customizations]);
 
   // Sample data for preview
   const sampleData = {
@@ -48,19 +72,18 @@ const CustomizationsView = () => {
     setIsSubmitting(true);
 
     try {
-      // TODO: Save to Convex
-      console.log("Saving email settings:", {
-        emailOption,
-        customHtml: emailOption === "custom" ? customHtml : null,
+      await updateConfirmationEmail({
+        useDefault: emailOption === "default",
+        customHtml: customHtml || undefined, // Always save the custom HTML
       });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Update initial value after successful save
       setInitialCustomHtml(customHtml);
+
+      toast.success("Email template saved successfully!");
     } catch (error) {
       console.error("Failed to save:", error);
+      toast.error("Failed to save email template. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -68,6 +91,13 @@ const CustomizationsView = () => {
 
   // Check if custom HTML has been edited
   const hasEdited = customHtml !== initialCustomHtml;
+
+  // Show loading state while fetching
+  if (customizations === undefined) {
+    return <Loading />;
+  }
+
+  if (customizations === null) return null;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 w-full lg:max-w-7xl mx-auto">
@@ -79,7 +109,7 @@ const CustomizationsView = () => {
       </div>
 
       {/* Form Section */}
-      <form onSubmit={handleSubmit} className="space-y-6 lg:space-y-8">
+      <div className="space-y-6 lg:space-y-8">
         {/* Email Template Options */}
         <div className="space-y-4">
           <Label className="text-base font-medium text-white">
@@ -90,18 +120,45 @@ const CustomizationsView = () => {
           </p>
           <RadioGroup
             value={emailOption}
-            onValueChange={(value) => {
-              setEmailOption(value as "default" | "custom");
-              // Initialize with default template when switching to custom
-              if (value === "custom" && !customHtml) {
-                const defaultTemplate = DEFAULT_CONFIRMATION_EMAIL(
-                  "${senderName}",
-                  "${senderMessage}",
-                  "${recipientEmail}",
-                  "${recipientName}",
-                );
-                setCustomHtml(defaultTemplate);
-                setInitialCustomHtml(defaultTemplate);
+            onValueChange={async (value) => {
+              const newValue = value as "default" | "custom";
+              setEmailOption(newValue);
+
+              if (newValue === "default") {
+                try {
+                  // Save with useDefault: true, but keep the customHtml
+                  await updateConfirmationEmail({
+                    useDefault: true,
+                    customHtml: customHtml || undefined,
+                  });
+                  toast.success("Switched to default template");
+                } catch (error) {
+                  console.error("Failed to save:", error);
+                  toast.error("Failed to update template");
+                }
+              } else if (newValue === "custom") {
+                // Initialize with default template when switching to custom for the first time
+                if (!customHtml) {
+                  const defaultTemplate = DEFAULT_CONFIRMATION_EMAIL(
+                    "${senderName}",
+                    "${senderMessage}",
+                    "${recipientEmail}",
+                    "${recipientName}",
+                  );
+                  setCustomHtml(defaultTemplate);
+                }
+
+                // Update to use custom template
+                try {
+                  await updateConfirmationEmail({
+                    useDefault: false,
+                    customHtml: customHtml || undefined,
+                  });
+                  toast.success("Switched to custom template");
+                } catch (error) {
+                  console.error("Failed to save:", error);
+                  toast.error("Failed to update template");
+                }
               }
             }}
             className="space-y-3"
@@ -216,7 +273,8 @@ const CustomizationsView = () => {
         {emailOption === "custom" && (
           <div className="flex justify-end pt-4 border-t border-gray-700">
             <Button
-              type="submit"
+              type="button"
+              onClick={handleSubmit}
               disabled={isSubmitting || !hasEdited}
               className="bg-orange-400 hover:bg-orange-300 text-white px-6 sm:px-8 w-full sm:w-auto text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -231,7 +289,7 @@ const CustomizationsView = () => {
             </Button>
           </div>
         )}
-      </form>
+      </div>
     </div>
   );
 };

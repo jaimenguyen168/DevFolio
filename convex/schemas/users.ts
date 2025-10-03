@@ -116,3 +116,11 @@ export const userProjects = defineTable({
   .index("by_user_and_slug", ["userId", "slug"])
   .index("by_user_and_name", ["userId", "name"])
   .index("by_slug", ["slug"]);
+
+export const userCustomizations = defineTable({
+  userId: v.id("users"),
+  confirmationEmail: v.object({
+    useDefault: v.boolean(),
+    customHtml: v.optional(v.string()),
+  }),
+}).index("by_user_id", ["userId"]);

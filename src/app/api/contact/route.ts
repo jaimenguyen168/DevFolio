@@ -54,14 +54,22 @@ export async function POST(request: Request) {
       `,
     });
 
-    const confirmationHtml =
-      customConfirmationHtml ||
-      DEFAULT_CONFIRMATION_EMAIL(
+    let confirmationHtml;
+    if (customConfirmationHtml) {
+      confirmationHtml = customConfirmationHtml
+        .replace(/\$\{senderName\}/g, senderName)
+        .replace(/\$\{senderEmail\}/g, senderEmail)
+        .replace(/\$\{senderMessage\}/g, senderMessage)
+        .replace(/\$\{recipientEmail\}/g, recipientEmail)
+        .replace(/\$\{recipientName\}/g, recipientName);
+    } else {
+      confirmationHtml = DEFAULT_CONFIRMATION_EMAIL(
         senderName,
         senderMessage,
         recipientEmail,
         recipientName,
       );
+    }
 
     // Send confirmation email to sender
     const { data: confirmEmail, error: confirmError } =

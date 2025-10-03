@@ -1,36 +1,161 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DevFolio
 
-## Getting Started
+<div>
+    <img src="https://img.shields.io/badge/-React-black?style=for-the-badge&logoColor=white&logo=react&color=61DAFB" alt="react" />
+    <img src="https://img.shields.io/badge/-Next_JS-black?style=for-the-badge&logoColor=white&logo=nextdotjs&color=000000" alt="nextjs" />
+    <img src="https://img.shields.io/badge/-Convex-black?style=for-the-badge&logoColor=white&logo=convex&color=FF6F00" alt="convex" />
+    <img src="https://img.shields.io/badge/-Clerk-black?style=for-the-badge&logoColor=white&logo=clerk&color=6C47FF" alt="clerk" />
+    <img src="https://img.shields.io/badge/-Tailwind_CSS-black?style=for-the-badge&logoColor=white&logo=tailwindcss&color=06B6D4" alt="tailwindcss" />
+    <img src="https://img.shields.io/badge/-shadcn/ui-black?style=for-the-badge&logoColor=white&logo=shadcnui&color=000000" alt="shadcn" />
+</div>
 
-First, run the development server:
+## 📋 <a name="table">Table of Contents</a>
+
+1. ✨ [Introduction](#introduction)
+2. ✅ [Tech Stack](#tech-stack)
+3. 🕹️ [Features](#features)
+4. 🤸 [Quick Start](#quick-start)
+5. 👥 [Contributors](#contributors)
+
+## <a name="introduction">✨ Introduction</a>
+
+DevFolio is a modern web application that transforms the traditional resume into an interactive digital portfolio. It serves as a comprehensive professional showcase where developers can display their projects, work experience, education, skills, and bio in a visually engaging format. More than just a resume builder, DevFolio acts as a personal website and networking hub, connecting talented developers with potential employers and collaborators. With its unique terminal-style interface and real-time editing capabilities, DevFolio makes creating and maintaining a professional online presence simple and fun.
+
+## <a name="tech-stack">✅ Tech Stack</a>
+
+- React
+- Next.js
+- Convex
+- Clerk
+- Tailwind CSS
+- shadcn/ui
+- Resend
+
+## <a name="features">🕹️ Features</a>
+
+### Profile Creation & Management
+👉 **Comprehensive profile builder** – Create detailed profiles including bio, work experience, education, skills, and projects.  
+👉 **Terminal-style interface** – Build your profile using an intuitive CLI-inspired interface for a unique developer experience.  
+👉 **Live editing & updates** – See changes in real-time powered by Convex's reactive database.
+👉 **Custom confirmation emails** – Personalized email notifications using Resend.
+
+### Security & Authentication
+👉 **Secure authentication** – Safe sign-up and sign-in process managed by Clerk.    
+
+### Sharing & Discovery
+👉 **Shareable portfolios** – Share your profile with a personalized username URL.  
+👉 **Browse developer portfolios** – Discover and explore profiles of other talented developers.  
+👉 **Contact functionality** – Allow visitors to send emails directly to portfolio owners.  
+
+### Future Features
+
+#### AI-Powered Enhancement
+🚀 **AI-enhanced writing** – Leverage AI to improve resume content, optimize descriptions, and enhance professional writing.  
+
+#### Advanced Customization
+🚀 **Theme customization** – Choose from multiple themes or create custom color schemes.  
+🚀 **Privacy controls** – Hide specific sections or make your portfolio private.  
+🚀 **Notification system** – Get notified when employers view or interact with your portfolio.  
+
+#### Export & Analytics
+🚀 **Download as CV/Resume** – Export your portfolio as a professional PDF resume or CV.  
+🚀 **Analytics dashboard** – Track portfolio views, visitor insights, and profile performance metrics.  
+
+## <a name="quick-start">🤸 Quick Start</a>
+
+Follow these steps to set up the project locally on your machine.
+
+### Prerequisites
+
+Make sure you have the following installed on your machine:
+
+- [Git](https://git-scm.com/)
+- [Node.js](https://nodejs.org/en) (v18 or higher)
+- [pnpm](https://pnpm.io/) (recommended package manager)
+
+### Installation Instructions
+
+**Cloning the Repository**
+
+```bash
+git clone https://github.com/yourusername/devfolio.git
+cd devfolio
+```
+
+**Installation**
+
+Install the project dependencies using pnpm (recommended):
+
+```bash
+pnpm install
+```
+
+Or using npm:
+
+```bash
+npm install
+```
+
+**Set Up Environment Variables**
+
+Create a new file named `.env.local` in the root of your project by copying from the example:
+
+```bash
+cp .env.example .env.local
+```
+
+Add the required API keys to your `.env.local` file:
+
+```env
+# Convex
+CONVEX_DEPLOYMENT=
+NEXT_PUBLIC_CONVEX_URL=
+
+# Clerk
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+
+# Resend
+RESEND_API_KEY=
+```
+
+**Getting API Keys:**
+
+- **Convex**: Sign up at [Convex](https://www.convex.dev/) and create a new project
+- **Clerk**: Get your keys from [Clerk Dashboard](https://dashboard.clerk.com/)
+- **Resend**: Obtain your API key from [Resend](https://resend.com/)
+
+**Running the Development Server**
+
+```bash
+pnpm dev
+```
+
+Or using npm:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Building for Production**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm build
+pnpm start
+```
 
-## Learn More
+## <a name="contributors">👥 Contributors</a>
 
-To learn more about Next.js, take a look at the following resources:
+**Developer**: [Jaime Nguyen](https://github.com/jaimenguyen168)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**UI Design**: [Portfolio for Developers Concept V.2.1](https://www.figma.com/design/5WPaJB8AoS64R0fULqvB8N/Portfolio-for-Developers-Concept-V.2.1--Community-?node-id=26532-1280&p=f&t=gCTPUKFSn24KHOw4-0) by Figma Community
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+<div align="center">
+  <p>Built with ❤️ by ME</p>
+  <p>⭐ Star this repo if you find it helpful!</p>
+</div>

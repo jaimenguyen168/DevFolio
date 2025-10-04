@@ -215,7 +215,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
                   <PanelRight size={20} />
                 </Button>
                 {selectedTechs.length === availableTechs.length ? (
-                  <span className="text-gray-400 text-sm">_all-stack</span>
+                  <span className="text-gray-400 text-sm">_all-stacks</span>
                 ) : (
                   <span className="text-gray-400 text-sm">
                     {selectedTechs.length > 3

@@ -9,6 +9,7 @@ import { useUsername } from "@/components/UsernameProvider";
 import Terminal from "@/components/Terminal";
 import CustomUserButton from "@/modules/auth/ui/components/CustomUserButton";
 import { User } from "@/modules/types";
+import Link from "next/link";
 
 const Footer = () => {
   const { username } = useUsername();
@@ -34,6 +35,10 @@ const Footer = () => {
     return <ExternalLink size={20} />;
   };
 
+  const maxVisibleLinks = 3;
+  const visibleLinks = userLinks?.slice(0, maxVisibleLinks) || [];
+  const remainingCount = (userLinks?.length || 0) - maxVisibleLinks;
+
   return (
     <div className="border-t border-gray-700 backdrop-blur-sm">
       <div className="flex items-center space-x-4">
@@ -44,7 +49,7 @@ const Footer = () => {
         </div>
 
         <div className="flex">
-          {userLinks?.map((link, index) => (
+          {visibleLinks.map((link, index) => (
             <div
               key={index}
               className="flex items-center text-gray-400 hover:text-white transition-colors border-r border-gray-700 py-4 px-3 first:border-l"
@@ -54,6 +59,15 @@ const Footer = () => {
               </a>
             </div>
           ))}
+
+          {remainingCount > 0 && (
+            <Link
+              href={`/${username}/contact`}
+              className="flex items-center text-gray-400 hover:text-white transition-colors border-r border-gray-700 py-4 px-3"
+            >
+              <span className="text-sm font-medium">+{remainingCount}</span>
+            </Link>
+          )}
         </div>
 
         <div className="flex items-center justify-end text-gray-400 space-x-4 px-4 flex-1">

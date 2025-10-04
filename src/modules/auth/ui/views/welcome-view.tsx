@@ -31,7 +31,7 @@ const WelcomeView = () => {
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearchValue, setDebouncedSearchValue] = useState("");
 
-  const user = useQuery(api.functions.users.getCurrentUser, {});
+  const user = useQuery(api.functions.users.getCurrentUser);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -53,7 +53,7 @@ const WelcomeView = () => {
   };
 
   const handleGetStarted = () => {
-    if (!isSignedIn) {
+    if (!isSignedIn || !user) {
       router.push("/sign-in");
       return;
     }

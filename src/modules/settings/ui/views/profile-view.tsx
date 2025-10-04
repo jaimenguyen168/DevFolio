@@ -5,14 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { Building2, Loader2, Upload } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
@@ -25,6 +18,7 @@ import { useRouter } from "next/navigation";
 import ImageUploadDialog from "@/modules/settings/ui/components/ImageUploadDialog";
 import Image from "next/image";
 import HashtagFormField from "@/components/HashtagFormField";
+import LinkFormField from "@/components/LinkFormField";
 
 interface ProfileViewProps {
   username: string;
@@ -39,6 +33,14 @@ const profileFormSchema = z.object({
   bio: z.string().optional(),
   hashtags: z.array(z.string()).optional(),
   imageUrl: z.string().optional(),
+  links: z
+    .array(
+      z.object({
+        label: z.string(),
+        url: z.url("Invalid URL"),
+      }),
+    )
+    .optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -48,11 +50,16 @@ const ProfileView = ({ username }: ProfileViewProps) => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hashtagInput, setHashtagInput] = useState("");
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
 
   const user = useQuery(api.functions.users.getUser, { username });
   const updateUser = useMutation(api.functions.users.updateUser);
+  const userLinks = useQuery(api.functions.userLinks.getUserLinks, {
+    username,
+  });
+  const createUserLink = useMutation(api.functions.userLinks.createUserLink);
+  const updateUserLink = useMutation(api.functions.userLinks.updateUserLink);
+  const deleteUserLink = useMutation(api.functions.userLinks.deleteUserLink);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -65,6 +72,7 @@ const ProfileView = ({ username }: ProfileViewProps) => {
       bio: "",
       hashtags: [],
       imageUrl: "",
+      links: [],
     },
   });
 
@@ -79,6 +87,11 @@ const ProfileView = ({ username }: ProfileViewProps) => {
         bio: user.bio || "",
         hashtags: user.hashtags || [],
         imageUrl: user.imageUrl || "",
+        links:
+          userLinks?.map((link) => ({
+            label: link.label,
+            url: link.url,
+          })) || [],
       });
     }
   }, [user, form]);
@@ -107,6 +120,48 @@ const ProfileView = ({ username }: ProfileViewProps) => {
         },
       });
 
+      // Sync links
+      const existingLinks = userLinks || [];
+      const newLinks = data.links || [];
+
+      // Create a map of existing links by label for easy lookup
+      const existingLinksMap = new Map(
+        existingLinks.map((link) => [link.label.toLowerCase(), link]),
+      );
+
+      // Create a map of new links by label
+      const newLinksMap = new Map(
+        newLinks.map((link) => [link.label.toLowerCase(), link]),
+      );
+
+      // Delete links that are no longer present
+      for (const existingLink of existingLinks) {
+        if (!newLinksMap.has(existingLink.label.toLowerCase())) {
+          await deleteUserLink({ linkId: existingLink._id });
+        }
+      }
+
+      // Update or create links
+      for (const newLink of newLinks) {
+        const existingLink = existingLinksMap.get(newLink.label.toLowerCase());
+
+        if (existingLink) {
+          // Update if URL changed
+          if (existingLink.url !== newLink.url) {
+            await updateUserLink({
+              linkId: existingLink._id,
+              updates: { url: newLink.url },
+            });
+          }
+        } else {
+          // Create new link
+          await createUserLink({
+            label: newLink.label,
+            url: newLink.url,
+          });
+        }
+      }
+
       if (usernameChanged && data.username) {
         router.replace(`/${data.username}/settings`);
       }
@@ -119,25 +174,6 @@ const ProfileView = ({ username }: ProfileViewProps) => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const addHashtag = () => {
-    if (hashtagInput.trim()) {
-      const currentHashtags = form.getValues("hashtags") || [];
-      const newHashtag = hashtagInput.startsWith("#")
-        ? hashtagInput.trim()
-        : `#${hashtagInput.trim()}`;
-      form.setValue("hashtags", [...currentHashtags, newHashtag]);
-      setHashtagInput("");
-    }
-  };
-
-  const removeHashtag = (index: number) => {
-    const currentHashtags = form.getValues("hashtags") || [];
-    form.setValue(
-      "hashtags",
-      currentHashtags.filter((_, i) => i !== index),
-    );
   };
 
   if (!user) {
@@ -270,6 +306,14 @@ const ProfileView = ({ username }: ProfileViewProps) => {
             disabled={!isEditing}
             multiline
             minHeight="100px"
+          />
+
+          {/* Links */}
+          <LinkFormField
+            control={form.control}
+            name="links"
+            label="Social Links"
+            disabled={!isEditing}
           />
 
           {/* Hashtags */}

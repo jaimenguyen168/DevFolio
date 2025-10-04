@@ -19,7 +19,7 @@ import {
 } from "@/lib/git/gitCommands";
 import { TABLE_CONFIGS, TABLE_OPERATIONS } from "@/lib/git/configs";
 import { useRouter } from "next/navigation";
-import { handleTabCompletion, TECH_STACKS } from "@/modules/about/constants";
+import { handleTabCompletion } from "@/modules/about/constants";
 
 interface HistoryEntry {
   type: "input" | "output";
@@ -120,7 +120,7 @@ const Terminal = () => {
 
     switch (mainCommand) {
       case "help":
-        output = generateHelpText();
+        output = generateHelpText(gitState);
         break;
 
       case "clear":
@@ -224,7 +224,7 @@ const Terminal = () => {
     }
 
     if (!gitState.context.targetTable) {
-      return "No table targeted. Use 'git <table>' to target a table first (e.g., 'git users', 'git user-links').";
+      return "No table targeted. Use 'git <table>' to target a table first (e.g., 'git users', 'git links').";
     }
 
     const tableOperations = TABLE_OPERATIONS[gitState.context.targetTable];

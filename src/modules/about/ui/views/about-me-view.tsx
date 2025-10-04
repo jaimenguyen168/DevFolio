@@ -48,6 +48,12 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
       username: username,
     },
   );
+  const customizations = useQuery(
+    api.functions.customizations.getCustomizationsByUsername,
+    {
+      username: username,
+    },
+  );
 
   const [activeContent, setActiveContent] = useState("bio");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -174,12 +180,22 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
         </AccordionTrigger>
         <AccordionContent className="pb-2">
           <div className="mt-2 space-y-2 ml-7">
-            <Button disabled variant="ghost" className="text-gray-200">
-              <Mail size={14} />
-              <span className="text-sm">{user?.email}</span>
-            </Button>
-            {user?.phone && (
-              <Button variant="ghost" className="text-gray-200" disabled>
+            {!customizations?.hideEmail && (
+              <Button
+                disabled
+                variant="ghost"
+                className="text-gray-200 justify-start p-0"
+              >
+                <Mail size={14} />
+                <span className="text-sm">{user?.email}</span>
+              </Button>
+            )}
+            {user?.phone && !customizations?.hidePhone && (
+              <Button
+                variant="ghost"
+                className="text-gray-200 justify-start p-0"
+                disabled
+              >
                 <Phone size={14} />
                 <span className="text-sm">{user.phone}</span>
               </Button>

@@ -5,6 +5,10 @@ import { oneDark } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { taglines } from "@/modules/about/constants";
 import { User } from "@/modules/types";
+import { Button } from "@/components/ui/button";
+import { Download, FolderGit2 } from "lucide-react";
+import UserProfileImage from "@/components/UserProfileImage";
+import Link from "next/link";
 
 interface BioViewProps {
   user: User;
@@ -47,58 +51,65 @@ export default bio;`;
   const hashtags = user.hashtags || ["#developer", "#designer", "#creative"];
 
   return (
-    <div className="w-full h-full flex-1 flex justify-center  p-8 lg:pt-16">
-      <div className="relative flex flex-col lg:flex-row items-start gap-0 max-w-5xl w-full">
-        {/* Profile Image Section */}
-        <div className="relative flex-shrink-0 w-full lg:w-auto">
-          <div className="bg-slate-700 rounded-3xl p-4 flex flex-col lg:flex-row gap-6 lg:gap-0">
-            {/* Image or Initials */}
-            <div className="flex-shrink-0">
-              {user.imageUrl ? (
-                <Image
-                  src={user.imageUrl}
-                  alt={user.name}
-                  width={500}
-                  height={500}
-                  className="lg:size-72 w-full h-[250px] object-cover rounded-2xl mx-auto lg:mx-0"
-                />
-              ) : (
-                <div className="size-64 rounded-2xl bg-slate-700 flex items-center justify-center mx-auto lg:mx-0">
-                  <span className="text-6xl font-bold text-slate-800 size-36 rounded-full bg-orange-300 flex items-center justify-center">
-                    {user.name ? getInitials(user.name) : "?"}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Hashtags on mobile */}
-            <div className="flex flex-wrap gap-2 lg:hidden items-start ml-0 lg:ml-6">
-              {hashtags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 bg-slate-600 text-gray-300 rounded-full text-sm"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Hashtags for desktop */}
-          <div className="hidden lg:flex flex-wrap h-auto gap-2 mt-4 w-56">
-            {hashtags.map((tag, index) => (
-              <span
-                key={index}
-                className="px-3 py-1 bg-slate-700 text-gray-300 rounded-full text-sm"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+    <div className="w-full h-full flex-1 flex flex-col gap-8 p-8 lg:p-16">
+      {/* Hero Section */}
+      <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12 max-w-7xl w-full mx-auto">
+        {/* Left: Profile Image */}
+        <div className="size-52 lg:size-64">
+          <UserProfileImage user={user} />
         </div>
 
-        {/* Bio Content - CodeMirror Card */}
-        <div className="bg-slate-800 lg:absolute left-84 top-16 rounded-3xl p-6 lg:-ml-24 mt-4 lg:mt-16 shadow-lg flex-1 lg:max-w-3xl z-10">
+        {/* Right: Text Content */}
+        <div className="flex-1 space-y-6 text-center lg:text-left">
+          <div className="space-y-2">
+            <h1 className="text-2xl lg:text-4xl font-bold text-white">
+              {user.name || "Username"},
+            </h1>
+            <h2 className="text-xl lg:text-3xl font-bold text-white">
+              {user.title || "Creative Technologist"}
+            </h2>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <Button
+              className="bg-orange-500 hover:bg-orange-600 text-white text-base rounded-md transition-colors"
+              size="lg"
+            >
+              <Download className="w-5 h-5 mr-2" />
+              Download Resume
+            </Button>
+
+            <Button
+              asChild
+              variant="outline"
+              className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white text-base rounded-md transition-colors"
+              size="lg"
+            >
+              <Link href={`/${user.username}/projects`}>
+                <FolderGit2 className="w-5 h-5 mr-2" />
+                View Projects
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Code View Section */}
+      <div className="max-w-7xl w-full mx-auto space-y-6">
+        {/* Hashtags */}
+        <div className="flex flex-wrap gap-2">
+          {hashtags.map((tag, index) => (
+            <span
+              key={index}
+              className="px-3 py-1 bg-slate-700 text-gray-300 rounded-full text-sm"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Bio Code Card */}
+        <div className="bg-slate-800 rounded-3xl p-6 shadow-lg">
           <div className="h-auto">
             <CodeMirror
               value={generateBioCode()}

@@ -13,8 +13,8 @@ const UserProfileImage = ({ user }: UserProfileImageProps) => {
         <Image
           src={user.imageUrl}
           alt="profile image"
-          width={50}
-          height={50}
+          width={1000}
+          height={1000}
           className="rounded-full object-cover w-full h-full"
         />
       ) : (

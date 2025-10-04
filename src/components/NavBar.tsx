@@ -14,6 +14,7 @@ import {
 import { usePathname } from "next/navigation";
 import { useUsername } from "@/components/UsernameProvider";
 import Image from "next/image";
+import UserProfileImage from "@/components/UserProfileImage";
 
 const navLinks = [
   { label: "_hello", href: "/home" },
@@ -27,6 +28,10 @@ const NavBar = () => {
   const user = useQuery(api.functions.users.getUser, {
     username: username as string,
   });
+
+  const currentUser = useQuery(api.functions.users.getCurrentUser);
+  const isCurrentUser = user?._id === currentUser?._id;
+  const showCurrentUserProfile = currentUser && !isCurrentUser;
 
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -53,22 +58,31 @@ const NavBar = () => {
     <nav className="flex items-center w-full border-b border-gray-700">
       {/* Desktop Navigation */}
       <div className="hidden lg:contents">
-        <div className="w-[360px] flex items-center space-x-4  px-8 py-5 border-r border-gray-700 ">
-          <Link href="/">
-            <Image
-              src="/icon.png"
-              alt="devfolio logo"
-              width={25}
-              height={25}
-              className="size-7"
-            />
-          </Link>
-          <Link
-            href={`/${username}/home`}
-            className="text-orange-400 hover:!text-orange-300 transition-colors"
-          >
-            {user?.name || "No User"}
-          </Link>
+        <div className="w-[360px] flex items-center space-x-4  px-8 py-5 border-r border-gray-700 justify-between">
+          <div className="flex items-center space-x-4">
+            <Link href="/">
+              <Image
+                src="/icon.png"
+                alt="devfolio logo"
+                width={25}
+                height={25}
+                className="size-7"
+              />
+            </Link>
+            <Link
+              href={`/${username}/home`}
+              className="text-orange-400 hover:!text-orange-300 transition-colors"
+            >
+              {user?.name || "No User"}
+            </Link>
+          </div>
+
+          {/* Current User Profile Image */}
+          {showCurrentUserProfile && (
+            <Link href={`/${currentUser.username}/home`} className="size-8">
+              <UserProfileImage user={currentUser} />
+            </Link>
+          )}
         </div>
 
         {user && (
@@ -76,7 +90,7 @@ const NavBar = () => {
             {/* Main Navigation Links */}
             <div className="flex flex-1">
               {mainNavLinks.map((link) => {
-                const isActive = pathname === link.href;
+                const isActive = pathname.startsWith(link.href);
                 return (
                   <Link
                     key={link.href}
@@ -136,50 +150,61 @@ const NavBar = () => {
           </Link>
         </div>
 
-        {user && (
-          <DropdownMenu open={open} onOpenChange={setOpen}>
-            <DropdownMenuTrigger asChild>
-              <button
-                suppressHydrationWarning
-                className="text-gray-400 hover:text-white transition-colors"
+        <div className="flex items-center space-x-4">
+          {/* Current User Profile Image */}
+          {showCurrentUserProfile && (
+            <Link href={`/${currentUser.username}/home`} className="size-8">
+              <UserProfileImage user={currentUser} />
+            </Link>
+          )}
+          {user && (
+            <DropdownMenu open={open} onOpenChange={setOpen}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  suppressHydrationWarning
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  {open ? <X size={24} /> : <Menu size={24} />}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="center"
+                side="bottom"
+                className="w-[calc(100vw-4rem)] h-[calc(100vh-11.9rem)] mx-8 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 border-gray-700 font-mono rounded-none border-t-0 border-b"
+                sideOffset={24}
               >
-                {open ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="center"
-              side="bottom"
-              className="w-[calc(100vw-4rem)] h-[calc(100vh-11.9rem)] mx-8 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 border-gray-700 font-mono rounded-none border-t-0 border-b"
-              sideOffset={24}
-            >
-              <div className="px-6 py-2 border-b border-gray-700">
-                <div className="text-gray-500 mb-3 font-mono"># navigate:</div>
-              </div>
+                <div className="px-6 py-2 border-b border-gray-700">
+                  <div className="text-gray-500 mb-3 font-mono">
+                    # navigate:
+                  </div>
+                </div>
 
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href;
-                return (
-                  <DropdownMenuItem
-                    key={`${username}/${link.href}`}
-                    asChild
-                    className={`px-0 py-0 text-[16px] text-white focus:bg-transparent hover:bg-transparent w-full rounded-none ${
-                      isActive
-                        ? "text-orange-400 hover:!text-orange-300"
-                        : "text-white hover:!text-orange-300"
-                    }`}
-                  >
-                    <Link
-                      href={`/${username}/${link.href}`}
-                      className="block px-6 py-4 transition-colors font-mono w-full border-b border-gray-700 text-lg"
+                {navLinks.map((link) => {
+                  const fullPath = `/${username}${link.href}`;
+                  const isActive = pathname.startsWith(fullPath);
+                  return (
+                    <DropdownMenuItem
+                      key={fullPath}
+                      asChild
+                      className={`px-0 py-0 text-[16px] text-white focus:bg-transparent hover:bg-transparent w-full rounded-none ${
+                        isActive
+                          ? "text-orange-400 hover:!text-orange-300"
+                          : "text-white hover:!text-orange-300"
+                      }`}
                     >
-                      {link.label}
-                    </Link>
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+                      <Link
+                        href={fullPath}
+                        className="block px-6 py-4 transition-colors font-mono w-full border-b border-gray-700 text-lg"
+                      >
+                        {link.label}
+                      </Link>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
     </nav>
   );

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Eye, Code } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
 import { DEFAULT_CONFIRMATION_EMAIL } from "@/constants/confirmationEmail";
 import { useQuery, useMutation } from "convex/react";
 import { toast } from "sonner";
@@ -18,6 +19,8 @@ const CustomizationsView = () => {
   );
   const [customHtml, setCustomHtml] = useState("");
   const [initialCustomHtml, setInitialCustomHtml] = useState("");
+  const [hideEmail, setHideEmail] = useState(false);
+  const [hidePhone, setHidePhone] = useState(false);
 
   const customizations = useQuery(
     api.functions.customizations.getCustomizations,
@@ -25,17 +28,24 @@ const CustomizationsView = () => {
   const updateConfirmationEmail = useMutation(
     api.functions.customizations.updateConfirmationEmail,
   );
+  const updateCustomizations = useMutation(
+    api.functions.customizations.updateCustomizations,
+  );
 
   useEffect(() => {
     if (customizations) {
       const useDefault = customizations.confirmationEmail.useDefault;
       setEmailOption(useDefault ? "default" : "custom");
 
-      // Always load the custom HTML if it exists, regardless of which option is selected
+      // Load custom HTML if it exists
       if (customizations.confirmationEmail.customHtml) {
         setCustomHtml(customizations.confirmationEmail.customHtml);
         setInitialCustomHtml(customizations.confirmationEmail.customHtml);
       }
+
+      // Load hide email/phone settings
+      setHideEmail(customizations.hideEmail || false);
+      setHidePhone(customizations.hidePhone || false);
     }
   }, [customizations]);
 
@@ -74,12 +84,10 @@ const CustomizationsView = () => {
     try {
       await updateConfirmationEmail({
         useDefault: emailOption === "default",
-        customHtml: customHtml || undefined, // Always save the custom HTML
+        customHtml: customHtml || undefined,
       });
 
-      // Update initial value after successful save
       setInitialCustomHtml(customHtml);
-
       toast.success("Email template saved successfully!");
     } catch (error) {
       console.error("Failed to save:", error);
@@ -89,10 +97,36 @@ const CustomizationsView = () => {
     }
   };
 
-  // Check if custom HTML has been edited
+  const handleToggleHideEmail = async (checked: boolean) => {
+    setHideEmail(checked);
+    try {
+      await updateCustomizations({
+        hideEmail: checked,
+      });
+      toast.success(checked ? "Email hidden" : "Email visible");
+    } catch (error) {
+      console.error("Failed to update:", error);
+      toast.error("Failed to update setting");
+      setHideEmail(!checked); // Revert on error
+    }
+  };
+
+  const handleToggleHidePhone = async (checked: boolean) => {
+    setHidePhone(checked);
+    try {
+      await updateCustomizations({
+        hidePhone: checked,
+      });
+      toast.success(checked ? "Phone hidden" : "Phone visible");
+    } catch (error) {
+      console.error("Failed to update:", error);
+      toast.error("Failed to update setting");
+      setHidePhone(!checked); // Revert on error
+    }
+  };
+
   const hasEdited = customHtml !== initialCustomHtml;
 
-  // Show loading state while fetching
   if (customizations === undefined) {
     return <Loading />;
   }
@@ -108,8 +142,66 @@ const CustomizationsView = () => {
         </h1>
       </div>
 
-      {/* Form Section */}
       <div className="space-y-6 lg:space-y-8">
+        {/* Contact Information Visibility */}
+        <div className="space-y-4">
+          <div>
+            <Label className="text-base font-medium text-white">
+              Contact Information Visibility
+            </Label>
+            <p className="text-sm text-gray-400 mt-1">
+              Control which contact information is displayed on your profile
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {/* Hide Email Switch */}
+            <div className="flex items-center justify-between p-4 rounded-lg border border-gray-700 bg-gray-800/50">
+              <div className="flex-1">
+                <Label
+                  htmlFor="hide-email"
+                  className="text-gray-200 font-medium cursor-pointer"
+                >
+                  Hide Email Address
+                </Label>
+                <p className="text-sm text-gray-400 mt-1">
+                  Your email will not be visible to visitors
+                </p>
+              </div>
+              <Switch
+                id="hide-email"
+                checked={hideEmail}
+                onCheckedChange={handleToggleHideEmail}
+                className="data-[state=checked]:bg-orange-400 data-[state=unchecked]:bg-gray-600"
+              />
+            </div>
+
+            {/* Hide Phone Switch */}
+            <div className="flex items-center justify-between p-4 rounded-lg border border-gray-700 bg-gray-800/50">
+              <div className="flex-1">
+                <Label
+                  htmlFor="hide-phone"
+                  className="text-gray-200 font-medium cursor-pointer"
+                >
+                  Hide Phone Number
+                </Label>
+                <p className="text-sm text-gray-400 mt-1">
+                  Your phone number will not be visible to visitors
+                </p>
+              </div>
+              <Switch
+                id="hide-phone"
+                checked={hidePhone}
+                onCheckedChange={handleToggleHidePhone}
+                className="data-[state=checked]:bg-orange-400 data-[state=unchecked]:bg-gray-600"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Separator */}
+        <div className="border-t border-gray-700"></div>
+
         {/* Email Template Options */}
         <div className="space-y-4">
           <Label className="text-base font-medium text-white">
@@ -126,7 +218,6 @@ const CustomizationsView = () => {
 
               if (newValue === "default") {
                 try {
-                  // Save with useDefault: true, but keep the customHtml
                   await updateConfirmationEmail({
                     useDefault: true,
                     customHtml: customHtml || undefined,
@@ -137,7 +228,6 @@ const CustomizationsView = () => {
                   toast.error("Failed to update template");
                 }
               } else if (newValue === "custom") {
-                // Initialize with default template when switching to custom for the first time
                 if (!customHtml) {
                   const defaultTemplate = DEFAULT_CONFIRMATION_EMAIL(
                     "${senderName}",
@@ -148,7 +238,6 @@ const CustomizationsView = () => {
                   setCustomHtml(defaultTemplate);
                 }
 
-                // Update to use custom template
                 try {
                   await updateConfirmationEmail({
                     useDefault: false,
@@ -198,7 +287,7 @@ const CustomizationsView = () => {
           </RadioGroup>
         </div>
 
-        {/* Custom HTML Editor (only show when custom is selected) */}
+        {/* Custom HTML Editor */}
         {emailOption === "custom" && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -249,7 +338,7 @@ const CustomizationsView = () => {
           </div>
         )}
 
-        {/* Default Template Preview (only show when default is selected) */}
+        {/* Default Template Preview */}
         {emailOption === "default" && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -269,7 +358,7 @@ const CustomizationsView = () => {
           </div>
         )}
 
-        {/* Submit Button - only show when custom is selected */}
+        {/* Submit Button */}
         {emailOption === "custom" && (
           <div className="flex justify-end pt-4 border-t border-gray-700">
             <Button

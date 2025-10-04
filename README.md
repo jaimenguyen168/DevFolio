@@ -37,7 +37,7 @@ DevFolio is a modern web application that transforms the traditional resume into
 👉 **Comprehensive profile builder** – Create detailed profiles including bio, work experience, education, skills, and projects.  
 👉 **Terminal-style interface** – Build your profile using an intuitive CLI-inspired interface for a unique developer experience.  
 👉 **Live editing & updates** – See changes in real-time powered by Convex's reactive database.
-</br>👉 **Custom confirmation emails** – Personalized email notifications using Resend.
+👉 **Custom confirmation emails** – Personalized email notifications using Resend.
 
 ### Security & Authentication
 👉 **Secure authentication** – Safe sign-up and sign-in process managed by Clerk.    
@@ -50,6 +50,8 @@ DevFolio is a modern web application that transforms the traditional resume into
 ### Future Features
 
 #### AI-Powered Enhancement
+🚀 Skills showcase – Add and display technical skills, tools, and technologies with proficiency levels.
+🚀 Blog integration – Write and publish blog posts directly on your portfolio to share knowledge and insights.
 🚀 **AI-enhanced writing** – Leverage AI to improve resume content, optimize descriptions, and enhance professional writing.  
 
 #### Advanced Customization

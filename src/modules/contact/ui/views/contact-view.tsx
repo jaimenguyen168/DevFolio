@@ -53,8 +53,15 @@ const ContactView = ({ username }: ContactViewProps) => {
     username: username,
   });
 
+  const userLinks = useQuery(api.functions.userLinks.getUserLinks, {
+    username: username,
+  });
+
   const customizations = useQuery(
-    api.functions.customizations.getCustomizations,
+    api.functions.customizations.getCustomizationsByUsername,
+    {
+      username: username,
+    },
   );
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -175,7 +182,7 @@ button.addEventListener('click', () => {
             </span>
           </AccordionTrigger>
           <AccordionContent className="p-3">
-            <div className="space-y-2 mx-4">
+            {!customizations?.hideEmail && (
               <Button
                 disabled
                 variant="ghost"
@@ -184,60 +191,62 @@ button.addEventListener('click', () => {
                 <Mail size={14} className="mr-2" />
                 <span className="text-sm">{user?.email}</span>
               </Button>
-              {user?.phone && (
-                <Button
-                  variant="ghost"
-                  className="text-gray-200 justify-start p-0"
-                  disabled
-                >
-                  <Phone size={14} className="mr-2" />
-                  <span className="text-sm">{user.phone}</span>
-                </Button>
-              )}
-            </div>
+            )}
+            {user?.phone && !customizations?.hidePhone && (
+              <Button
+                variant="ghost"
+                className="text-gray-200 justify-start p-0"
+                disabled
+              >
+                <Phone size={14} className="mr-2" />
+                <span className="text-sm">{user.phone}</span>
+              </Button>
+            )}
           </AccordionContent>
         </AccordionItem>
 
         {/* Find Me Also In Section */}
-        <AccordionItem value="find-me-also-in" className="border-gray-700">
-          <AccordionTrigger className="flex items-center space-x-2 text-white hover:text-orange-400 transition-colors hover:no-underline py-3.5 border-b border-gray-700 rounded-none px-4">
-            <span className="flex items-center">
-              <User size={16} className="mr-2" /> _find-me-also-in
-            </span>
-          </AccordionTrigger>
-          <AccordionContent className="pb-2">
-            <div className="flex flex-col mt-2 space-y-2 ml-6">
-              <Button
-                variant="ghost"
-                className="text-blue-400 hover:text-blue-300 justify-start p-2"
-              >
-                <ExternalLink size={14} className="mr-2" />
-                <span className="text-sm">YouTube</span>
-              </Button>
-              <Button
-                variant="ghost"
-                className="text-blue-400 hover:text-blue-300 justify-start p-2"
-              >
-                <ExternalLink size={14} className="mr-2" />
-                <span className="text-sm">dev.to</span>
-              </Button>
-              <Button
-                variant="ghost"
-                className="text-blue-400 hover:text-blue-300 justify-start p-2"
-              >
-                <ExternalLink size={14} className="mr-2" />
-                <span className="text-sm">Instagram</span>
-              </Button>
-              <Button
-                variant="ghost"
-                className="text-blue-400 hover:text-blue-300 justify-start p-2"
-              >
-                <ExternalLink size={14} className="mr-2" />
-                <span className="text-sm">Twitch</span>
-              </Button>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+        {userLinks &&
+          userLinks.filter(
+            (link) =>
+              link.label.toLowerCase() !== "github" &&
+              link.label.toLowerCase() !== "email",
+          ).length > 0 && (
+            <AccordionItem value="find-me-also-in" className="border-gray-700">
+              <AccordionTrigger className="flex items-center space-x-2 text-white hover:text-orange-400 transition-colors hover:no-underline py-3.5 border-b border-gray-700 rounded-none px-4">
+                <span className="flex items-center">
+                  <User size={16} className="mr-2" /> _find-me-also-in
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-2">
+                <div className="flex flex-col mt-2 space-y-2 ml-6">
+                  {userLinks
+                    .filter(
+                      (link) =>
+                        link.label.toLowerCase() !== "github" &&
+                        link.label.toLowerCase() !== "email",
+                    )
+                    .map((link) => (
+                      <Button
+                        key={link._id}
+                        variant="ghost"
+                        className="text-blue-400 hover:text-blue-300 justify-start p-2"
+                        asChild
+                      >
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink size={14} className="mr-2" />
+                          <span className="text-sm">{link.label}</span>
+                        </a>
+                      </Button>
+                    ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
       </Accordion>
     </div>
   );

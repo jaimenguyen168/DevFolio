@@ -111,7 +111,7 @@ const ProjectCard = ({
                 >
                   <button className="rounded-full bg-indigo-200 backdrop-blur-sm flex items-center justify-center shadow-lg transition-transform hover:scale-110 gap-2 py-0.5 px-2">
                     <FaGithub size={16} />
-                    <span>{repoData.star || 0}</span>
+                    <span>{repoData.stars || 0}</span>
                     <Star size={16} />
                   </button>
                 </Link>
@@ -151,7 +151,7 @@ const ProjectCard = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white transition-all duration-200 hover:shadow-md"
+                    className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white transition-all duration-200 hover:shadow-md cursor-pointer"
                   >
                     view-project
                   </Button>

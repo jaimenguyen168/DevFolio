@@ -43,6 +43,9 @@ export const createProject = mutation({
     techStack: v.optional(
       v.array(v.union(...TECH_STACKS.map((tech) => v.literal(tech)))),
     ),
+    features: v.optional(v.array(v.string())),
+    futureFeatures: v.optional(v.array(v.string())),
+    contributors: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
     const user = await validateUser(ctx);
@@ -58,6 +61,9 @@ export const createProject = mutation({
       imageUrls: args.imageUrls,
       status: args.status,
       techStack: args.techStack,
+      features: args.features,
+      futureFeatures: args.futureFeatures,
+      contributors: args.contributors,
       views: 0,
     });
   },

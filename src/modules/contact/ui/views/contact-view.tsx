@@ -29,6 +29,7 @@ import EmailSuccessView from "@/modules/contact/ui/components/EmailSuccessView";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import NotFoundView from "@/modules/auth/ui/views/not-found-view";
+import { useRouter } from "next/navigation";
 
 const contactFormSchema = z.object({
   senderName: z
@@ -49,6 +50,7 @@ interface ContactViewProps {
 }
 
 const ContactView = ({ username }: ContactViewProps) => {
+  const router = useRouter();
   const user = useQuery(api.functions.users.getUser, {
     username: username,
   });
@@ -300,8 +302,8 @@ button.addEventListener('click', () => {
       {/* Right Container - Scrollable content (middle + right sections) */}
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
         {/* Tab Header */}
-        <div className="items-center border-b border-gray-700 sticky top-0  z-10 w-full">
-          <div className="px-4 py-3 flex items-center w-full sm:w-fit justify-between md:justify-start gap-3 sm:border-r sm:border-gray-700">
+        <div className="items-center border-b border-gray-700 sticky top-0  bg-slate-900 z-10 w-full">
+          <div className="px-4 py-3 flex items-center w-full sm:w-fit justify-between md:justify-start gap-3 sm:border-r sm:border-gray-700 ">
             <div className="flex items-center w-full">
               <Button
                 variant="ghost"
@@ -314,7 +316,10 @@ button.addEventListener('click', () => {
               <span className="text-gray-400 text-sm">_contact</span>
             </div>
 
-            <button className="text-gray-500 hover:text-white cursor-pointer">
+            <button
+              className="text-gray-500 hover:text-white cursor-pointer"
+              onClick={() => router.push(`/${username}`)}
+            >
               ×
             </button>
           </div>
@@ -417,7 +422,7 @@ button.addEventListener('click', () => {
           </div>
 
           {/* Right Section - Code Mirror */}
-          <div className="flex-1 lg:w-1/2 w-full flex flex-col min-h-[400px] lg:min-h-0 flex-shrink-0 p-8 xl:p-16 2xl:p-28 ">
+          <div className="flex-1 lg:w-1/2 w-full flex flex-col min-h-[400px] lg:min-h-0 flex-shrink-0 p-8 xl:p-16 2xl:p-28">
             <div className="flex-1 min-h-0 w-full">
               <CodeMirror
                 value={generateCode()}
@@ -445,6 +450,11 @@ button.addEventListener('click', () => {
                 className="[&_.cm-editor]:!bg-transparent [&_.cm-focused]:!bg-transparent [&_.cm-gutters]:w-8 [&_.cm-gutters]:min-w-8 [&_.cm-gutters]:!bg-transparent [&_.cm-gutter]:!bg-transparent [&_.cm-lineNumbers]:!bg-transparent h-full"
               />
             </div>
+          </div>
+
+          <div className="h-32 text-transparent select-none pointer-events-none">
+            sjhcvdsjhcvdsjhcv ds ds dsb dshj cdshj dshj sdjhhdsvcXZBN
+            xbsahgcvsahxvc hx vxghzv ghdsvx ghdsv hgdsv ghsdv cb sd
           </div>
         </div>
       </div>

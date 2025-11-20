@@ -20,6 +20,7 @@ import {
 import { TABLE_CONFIGS, TABLE_OPERATIONS } from "@/lib/git/configs";
 import { useRouter } from "next/navigation";
 import { handleTabCompletion } from "@/modules/about/constants";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface HistoryEntry {
   type: "input" | "output";
@@ -28,6 +29,7 @@ interface HistoryEntry {
 
 const Terminal = () => {
   const router = useRouter();
+  const isMobile = useIsMobile();
   const { username } = useUsername();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [history, setHistory] = useState<HistoryEntry[]>([
@@ -415,7 +417,7 @@ const Terminal = () => {
         </div>
         <DrawerTrigger asChild>
           <button className="hover:bg-gray-700 p-1 rounded">
-            <TerminalSquare size={24} />
+            <TerminalSquare size={isMobile ? 16 : 24} />
           </button>
         </DrawerTrigger>
       </div>

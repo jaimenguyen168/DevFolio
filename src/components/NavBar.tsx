@@ -15,6 +15,7 @@ import { usePathname } from "next/navigation";
 import { useUsername } from "@/components/UsernameProvider";
 import Image from "next/image";
 import UserProfileImage from "@/components/UserProfileImage";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const navLinks = [
   { label: "_hello", href: "/home" },
@@ -25,6 +26,7 @@ const navLinks = [
 
 const NavBar = () => {
   const { username } = useUsername();
+  const isMobile = useIsMobile();
   const user = useQuery(api.functions.users.getUser, {
     username: username as string,
   });
@@ -133,18 +135,17 @@ const NavBar = () => {
       {/* Mobile Navigation */}
       <div className="lg:hidden flex items-center justify-between w-full px-6 py-5">
         <div className="flex items-center space-x-3">
-          <Link href="/" className="text-gray-400">
+          <Link href="/">
             <Image
               src="/icon.png"
               alt="devfolio logo"
-              width={25}
-              height={25}
-              className="size-7"
+              width={isMobile ? 24 : 32}
+              height={isMobile ? 24 : 32}
             />
           </Link>
           <Link
             href={`/${username}/home`}
-            className="text-orange-400 hover:!text-orange-300 transition-colors"
+            className="text-orange-400 text-sm md:text-lg hover:!text-orange-300 transition-colors"
           >
             {user?.name || "No User"}
           </Link>
@@ -164,13 +165,17 @@ const NavBar = () => {
                   suppressHydrationWarning
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  {open ? <X size={24} /> : <Menu size={24} />}
+                  {open ? (
+                    <X size={isMobile ? 24 : 28} />
+                  ) : (
+                    <Menu size={isMobile ? 24 : 28} />
+                  )}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="center"
                 side="bottom"
-                className="w-[calc(100vw-4rem)] h-[calc(100vh-11.9rem)] mx-8 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 border-gray-700 font-mono rounded-none border-t-0 border-b"
+                className="w-[calc(100vw-2rem)] md:w-[calc(100vw-4rem)] h-[calc(100vh-8.9rem)] md:h-[calc(100vh-11.9rem)] mx-4 md:mx-8 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 border-gray-700 font-mono rounded-none border-t-0 border-b"
                 sideOffset={24}
               >
                 <div className="px-6 py-2 border-b border-gray-700">

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ReactNode } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,11 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DevFolio",
+  title: "DevFolio - Professional Developer Portfolio Builder",
   description:
     "Create and host your professional developer portfolio to showcase your skills, projects, and experience to recruiters and employers. Build your coding presence with our modern, customizable platform.",
   icons: {
     icon: "/temp.png",
+    shortcut: "/temp.png",
+    apple: "/temp.png",
   },
   keywords: [
     "developer portfolio",
@@ -36,6 +39,8 @@ export const metadata: Metadata = {
   authors: [{ name: "Jaime Nguyen" }],
   creator: "jaimenguyen168",
   publisher: "jaimenguyen168",
+  category: "Technology",
+  classification: "Portfolio Builder",
   robots: {
     index: true,
     follow: true,
@@ -47,12 +52,36 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  openGraph: {
+    title: "DevFolio - Professional Developer Portfolio Builder",
+    description:
+      "Create and host your professional developer portfolio to showcase your skills, projects, and experience to recruiters and employers. Build your coding presence with our modern, customizable platform.",
+    url: "https://devfolio.me/",
+    siteName: "DevFolio",
+    images: [
+      {
+        url: "https://devfolio.me/api/og",
+        width: 1200,
+        height: 630,
+        alt: "DevFolio - Developer Portfolio Builder",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://devfolio.me/",
+  },
+  verification: {
+    google: "1prwuKVVD1FtaYZ1T6U9YzblWLAc6zAdqV2dU1aXEXU",
+  },
+  metadataBase: new URL("https://devfolio.me"),
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="en">

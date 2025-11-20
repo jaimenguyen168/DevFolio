@@ -34,7 +34,7 @@ const CustomUserButton = ({ currentUser }: CustomUserButtonProps) => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="size-8 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 hover:scale-105 transition-transform">
+      <DropdownMenuTrigger className="size-6 md:size-10 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 hover:scale-105 transition-transform">
         <UserProfileImage user={currentUser} />
       </DropdownMenuTrigger>
 

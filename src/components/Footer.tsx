@@ -10,9 +10,11 @@ import Terminal from "@/components/Terminal";
 import CustomUserButton from "@/modules/auth/ui/components/CustomUserButton";
 import { User } from "@/modules/types";
 import Link from "next/link";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Footer = () => {
   const { username } = useUsername();
+  const isMobile = useIsMobile();
 
   const isCurrentUser = useQuery(api.functions.users.isCurrentUser, {
     username: username as string,
@@ -30,20 +32,20 @@ const Footer = () => {
     );
     if (iconItem) {
       const { Icon } = iconItem;
-      return <Icon size={20} />;
+      return <Icon size={isMobile ? 16 : 24} />;
     }
-    return <ExternalLink size={20} />;
+    return <ExternalLink size={isMobile ? 16 : 24} />;
   };
 
-  const maxVisibleLinks = 3;
+  const maxVisibleLinks = isMobile ? 2 : 3;
   const visibleLinks = userLinks?.slice(0, maxVisibleLinks) || [];
   const remainingCount = (userLinks?.length || 0) - maxVisibleLinks;
 
   return (
     <div className="border-t border-gray-700 backdrop-blur-sm">
-      <div className="flex items-center space-x-4">
-        <div className="p-3 border-gray-700">
-          <span className="text-gray-400 text-sm md:text-base">
+      <div className="flex items-center space-x-2 md:space-x-4">
+        <div className="p-2 md:p-4 border-gray-700">
+          <span className="text-gray-400 text-xs md:text-base">
             find me in:
           </span>
         </div>
@@ -52,7 +54,7 @@ const Footer = () => {
           {visibleLinks.map((link, index) => (
             <div
               key={index}
-              className="flex items-center text-gray-400 hover:text-white transition-colors border-r border-gray-700 py-4 px-3 first:border-l"
+              className="flex items-center text-gray-400 hover:text-white transition-colors border-r border-gray-700 p-3 md:p-4 first:border-l"
             >
               <a href={link.url} target="_blank" rel="noopener noreferrer">
                 {getIconByLabel(link.label)}
@@ -63,14 +65,16 @@ const Footer = () => {
           {remainingCount > 0 && (
             <Link
               href={`/${username}/contact`}
-              className="flex items-center text-gray-400 hover:text-white transition-colors border-r border-gray-700 py-4 px-3"
+              className="flex items-center text-gray-400 hover:text-white transition-colors border-r border-gray-700 p-3 md:p-4"
             >
-              <span className="text-sm font-medium">+{remainingCount}</span>
+              <span className="text-xs md:text-lg font-medium">
+                +{remainingCount}
+              </span>
             </Link>
           )}
         </div>
 
-        <div className="flex items-center justify-end text-gray-400 space-x-4 px-4 flex-1">
+        <div className="flex items-center justify-end text-gray-400 space-x-2 md:space-x-4 px-2 md:px-4 flex-1">
           {isCurrentUser && (
             <>
               <Terminal />
@@ -78,7 +82,7 @@ const Footer = () => {
             </>
           )}
 
-          <span className="text-sm md:text-base">
+          <span className="text-xs md:text-base">
             © {new Date().getFullYear()}
           </span>
         </div>
@@ -86,4 +90,5 @@ const Footer = () => {
     </div>
   );
 };
+
 export default Footer;

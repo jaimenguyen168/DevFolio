@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://devfolio.me/sitemap.xml
+
+# Block admin pages
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /sign-in/
+Disallow: /sign-up/

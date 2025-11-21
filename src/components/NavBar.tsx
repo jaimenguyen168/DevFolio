@@ -17,11 +17,31 @@ import Image from "next/image";
 import UserProfileImage from "@/components/UserProfileImage";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const navLinks = [
-  { label: "_hello", href: "/home" },
-  { label: "_about-me", href: "/about" },
-  { label: "_projects", href: "/projects" },
-  { label: "_contact-me", href: "/contact" },
+const createNavLinks = (username: string, userName: string) => [
+  {
+    label: "_hello",
+    href: "/home",
+    title: `${userName}'s Portfolio - Developer Home Page`,
+    description: `Visit ${userName}'s developer portfolio homepage`,
+  },
+  {
+    label: "_about-me",
+    href: "/about",
+    title: `About ${userName} - Skills and Experience`,
+    description: `Learn about ${userName}'s background, skills and professional experience`,
+  },
+  {
+    label: "_projects",
+    href: "/projects",
+    title: `${userName}'s Projects - Code and Work Portfolio`,
+    description: `Explore ${userName}'s development projects and code samples`,
+  },
+  {
+    label: "_contact-me",
+    href: "/contact",
+    title: `Contact ${userName} - Get in Touch`,
+    description: `Get in touch with ${userName} for collaboration or opportunities`,
+  },
 ];
 
 const NavBar = () => {
@@ -38,13 +58,14 @@ const NavBar = () => {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  const createNavLinks = (username: string) =>
-    navLinks.map((link) => ({
+  const createNavLinksWithPaths = (username: string, userName: string) =>
+    createNavLinks(username, userName).map((link) => ({
       ...link,
       href: `/${username}${link.href}`,
     }));
 
-  const navigationLinks = username ? createNavLinks(username) : [];
+  const navigationLinks =
+    username && user?.name ? createNavLinksWithPaths(username, user.name) : [];
   const mainNavLinks = navigationLinks.filter(
     (link) => !link.label.includes("_contact-me"),
   );
@@ -57,15 +78,23 @@ const NavBar = () => {
   }
 
   return (
-    <nav className="flex items-center w-full border-b border-gray-700">
+    <nav
+      className="flex items-center w-full border-b border-gray-700"
+      role="navigation"
+      aria-label="Main navigation"
+    >
       {/* Desktop Navigation */}
       <div className="hidden lg:contents">
         <div className="w-[360px] flex items-center space-x-4  px-8 py-5 border-r border-gray-700 justify-between">
           <div className="flex items-center space-x-4">
-            <Link href="/">
+            <Link
+              href="/"
+              aria-label="DevFolio home page"
+              title="DevFolio - Developer Portfolio Platform"
+            >
               <Image
                 src="/icon.png"
-                alt="devfolio logo"
+                alt="DevFolio logo"
                 width={25}
                 height={25}
                 className="size-7"
@@ -74,6 +103,8 @@ const NavBar = () => {
             <Link
               href={`/${username}/home`}
               className="text-orange-400 hover:!text-orange-300 transition-colors"
+              title={`View ${user?.name || "User"}'s portfolio home page`}
+              aria-label={`Go to ${user?.name || "User"}'s portfolio`}
             >
               {user?.name || "No User"}
             </Link>
@@ -81,7 +112,12 @@ const NavBar = () => {
 
           {/* Current User Profile Image */}
           {showCurrentUserProfile && (
-            <Link href={`/${currentUser.username}/home`} className="size-8">
+            <Link
+              href={`/${currentUser.username}/home`}
+              className="size-8"
+              title={`Go to ${currentUser.name}'s portfolio`}
+              aria-label={`View ${currentUser.name}'s profile`}
+            >
               <UserProfileImage user={currentUser} />
             </Link>
           )}
@@ -101,6 +137,9 @@ const NavBar = () => {
                       isActive ? "text-orange-400" : "text-gray-400"
                     }`}
                     suppressHydrationWarning
+                    title={link.title}
+                    aria-label={link.description}
+                    aria-current={isActive ? "page" : undefined}
                   >
                     {link.label}
                     {isActive && (
@@ -121,6 +160,11 @@ const NavBar = () => {
                     : "text-gray-400"
                 }`}
                 suppressHydrationWarning
+                title={contactLink.title}
+                aria-label={contactLink.description}
+                aria-current={
+                  pathname === contactLink.href ? "page" : undefined
+                }
               >
                 {contactLink.label}
                 {pathname === contactLink.href && (
@@ -135,10 +179,14 @@ const NavBar = () => {
       {/* Mobile Navigation */}
       <div className="lg:hidden flex items-center justify-between w-full px-6 py-5">
         <div className="flex items-center space-x-3">
-          <Link href="/">
+          <Link
+            href="/"
+            aria-label="DevFolio home page"
+            title="DevFolio - Developer Portfolio Platform"
+          >
             <Image
               src="/icon.png"
-              alt="devfolio logo"
+              alt="DevFolio logo"
               width={isMobile ? 24 : 32}
               height={isMobile ? 24 : 32}
             />
@@ -146,6 +194,8 @@ const NavBar = () => {
           <Link
             href={`/${username}/home`}
             className="text-orange-400 text-sm md:text-lg hover:!text-orange-300 transition-colors"
+            title={`View ${user?.name || "User"}'s portfolio home page`}
+            aria-label={`Go to ${user?.name || "User"}'s portfolio`}
           >
             {user?.name || "No User"}
           </Link>
@@ -154,7 +204,12 @@ const NavBar = () => {
         <div className="flex items-center space-x-4">
           {/* Current User Profile Image */}
           {showCurrentUserProfile && (
-            <Link href={`/${currentUser.username}/home`} className="size-8">
+            <Link
+              href={`/${currentUser.username}/home`}
+              className="size-8"
+              title={`Go to ${currentUser.name}'s portfolio`}
+              aria-label={`View ${currentUser.name}'s profile`}
+            >
               <UserProfileImage user={currentUser} />
             </Link>
           )}
@@ -164,6 +219,10 @@ const NavBar = () => {
                 <button
                   suppressHydrationWarning
                   className="text-gray-400 hover:text-white transition-colors"
+                  aria-label={
+                    open ? "Close navigation menu" : "Open navigation menu"
+                  }
+                  title={open ? "Close menu" : "Open menu"}
                 >
                   {open ? (
                     <X size={isMobile ? 24 : 28} />
@@ -177,6 +236,8 @@ const NavBar = () => {
                 side="bottom"
                 className="w-[calc(100vw-2rem)] md:w-[calc(100vw-4rem)] h-[calc(100vh-8.9rem)] md:h-[calc(100vh-11.9rem)] mx-4 md:mx-8 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 border-gray-700 font-mono rounded-none border-t-0 border-b"
                 sideOffset={24}
+                role="menu"
+                aria-label="Main navigation menu"
               >
                 <div className="px-6 py-2 border-b border-gray-700">
                   <div className="text-gray-500 mb-3 font-mono">
@@ -184,22 +245,25 @@ const NavBar = () => {
                   </div>
                 </div>
 
-                {navLinks.map((link) => {
-                  const fullPath = `/${username}${link.href}`;
-                  const isActive = pathname.startsWith(fullPath);
+                {navigationLinks.map((link) => {
+                  const isActive = pathname.startsWith(link.href);
                   return (
                     <DropdownMenuItem
-                      key={fullPath}
+                      key={link.href}
                       asChild
                       className={`px-0 py-0 text-[16px] text-white focus:bg-transparent hover:bg-transparent w-full rounded-none ${
                         isActive
                           ? "text-orange-400 hover:!text-orange-300"
                           : "text-white hover:!text-orange-300"
                       }`}
+                      role="menuitem"
                     >
                       <Link
-                        href={fullPath}
+                        href={link.href}
                         className="block px-6 py-4 transition-colors font-mono w-full border-b border-gray-700 text-lg"
+                        title={link.title}
+                        aria-label={link.description}
+                        aria-current={isActive ? "page" : undefined}
                       >
                         {link.label}
                       </Link>

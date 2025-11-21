@@ -30,6 +30,7 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import NotFoundView from "@/modules/auth/ui/views/not-found-view";
 import { useRouter } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const contactFormSchema = z.object({
   senderName: z
@@ -51,6 +52,7 @@ interface ContactViewProps {
 
 const ContactView = ({ username }: ContactViewProps) => {
   const router = useRouter();
+  const isMobile = useIsMobile();
   const user = useQuery(api.functions.users.getUser, {
     username: username,
   });
@@ -420,7 +422,6 @@ button.addEventListener('click', () => {
               </Form>
             )}
           </div>
-
           {/* Right Section - Code Mirror */}
           <div className="flex-1 lg:w-1/2 w-full flex flex-col min-h-[400px] lg:min-h-0 flex-shrink-0 p-8 xl:p-16 2xl:p-28">
             <div className="flex-1 min-h-0 w-full">
@@ -451,11 +452,13 @@ button.addEventListener('click', () => {
               />
             </div>
           </div>
-
-          <div className="h-32 text-transparent select-none pointer-events-none">
-            sjhcvdsjhcvdsjhcv ds ds dsb dshj cdshj dshj sdjhhdsvcXZBN
-            xbsahgcvsahxvc hx vxghzv ghdsvx ghdsv hgdsv ghsdv cb sd
-          </div>
+          // hidden view for mobile footer
+          {isMobile && (
+            <div className="h-32 text-transparent select-none pointer-events-none">
+              sjhcvdsjhcvdsjhcv ds ds dsb dshj cdshj dshj sdjhhdsvcXZBN
+              xbsahgcvsahxvc hx vxghzv ghdsvx ghdsv hgdsv ghsdv cb sd
+            </div>
+          )}
         </div>
       </div>
     </div>

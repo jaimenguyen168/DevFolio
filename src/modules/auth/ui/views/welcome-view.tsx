@@ -153,7 +153,7 @@ const WelcomeView = () => {
           <Link href="/" className="flex items-center space-x-2 sm:space-x-3">
             <Image
               src="/icon.png"
-              alt="devfolio logo"
+              alt="DevFolio - Developer Portfolio Platform"
               width={25}
               height={25}
               className={isMobile ? "size-5 sm:size-6" : "size-6 sm:size-8"}
@@ -179,6 +179,7 @@ const WelcomeView = () => {
                   "_blank",
                 )
               }
+              aria-label="View source code on GitHub"
             >
               <FaGithub
                 size={isMobile ? 16 : 20}
@@ -192,12 +193,12 @@ const WelcomeView = () => {
         <div
           className={`flex-1 flex px-10 lg:px-12 overflow-y-auto ${
             isMobile
-              ? "items-start justify-center py-12"
+              ? "items-center justify-center py-8"
               : "items-center justify-center"
           }`}
         >
           <div className="text-center max-w-4xl">
-            <div className="mb-6 sm:mb-12">
+            <div className="mb-6 sm:mb-12 mt-0 sm:mt-24 lg:mt-0">
               <div className="mb-2 sm:mb-4 text-gray-400 text-sm md:text-xl">
                 Welcome to
               </div>

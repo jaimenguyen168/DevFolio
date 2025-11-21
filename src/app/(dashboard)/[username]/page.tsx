@@ -1,13 +1,11 @@
-import { redirect } from "next/navigation";
+import HomePage from "@/app/(dashboard)/[username]/home/page";
 
 interface DashboardPageProps {
   params: Promise<{ username: string }>;
 }
 
 const DashboardPage = async ({ params }: DashboardPageProps) => {
-  const { username } = await params;
-
-  return redirect(`/${username}/home`);
+  return <HomePage params={params} />;
 };
 
 export default DashboardPage;

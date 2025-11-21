@@ -56,8 +56,16 @@ const Footer = () => {
               key={index}
               className="flex items-center text-gray-400 hover:text-white transition-colors border-r border-gray-700 p-3 md:p-4 first:border-l"
             >
-              <a href={link.url} target="_blank" rel="noopener noreferrer">
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Visit ${link.label}`}
+              >
                 {getIconByLabel(link.label)}
+                <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity whitespace-nowrap mb-2">
+                  {link.label}
+                </span>
               </a>
             </div>
           ))}

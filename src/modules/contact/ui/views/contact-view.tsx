@@ -452,7 +452,7 @@ button.addEventListener('click', () => {
               />
             </div>
           </div>
-          // hidden view for mobile footer
+
           {isMobile && (
             <div className="h-32 text-transparent select-none pointer-events-none">
               sjhcvdsjhcvdsjhcv ds ds dsb dshj cdshj dshj sdjhhdsvcXZBN

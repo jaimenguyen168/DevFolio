@@ -191,6 +191,7 @@ button.addEventListener('click', () => {
                 disabled
                 variant="ghost"
                 className="text-gray-200 justify-start p-0"
+                aria-label="Contact email"
               >
                 <Mail size={14} className="mr-2" />
                 <span className="text-sm">{user?.email}</span>
@@ -201,6 +202,7 @@ button.addEventListener('click', () => {
                 variant="ghost"
                 className="text-gray-200 justify-start p-0"
                 disabled
+                aria-label="Contact phone"
               >
                 <Phone size={14} className="mr-2" />
                 <span className="text-sm">{user.phone}</span>
@@ -236,11 +238,13 @@ button.addEventListener('click', () => {
                         variant="ghost"
                         className="text-blue-400 hover:text-blue-300 justify-start p-2"
                         asChild
+                        aria-label={`Link to ${link.label}`}
                       >
                         <a
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
+                          aria-label={`Link to ${link.label}`}
                         >
                           <ExternalLink size={14} className="mr-2" />
                           <span className="text-sm">{link.label}</span>
@@ -291,6 +295,7 @@ button.addEventListener('click', () => {
             size="sm"
             onClick={toggleSidebar}
             className="text-gray-400 hover:bg-gray-700 hover:text-white p-1"
+            aria-label="Close sidebar"
           >
             <X size={20} />
           </Button>
@@ -312,6 +317,7 @@ button.addEventListener('click', () => {
                 size="sm"
                 onClick={toggleSidebar}
                 className="sm:hidden text-gray-400 hover:bg-gray-700 hover:text-white p-1 mr-3"
+                aria-label="Open sidebar"
               >
                 <PanelRight size={20} />
               </Button>
@@ -321,6 +327,7 @@ button.addEventListener('click', () => {
             <button
               className="text-gray-500 hover:text-white cursor-pointer"
               onClick={() => router.push(`/${username}`)}
+              aria-label="Close contact form"
             >
               ×
             </button>
@@ -413,6 +420,7 @@ button.addEventListener('click', () => {
                       !form.formState.isValid ||
                       !form.formState.isDirty
                     }
+                    aria-label="Submit contact form"
                   >
                     {form.formState.isSubmitting
                       ? "Submitting..."

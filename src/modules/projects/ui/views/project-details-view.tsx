@@ -131,6 +131,7 @@ const ProjectDetailsView = ({ username, slug }: ProjectDetailsViewProps) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1 group"
+                    aria-label="Project URL"
                   >
                     <span className="truncate">{url}</span>
                     <ExternalLink
@@ -154,6 +155,7 @@ const ProjectDetailsView = ({ username, slug }: ProjectDetailsViewProps) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-blue-400 hover:text-blue-300 truncate block"
+                    aria-label="Project Repository"
                   >
                     {githubUrl.replace("https://github.com/", "")}
                   </a>
@@ -253,6 +255,7 @@ const ProjectDetailsView = ({ username, slug }: ProjectDetailsViewProps) => {
             size="sm"
             onClick={toggleSidebar}
             className="text-gray-400 hover:bg-gray-700 hover:text-white p-1"
+            aria-label="Close sidebar"
           >
             <X size={20} />
           </Button>
@@ -274,6 +277,7 @@ const ProjectDetailsView = ({ username, slug }: ProjectDetailsViewProps) => {
                 size="sm"
                 onClick={toggleSidebar}
                 className="md:hidden text-gray-400 hover:bg-gray-700 hover:text-white p-1 mr-3"
+                aria-label="Open sidebar"
               >
                 <PanelRight size={20} />
               </Button>
@@ -281,7 +285,10 @@ const ProjectDetailsView = ({ username, slug }: ProjectDetailsViewProps) => {
             </div>
 
             <Link href={`/${username}/projects`}>
-              <button className="text-gray-500 hover:text-white cursor-pointer">
+              <button
+                className="text-gray-500 hover:text-white cursor-pointer"
+                aria-label="Close project details"
+              >
                 ×
               </button>
             </Link>
@@ -304,6 +311,7 @@ const ProjectDetailsView = ({ username, slug }: ProjectDetailsViewProps) => {
                         variant="outline"
                         size="sm"
                         className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white gap-2"
+                        aria-label="Open live demo"
                       >
                         <ExternalLink size={16} />
                         Live Demo
@@ -321,6 +329,7 @@ const ProjectDetailsView = ({ username, slug }: ProjectDetailsViewProps) => {
                         variant="outline"
                         size="sm"
                         className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white gap-2"
+                        aria-label="View code"
                       >
                         <FaGithub size={16} />
                         View Code
@@ -358,6 +367,7 @@ const ProjectDetailsView = ({ username, slug }: ProjectDetailsViewProps) => {
                       width={1000}
                       height={1000}
                       className="object-cover w-full h-full"
+                      aria-label={`${name} preview ${selectedImageIndex + 1}`}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
@@ -392,13 +402,15 @@ const ProjectDetailsView = ({ username, slug }: ProjectDetailsViewProps) => {
                               ? "border-blue-400 ring-2 ring-blue-400/50"
                               : "border-gray-600 hover:border-gray-500"
                           }`}
+                          aria-label="Thumbnail"
                         >
                           <Image
                             src={img}
-                            alt={`Thumbnail ${index + 1}`}
+                            alt={`Thumbnail ${index + 1} from ${name}`}
                             width={100}
                             height={100}
                             className="object-cover w-full h-full"
+                            aria-label={`Thumbnail ${index + 1} from ${name}`}
                           />
                         </button>
                       ))}
@@ -709,6 +721,7 @@ const ProjectDetailsView = ({ username, slug }: ProjectDetailsViewProps) => {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1 group"
+                            aria-label="Project Homepage"
                           >
                             {repoData.homepage}
                             <ExternalLink

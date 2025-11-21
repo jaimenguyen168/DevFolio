@@ -1,33 +1,21 @@
 import React from "react";
 import { Metadata } from "next";
 import HomeView from "@/modules/home/ui/views/home-view";
+import { generatePageMetadata } from "@/constants/metadata";
 
 interface PageProps {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { username } = params;
-
-  return {
-    title: `${username} - Developer Portfolio | DevFolio`,
-    description: `View ${username}'s professional developer portfolio on DevFolio.`,
-    openGraph: {
-      title: `${username} - Developer Portfolio | DevFolio`,
-      description: `View ${username}'s professional developer portfolio on DevFolio.`,
-      type: "profile",
-      url: `https://devfolio.me/${username}`,
-    },
-    alternates: {
-      canonical: `https://devfolio.me/${username}`,
-    },
-  };
+  const { username } = await params;
+  return generatePageMetadata(username, "home");
 }
 
 export default async function HomePage({ params }: PageProps) {
-  const { username } = params;
+  const { username } = await params;
 
   return <HomeView username={username} />;
 }

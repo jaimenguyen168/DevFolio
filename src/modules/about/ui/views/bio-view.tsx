@@ -72,8 +72,9 @@ export default bio;`;
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Button
-              className="bg-orange-500 hover:bg-orange-600 text-white text-base rounded-md transition-colors"
+              className="bg-orange-600 hover:bg-orange-500 text-white text-base rounded-md transition-colors"
               size="lg"
+              aria-label="Download Resume"
             >
               <Download className="w-5 h-5 mr-2" />
               Download Resume
@@ -82,10 +83,14 @@ export default bio;`;
             <Button
               asChild
               variant="outline"
-              className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white text-base rounded-md transition-colors"
+              className="border-orange-600 text-orange-600 hover:bg-orange-400 hover:text-white text-base rounded-md transition-colors"
               size="lg"
+              aria-label="View Projects"
             >
-              <Link href={`/${user.username}/projects`}>
+              <Link
+                href={`/${user.username}/projects`}
+                aria-label="View Projects"
+              >
                 <FolderGit2 className="w-5 h-5 mr-2" />
                 View Projects
               </Link>
@@ -116,6 +121,7 @@ export default bio;`;
               theme={oneDark}
               extensions={codeMirrorExtensions}
               editable={false}
+              aria-label="Bio information displayed as JavaScript code"
               basicSetup={{
                 lineNumbers: true,
                 foldGutter: false,

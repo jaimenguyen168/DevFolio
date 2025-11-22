@@ -5,8 +5,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { Loader2, Upload, X } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Switch } from "@/components/ui/switch";
+import { Loader2, Upload, X, Star } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { toast } from "sonner";
@@ -34,6 +43,7 @@ const projectSchema = z.object({
   techStack: z.array(z.string()).optional(),
   features: z.array(z.string()).optional(),
   futureFeatures: z.array(z.string()).optional(),
+  featured: z.boolean().optional(),
 });
 
 type ProjectFormValues = z.infer<typeof projectSchema>;
@@ -61,6 +71,7 @@ const ProjectEditView = ({
       techStack: [],
       features: [],
       futureFeatures: [],
+      featured: false,
     },
   });
 
@@ -75,6 +86,7 @@ const ProjectEditView = ({
         techStack: project.techStack || [],
         features: project.features || [],
         futureFeatures: project.futureFeatures || [],
+        featured: project.featured || false,
       });
     }
   }, [project, form]);
@@ -97,6 +109,7 @@ const ProjectEditView = ({
         techStack: validTechStack,
         features: data.features,
         futureFeatures: data.futureFeatures,
+        featured: data.featured,
       };
 
       if (project) {
@@ -207,7 +220,7 @@ const ProjectEditView = ({
             </CardContent>
           </Card>
 
-          {/* Project Name and Slug */}
+          {/* Project Name and Featured Toggle */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <CustomFormField
               control={form.control}
@@ -215,6 +228,33 @@ const ProjectEditView = ({
               label="Project Name"
               placeholder="e.g. My Awesome App"
               required
+            />
+
+            {/* Featured Project Toggle */}
+            <FormField
+              control={form.control}
+              name="featured"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-white flex items-center gap-2">
+                      <Star className="h-4 w-4 text-orange-400" />
+                      Featured Project
+                    </FormLabel>
+                    <FormDescription className="text-gray-400">
+                      Show this project in the featured projects showcase
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="data-[state=checked]:bg-orange-500 data-[state=unchecked]:bg-gray-500"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </div>
 

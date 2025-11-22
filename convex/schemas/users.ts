@@ -111,6 +111,7 @@ export const userProjects = defineTable({
   futureFeatures: v.optional(v.array(v.string())),
   contributors: v.optional(v.id("users")),
   views: v.optional(v.number()),
+  featured: v.optional(v.boolean()),
 })
   .index("by_user_id", ["userId"])
   .index("by_user_and_slug", ["userId", "slug"])

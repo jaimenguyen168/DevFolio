@@ -8,6 +8,7 @@ import {
   ExternalLink,
   Code2,
   Image as ImageIcon,
+  Star,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
@@ -26,8 +27,18 @@ const ProjectSettingsCard = ({
   onDelete,
 }: ProjectSettingsCardProps) => {
   return (
-    <Card className="bg-slate-900 border-gray-700 hover:border-orange-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10 py-3">
+    <Card className="bg-slate-900 border-gray-700 hover:border-orange-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10 py-3 relative">
       <CardContent className="p-4 sm:p-6">
+        {/* Featured Badge - positioned absolutely at top right */}
+        {project.featured && (
+          <div className="absolute top-6 right-3 z-10">
+            <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/50 text-xs flex items-center gap-1 px-2 py-1">
+              <Star className="h-3 w-3 fill-current" />
+              Featured
+            </Badge>
+          </div>
+        )}
+
         {/* Header with Image and Project Info */}
         <div className="flex items-center gap-3 sm:gap-4 mb-4">
           {project.imageUrls && project.imageUrls.length > 0 ? (
@@ -46,9 +57,11 @@ const ProjectSettingsCard = ({
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h3 className="text-base sm:text-lg font-semibold text-white truncate">
-              {project.name}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-base sm:text-lg font-semibold text-white truncate">
+                {project.name}
+              </h3>
+            </div>
             {project.slug && (
               <p className="text-xs sm:text-sm text-gray-400 truncate">
                 /{project.slug}

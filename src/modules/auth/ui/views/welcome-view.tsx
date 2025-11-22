@@ -198,7 +198,7 @@ const WelcomeView = () => {
           }`}
         >
           <div className="text-center max-w-4xl">
-            <div className="mb-6 sm:mb-12 mt-0 sm:mt-24 lg:mt-0">
+            <div className="mb-6 sm:mb-12 mt-0 sm:mt-24 md:mt-0">
               <div className="mb-2 sm:mb-4 text-gray-400 text-sm md:text-xl">
                 Welcome to
               </div>

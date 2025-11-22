@@ -34,10 +34,6 @@ interface ProjectsViewProps {
 }
 
 const ProjectsView = ({ username }: ProjectsViewProps) => {
-  const user = useQuery(api.functions.users.getUser, {
-    username: username,
-  });
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
   const [availableTechs, setAvailableTechs] = useState<string[]>([]);
@@ -79,11 +75,11 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
   const isEmpty = projects?.length === 0;
   const isCleared = filteredProjects?.length === 0;
 
-  if (user === undefined || projects === undefined) {
+  if (projects === undefined) {
     return <Loading />;
   }
 
-  if (!user || !projects) {
+  if (!projects) {
     return <NotFoundView />;
   }
 
@@ -111,6 +107,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
                       ? "text-orange-400"
                       : "text-gray-400 hover:text-orange-300"
                   }`}
+                  aria-label="Select technology"
                 >
                   {isSelected ? (
                     <CheckSquare size={16} />
@@ -136,6 +133,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
                   <button
                     onClick={handleSelectAll}
                     className="flex items-center justify-start w-full space-x-6 text-gray-400"
+                    aria-label="Select all"
                   >
                     <Layers size={16} />
                     <span>Select all</span>
@@ -147,6 +145,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
                   <button
                     onClick={handleClearAll}
                     className="flex items-center justify-start w-full space-x-6 text-gray-400"
+                    aria-label="Clear all"
                   >
                     <Trash2 size={16} />
                     <span>Clear all</span>
@@ -187,6 +186,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
             size="sm"
             onClick={toggleSidebar}
             className="text-gray-400 hover:bg-gray-700 hover:text-white p-1"
+            aria-label="Close sidebar"
           >
             <X size={20} />
           </Button>
@@ -211,6 +211,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
                   size="sm"
                   onClick={toggleSidebar}
                   className="sm:hidden text-gray-400 hover:bg-gray-700 hover:text-white p-1 mr-3"
+                  aria-label="Toggle sidebar"
                 >
                   <PanelRight size={20} />
                 </Button>
@@ -228,6 +229,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
               <button
                 onClick={handleClearAll}
                 className="text-gray-500 hover:text-white cursor-pointer"
+                aria-label="Clear all"
               >
                 ×
               </button>
@@ -249,7 +251,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
             </p>
           </div>
         ) : (
-          <div className="flex-1 px-4 lg:px-12 pt-6 overflow-y-auto ">
+          <div className="flex-1 px-4 lg:px-12 py-6 overflow-y-auto ">
             <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 max-w-7xl mx-auto ">
               <AnimatePresence>
                 {filteredProjects?.map((project, index) => (

@@ -185,6 +185,7 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
                 disabled
                 variant="ghost"
                 className="text-gray-200 justify-start p-0"
+                aria-label={`Email: ${user?.email}`}
               >
                 <Mail size={14} />
                 <span className="text-sm">{user?.email}</span>
@@ -195,6 +196,7 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
                 variant="ghost"
                 className="text-gray-200 justify-start p-0"
                 disabled
+                aria-label={`Phone: ${user.phone}`}
               >
                 <Phone size={14} />
                 <span className="text-sm">{user.phone}</span>
@@ -235,6 +237,7 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
             size="sm"
             onClick={toggleSidebar}
             className="text-gray-400 hover:bg-gray-700 hover:text-white p-1"
+            aria-label="Close sidebar"
           >
             <X size={20} />
           </Button>
@@ -257,6 +260,7 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
                   size="sm"
                   onClick={toggleSidebar}
                   className="md:hidden text-gray-400 hover:bg-gray-700 hover:text-white p-1 mr-3"
+                  aria-label="Open sidebar"
                 >
                   <PanelRight size={20} />
                 </Button>
@@ -268,6 +272,7 @@ const AboutMeView = ({ username }: AboutMeViewProps) => {
               <button
                 className="text-gray-500 hover:text-white cursor-pointer"
                 onClick={() => router.push(`/${username}`)}
+                aria-label="Close about me section"
               >
                 ×
               </button>

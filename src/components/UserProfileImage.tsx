@@ -12,10 +12,13 @@ const UserProfileImage = ({ user }: UserProfileImageProps) => {
       {user.imageUrl ? (
         <Image
           src={user.imageUrl}
-          alt="profile image"
-          width={1000}
-          height={1000}
+          alt={`${user.name} Profile Image`}
+          width={400}
+          height={400}
           className="rounded-full object-cover w-full h-full"
+          fetchPriority="high"
+          priority
+          loading="eager"
         />
       ) : (
         <span className="lg:text-4xl text-white font-semibold text-2xl">

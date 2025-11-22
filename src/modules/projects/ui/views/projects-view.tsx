@@ -34,10 +34,6 @@ interface ProjectsViewProps {
 }
 
 const ProjectsView = ({ username }: ProjectsViewProps) => {
-  const user = useQuery(api.functions.users.getUser, {
-    username: username,
-  });
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
   const [availableTechs, setAvailableTechs] = useState<string[]>([]);
@@ -79,11 +75,11 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
   const isEmpty = projects?.length === 0;
   const isCleared = filteredProjects?.length === 0;
 
-  if (user === undefined || projects === undefined) {
+  if (projects === undefined) {
     return <Loading />;
   }
 
-  if (!user || !projects) {
+  if (!projects) {
     return <NotFoundView />;
   }
 
@@ -255,7 +251,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
             </p>
           </div>
         ) : (
-          <div className="flex-1 px-4 lg:px-12 pt-6 overflow-y-auto ">
+          <div className="flex-1 px-4 lg:px-12 py-6 overflow-y-auto ">
             <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 max-w-7xl mx-auto ">
               <AnimatePresence>
                 {filteredProjects?.map((project, index) => (

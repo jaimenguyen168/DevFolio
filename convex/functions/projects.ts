@@ -11,18 +11,26 @@ import { TECH_STACKS } from "../../src/modules/about/constants";
 export const getProjects = query({
   args: {
     username: v.string(),
+    featured: v.optional(v.boolean()),
   },
-  handler: async (ctx, { username }) => {
+  handler: async (ctx, { username, featured }) => {
     const user = await getUserByUsername(ctx, username);
 
     if (!user) {
       return [];
     }
 
-    return await ctx.db
+    let projectsQuery = ctx.db
       .query("userProjects")
-      .withIndex("by_user_id", (q) => q.eq("userId", user._id))
-      .collect();
+      .withIndex("by_user_id", (q) => q.eq("userId", user._id));
+
+    if (featured !== undefined) {
+      projectsQuery = projectsQuery.filter((q) =>
+        q.eq(q.field("featured"), featured),
+      );
+    }
+
+    return await projectsQuery.collect();
   },
 });
 
@@ -46,6 +54,7 @@ export const createProject = mutation({
     features: v.optional(v.array(v.string())),
     futureFeatures: v.optional(v.array(v.string())),
     contributors: v.optional(v.id("users")),
+    featured: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const user = await validateUser(ctx);
@@ -65,6 +74,7 @@ export const createProject = mutation({
       futureFeatures: args.futureFeatures,
       contributors: args.contributors,
       views: 0,
+      featured: args.featured || false,
     });
   },
 });
@@ -91,6 +101,7 @@ export const updateProject = mutation({
       features: v.optional(v.array(v.string())),
       futureFeatures: v.optional(v.array(v.string())),
       contributors: v.optional(v.id("users")),
+      featured: v.optional(v.boolean()),
     }),
   },
   handler: async (ctx, { projectId, updates }) => {

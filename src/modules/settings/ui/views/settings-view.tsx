@@ -136,7 +136,7 @@ const SettingsView = ({ username }: SettingsViewProps) => {
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 backdrop-blur-md z-40 md:hidden"
+          className="fixed inset-0 backdrop-blur-md md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}

@@ -19,6 +19,7 @@ import ImageUploadDialog from "@/modules/settings/ui/components/ImageUploadDialo
 import Image from "next/image";
 import HashtagFormField from "@/components/HashtagFormField";
 import LinkFormField from "@/components/LinkFormField";
+import ResumeManagement from "@/modules/settings/ui/components/ResumeManagement";
 
 interface ProfileViewProps {
   username: string;
@@ -94,7 +95,7 @@ const ProfileView = ({ username }: ProfileViewProps) => {
           })) || [],
       });
     }
-  }, [user, form]);
+  }, [user, form, userLinks]);
 
   const currentImageUrl = form.watch("imageUrl");
 
@@ -193,7 +194,7 @@ const ProfileView = ({ username }: ProfileViewProps) => {
 
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row items-start justify-between gap-4 mb-8 lg:mb-12">
-        <div className="flex items-center space-x-3 sm:space-x-6 w-full sm:w-auto  mb-4 lg:mb-0">
+        <div className="flex items-center space-x-3 sm:space-x-6 w-full sm:w-auto mb-4 lg:mb-0">
           <div
             className={`relative size-16 sm:size-20 lg:size-24 rounded-full overflow-hidden bg-gray-700 border-2 border-gray-600 flex-shrink-0 ${isEditing ? "cursor-pointer hover:opacity-80 transition-opacity group" : ""}`}
             onClick={() => isEditing && setIsImageDialogOpen(true)}
@@ -241,6 +242,9 @@ const ProfileView = ({ username }: ProfileViewProps) => {
           {isEditing ? "Cancel" : "Edit"}
         </Button>
       </div>
+
+      {/* Resume Section - Now using ResumeManagement component */}
+      <ResumeManagement userId={user._id} isEditing={isEditing} />
 
       {/* Form Section */}
       <Form {...form}>

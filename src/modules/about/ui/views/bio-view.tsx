@@ -1,29 +1,20 @@
 import React from "react";
-import Image from "next/image";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import { oneDark } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { taglines } from "@/modules/about/constants";
 import { User } from "@/modules/types";
 import { Button } from "@/components/ui/button";
-import { Download, FolderGit2 } from "lucide-react";
+import { FolderGit2 } from "lucide-react";
 import UserProfileImage from "@/components/UserProfileImage";
 import Link from "next/link";
+import ResumeDownloadButton from "@/components/ResumeDownloadButton";
 
 interface BioViewProps {
   user: User;
 }
 
 const BioView = ({ user }: BioViewProps) => {
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   const generateBioCode = () => {
     const bioLines = user.bio
       ? user.bio.split("\n").map((line) => `  "${line}"`)
@@ -71,14 +62,8 @@ export default bio;`;
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <Button
-              className="bg-orange-600 hover:bg-orange-500 text-white text-base rounded-md transition-colors"
-              size="lg"
-              aria-label="Download Resume"
-            >
-              <Download className="w-5 h-5 mr-2" />
-              Download Resume
-            </Button>
+            {/* Dynamic Resume Button */}
+            <ResumeDownloadButton userId={user._id} />
 
             <Button
               asChild

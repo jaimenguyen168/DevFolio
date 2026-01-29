@@ -16,6 +16,7 @@ import { useUsername } from "@/components/UsernameProvider";
 import Image from "next/image";
 import UserProfileImage from "@/components/UserProfileImage";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 const createNavLinks = (username: string) => [
   {
@@ -80,12 +81,15 @@ const NavBar = () => {
   return (
     <>
       <nav
-        className="flex items-center w-full border-b border-gray-700 relative z-50"
+        className={cn(
+          "flex items-center w-full border-b border-gray-700 relative",
+          isMobile ? "z-0" : "z-50",
+        )}
         role="navigation"
         aria-label="Main navigation"
       >
         {/* Desktop Navigation */}
-        <div className="hidden lg:contents">
+        <div className="hidden lg:contents z-50">
           <div className="w-[360px] flex items-center space-x-4  px-8 py-5 border-r border-gray-700 justify-between">
             <div className="flex items-center space-x-4">
               <Link
@@ -178,7 +182,7 @@ const NavBar = () => {
         </div>
 
         {/* Mobile Navigation */}
-        <div className="lg:hidden flex items-center justify-between w-full px-6 py-5">
+        <div className="lg:hidden flex flex-1 items-center justify-between w-full px-6 py-5 z-50">
           <div className="flex items-center space-x-3">
             <Link
               href="/"
@@ -282,9 +286,10 @@ const NavBar = () => {
       {/* Full screen overlay when mobile menu is open */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/80 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-md z-40 lg:hidden"
           style={{ top: "88px" }} // Adjust based on your navbar height
           onClick={() => setOpen(false)}
+          aria-hidden="true"
         />
       )}
     </>

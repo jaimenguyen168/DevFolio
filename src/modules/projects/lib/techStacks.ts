@@ -968,3 +968,19 @@ export const getTechInfo = (tech: string) => {
 };
 
 export default TECH_STACK;
+
+export function getTechStackCounts(projects: Project[]) {
+  const techCounts: Record<string, number> = {};
+
+  projects.forEach((project) => {
+    if (project.techStack) {
+      project.techStack.forEach((tech) => {
+        techCounts[tech] = (techCounts[tech] || 0) + 1;
+      });
+    }
+  });
+
+  return Object.entries(techCounts)
+    .map(([value, count]) => ({ value, count }))
+    .sort((a, b) => b.count - a.count);
+}

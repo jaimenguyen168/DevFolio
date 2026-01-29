@@ -99,3 +99,60 @@ export const updateUser = mutation({
     return await ctx.db.get(user._id);
   },
 });
+
+export const uploadResume = mutation({
+  args: {
+    userId: v.id("users"),
+    storageId: v.id("_storage"),
+    fileName: v.string(),
+  },
+  handler: async (ctx, { userId, storageId, fileName }) => {
+    // Update user with resume info
+    await ctx.db.patch(userId, {
+      resumeStorageId: storageId,
+      resumeFileName: fileName,
+    });
+
+    return { success: true };
+  },
+});
+
+export const getResumeUrl = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    const user = await ctx.db.get(userId);
+
+    if (!user?.resumeStorageId) {
+      return null;
+    }
+
+    const url = await ctx.storage.getUrl(user.resumeStorageId);
+    return {
+      url,
+      fileName: user.resumeFileName,
+    };
+  },
+});
+
+export const generateUploadUrl = mutation({
+  handler: async (ctx) => {
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const deleteResume = mutation({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    const user = await ctx.db.get(userId);
+
+    if (user?.resumeStorageId) {
+      await ctx.storage.delete(user.resumeStorageId);
+      await ctx.db.patch(userId, {
+        resumeStorageId: undefined,
+        resumeFileName: undefined,
+      });
+    }
+
+    return { success: true };
+  },
+});

@@ -1,8 +1,6 @@
-"use client";
-
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "motion/react";
-import { ExternalLink, ArrowRight, Code2, Star } from "lucide-react";
+import { ExternalLink, ArrowRight, Code2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getTechInfo } from "@/modules/projects/lib/techStacks";
 import { SiGithub } from "react-icons/si";
@@ -11,12 +9,29 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface ProjectsShowcaseProps {
-  projects: Project[];
+  projects: Project[] | undefined;
   username: string;
 }
 
 const ProjectsShowcase = ({ projects, username }: ProjectsShowcaseProps) => {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  if (projects === undefined) {
+    return (
+      <div className="flex-1 w-full">
+        <div className="bg-gradient-to-br from-slate-800/20 to-slate-900/40 backdrop-blur-sm border border-slate-700/30 rounded-xl p-4 lg:p-8 relative overflow-hidden">
+          <div className="text-center mb-6 lg:mb-8 relative z-10">
+            <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-white mb-2">
+              Featured Projects
+            </h2>
+          </div>
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-pulse text-gray-500">
+              Loading projects...
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const featuredProjects = projects.slice(0, 6);
 
@@ -73,8 +88,8 @@ const ProjectsShowcase = ({ projects, username }: ProjectsShowcaseProps) => {
             <motion.div
               key={project._id}
               className="group cursor-pointer"
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
+              // onMouseEnter={() => setHoveredIndex(index)}
+              // onMouseLeave={() => setHoveredIndex(null)}
               onClick={() => handleProjectClick(project.slug)}
               whileHover={{ y: -4 }}
               initial={{ opacity: 0, y: 20 }}

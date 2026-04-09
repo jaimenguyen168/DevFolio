@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 const createNavLinks = (username: string) => [
   {
     label: "_hello",
-    href: "/home",
+    href: "/",
     title: `${username}'s Portfolio - Developer Home Page`,
     description: `Visit ${username}'s developer portfolio homepage`,
   },
@@ -106,7 +106,7 @@ const NavBar = () => {
                 />
               </Link>
               <Link
-                href={`/${username}/home`}
+                href={`/${username}`}
                 className="text-orange-400 hover:!text-orange-300 transition-colors"
                 title={`View ${user?.name || "User"}'s portfolio home page`}
                 aria-label={`Go to ${user?.name || "User"}'s portfolio`}
@@ -118,7 +118,7 @@ const NavBar = () => {
             {/* Current User Profile Image */}
             {showCurrentUserProfile && (
               <Link
-                href={`/${currentUser.username}/home`}
+                href={`/${currentUser.username}`}
                 className="size-8"
                 title={`Go to ${currentUser.name}'s portfolio`}
                 aria-label={`View ${currentUser.name}'s profile`}
@@ -197,7 +197,7 @@ const NavBar = () => {
               />
             </Link>
             <Link
-              href={`/${username}/home`}
+              href={`/${username}`}
               className="text-orange-400 text-sm md:text-lg hover:!text-orange-300 transition-colors"
               title={`View ${user?.name || "User"}'s portfolio home page`}
               aria-label={`Go to ${user?.name || "User"}'s portfolio`}
@@ -210,7 +210,7 @@ const NavBar = () => {
             {/* Current User Profile Image */}
             {showCurrentUserProfile && (
               <Link
-                href={`/${currentUser.username}/home`}
+                href={`/${currentUser.username}`}
                 className="size-8"
                 title={`Go to ${currentUser.name}'s portfolio`}
                 aria-label={`View ${currentUser.name}'s profile`}

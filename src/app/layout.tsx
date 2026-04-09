@@ -20,9 +20,10 @@ export const metadata: Metadata = {
   description:
     "Create and host your professional developer portfolio to showcase your skills, projects, and experience to recruiters and employers. Build your coding presence with our modern, customizable platform.",
   icons: {
-    icon: "/temp.png",
-    shortcut: "/temp.png",
-    apple: "/temp.png",
+    icon: [
+      { url: "/icon.svg", media: "(prefers-color-scheme: light)" },
+      { url: "/icon.svg", media: "(prefers-color-scheme: dark)" },
+    ],
   },
   keywords: [
     "developer portfolio",

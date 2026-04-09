@@ -292,7 +292,7 @@ const Terminal = () => {
         gitState.stagedChanges.username !== username
       ) {
         setIsOpen(false);
-        router.push(`/${gitState.stagedChanges.username}/home`);
+        router.push(`/${gitState.stagedChanges.username}`);
 
         return (
           result + "\n\nUsername updated! Redirecting to new profile URL..."

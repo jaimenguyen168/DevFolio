@@ -35,7 +35,7 @@ interface ProjectsViewProps {
 
 const ProjectsView = ({ username }: ProjectsViewProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
+  const [selectedTechs, setSelectedTechs] = useState<string[] | null>(null);
   const [availableTechs, setAvailableTechs] = useState<string[]>([]);
 
   const projects = useQuery(api.functions.projects.getProjects, {
@@ -44,19 +44,13 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
 
   useEffect(() => {
     if (projects) {
-      const uniqueTechs = getUniqueTechnologies(projects);
-      setAvailableTechs(uniqueTechs);
-      setSelectedTechs(uniqueTechs);
+      setAvailableTechs(getUniqueTechnologies(projects));
     }
   }, [projects]);
 
-  const handleClearAll = () => {
-    setSelectedTechs([]);
-  };
+  const handleClearAll = () => setSelectedTechs([]);
 
-  const handleSelectAll = () => {
-    setSelectedTechs(availableTechs);
-  };
+  const handleSelectAll = () => setSelectedTechs(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -64,16 +58,23 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
 
   const selectTech = (tech: string) => {
     setSelectedTechs((prev) =>
-      prev.includes(tech) ? prev.filter((t) => t !== tech) : [...prev, tech],
+      prev === null
+        ? [tech]
+        : prev.includes(tech)
+          ? prev.filter((t) => t !== tech)
+          : [...prev, tech],
     );
   };
 
-  const filteredProjects = projects?.filter((project) =>
-    project.techStack?.some((tech) => selectedTechs.includes(tech)),
-  );
+  const filteredProjects =
+    selectedTechs === null
+      ? projects
+      : projects?.filter((p) =>
+          p.techStack?.some((t) => selectedTechs.includes(t)),
+        );
 
   const isEmpty = projects?.length === 0;
-  const isCleared = filteredProjects?.length === 0;
+  const isCleared = selectedTechs !== null && filteredProjects?.length === 0;
 
   if (projects === undefined) {
     return <Loading />;
@@ -96,7 +97,8 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
           <div className="mt-2 space-y-5 mx-4">
             {availableTechs.map((tech) => {
               const techInfo = getTechInfo(tech);
-              const isSelected = selectedTechs.includes(tech);
+              const isSelected =
+                selectedTechs === null || selectedTechs.includes(tech);
 
               return (
                 <button
@@ -171,9 +173,7 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
       {/* Left Sidebar - Desktop: Fixed, Mobile: Overlay */}
       <div
         className={`
-        ${/* Desktop styles */ ""}
         md:w-[360px] md:border-r md:border-gray-700 md:flex md:flex-col md:h-full md:relative md:transform-none md:transition-none
-        ${/* Mobile styles */ ""}
         fixed top-0 left-0 h-full w-[360px] bg-slate-900 border-r border-gray-700 flex flex-col z-50 transform transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}
@@ -215,7 +215,8 @@ const ProjectsView = ({ username }: ProjectsViewProps) => {
                 >
                   <PanelRight size={20} />
                 </Button>
-                {selectedTechs.length === availableTechs.length ? (
+                {selectedTechs === null ||
+                selectedTechs.length === availableTechs.length ? (
                   <span className="text-gray-400 text-sm">_all-stacks</span>
                 ) : (
                   <span className="text-gray-400 text-sm">

@@ -1,5 +1,9 @@
 # DevFolio
 
+<img width="1485" height="1059" alt="devfolio" src="https://github.com/user-attachments/assets/f0f9c8b5-abdb-4a17-af94-71dc704f4f81" />
+
+<br />
+
 <div>
     <img src="https://img.shields.io/badge/-React-black?style=for-the-badge&logoColor=white&logo=react&color=61DAFB" alt="react" />
     <img src="https://img.shields.io/badge/-Next_JS-black?style=for-the-badge&logoColor=white&logo=nextdotjs&color=000000" alt="nextjs" />

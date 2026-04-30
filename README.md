@@ -38,34 +38,34 @@ DevFolio is a modern web application that transforms the traditional resume into
 ## <a name="features">🕹️ Features</a>
 
 ### Profile Creation & Management
-👉 **Comprehensive profile builder** – Create detailed profiles including bio, work experience, education, skills, and projects.  
-👉 **Terminal-style interface** – Build your profile using an intuitive CLI-inspired interface for a unique developer experience.  
-👉 **Live editing & updates** – See changes in real-time powered by Convex's reactive database.
-👉 **Custom confirmation emails** – Personalized email notifications using Resend.
+👉 **Comprehensive profile builder** – Create detailed profiles including bio, work experience, education, skills, and projects. <br />
+👉 **Terminal-style interface** – Build your profile using an intuitive CLI-inspired interface for a unique developer experience. <br />
+👉 **Live editing & updates** – See changes in real-time powered by Convex's reactive database. <br />
+👉 **Custom confirmation emails** – Personalized email notifications using Resend. <br />
 
 ### Security & Authentication
-👉 **Secure authentication** – Safe sign-up and sign-in process managed by Clerk.    
+👉 **Secure authentication** – Safe sign-up and sign-in process managed by Clerk. <br />
 
 ### Sharing & Discovery
-👉 **Shareable portfolios** – Share your profile with a personalized username URL.  
-👉 **Browse developer portfolios** – Discover and explore profiles of other talented developers.  
-👉 **Contact functionality** – Allow visitors to send emails directly to portfolio owners.  
+👉 **Shareable portfolios** – Share your profile with a personalized username URL. <br />
+👉 **Browse developer portfolios** – Discover and explore profiles of other talented developers. <br />
+👉 **Contact functionality** – Allow visitors to send emails directly to portfolio owners. <br />
+👉 **Download as CV/Resume** – Export your portfolio as a professional PDF resume or CV. <br />
 
 ### Future Features
 
 #### AI-Powered Enhancement
-🚀 Skills showcase – Add and display technical skills, tools, and technologies with proficiency levels.
-🚀 Blog integration – Write and publish blog posts directly on your portfolio to share knowledge and insights.
-🚀 **AI-enhanced writing** – Leverage AI to improve resume content, optimize descriptions, and enhance professional writing.  
+🚀 **Skills showcase** – Add and display technical skills, tools, and technologies with proficiency levels. <br />
+🚀 **Blog integration** – Write and publish blog posts directly on your portfolio to share knowledge and insights. <br />
+🚀 **AI-enhanced writing** – Leverage AI to improve resume content, optimize descriptions, and enhance professional writing. <br />
 
 #### Advanced Customization
-🚀 **Theme customization** – Choose from multiple themes or create custom color schemes.  
-🚀 **Privacy controls** – Hide specific sections or make your portfolio private.  
-🚀 **Notification system** – Get notified when employers view or interact with your portfolio.  
+🚀 **Theme customization** – Choose from multiple themes or create custom color schemes. <br />
+🚀 **Privacy controls** – Hide specific sections or make your portfolio private. <br />
+🚀 **Notification system** – Get notified when employers view or interact with your portfolio. <br />
 
 #### Export & Analytics
-🚀 **Download as CV/Resume** – Export your portfolio as a professional PDF resume or CV.  
-🚀 **Analytics dashboard** – Track portfolio views, visitor insights, and profile performance metrics.  
+🚀 **Analytics dashboard** – Track portfolio views, visitor insights, and profile performance metrics. <br />
 
 ## <a name="quick-start">🤸 Quick Start</a>
 
